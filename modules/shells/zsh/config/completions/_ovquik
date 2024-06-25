@@ -1,0 +1,12 @@
+#compdef ovquik
+
+_arguments '-s[status]'
+_arguments '-d[disconnect]'
+_arguments '-c[connect]::Server:->servers'
+case "$state" in
+    servers)
+        local -a servers_list
+        servers_list=( `cd $OVPN_ROOT && ls *.ovpn | awk -F '-' '{print $3}' | tr ' ' '-'` )
+        _multi_parts / servers_list
+        ;;
+esac

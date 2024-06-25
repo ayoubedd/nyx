@@ -1,0 +1,16 @@
+mode=drun
+normal_window=false
+no_actions=true
+matching=contains
+gtk_dark=true
+filter_rate=250
+allow_images=true
+allow_markup=true
+image_size=32px
+drun-display_generic=true
+dynamic_lines=true
+term=alacritty
+insensitive=true
+prompt=Search
+width=550
+hide_scroll=true

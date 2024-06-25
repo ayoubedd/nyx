@@ -1,0 +1,83 @@
+# Global variables
+set {
+  $mod Mod4
+  $left h
+  $right l
+  $up k
+  $down j
+
+  $cursor Catppuccin-Teal-Cursors
+  $cursor_size 22
+
+  $font_name Cantarell Bold
+  $font_size 12
+
+  $term alacritty
+  $term_floating $term --class floating-alacritty --title 'Floating Alacritty'
+  $action ~/.local/bin/sway_action
+  # $launcher ~/.local/bin/app_launcher
+  $launcher wofi
+  $execmd ~/.local/bin/execmd
+  $dragdrop ~/.local/bin/dragdrop
+  $file_manager $term --class floating-alacritty --title 'lf' -e 'lf'
+  $window_picker ~/.local/bin/window_picker
+  $clipboard_mngr cliphist list | wofi -d | cliphist decode | wtype -s 600 -
+  $color_picker wl-color-picker clipboard
+  $emoji_picker wofi-emoji | wl-copy
+  $lock_screen swaylock -f
+  $snaparea grim -g "$(slurp)" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | wl-copy -t 'image/png'
+  $snapfull grim -g "$(slurp -o)" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | wl-copy -t 'image/png'
+
+  # Sound
+  $volume_up pactl set-sink-volume @DEFAULT_SINK@ +5%
+  $volume_down pactl set-sink-volume @DEFAULT_SINK@ -5%
+  $volume_mute_toggle pactl set-sink-mute @DEFAULT_SINK@ toggle
+  $player_play_toggle playerctl play-pause
+  $player_next playerctl next
+  $player_prev playerctl previous
+
+  # Screen
+  $screen_brightness_up brightnessctl set +5% && notify-send "Brightness" "Brightness: $(brightnessctl | grep -Eo '[0-9]+%')"
+  $screen_brightness_down brightnessctl set 5%- && notify-send "Brightness" "Brightness: $(brightnessctl | grep -Eo '[0-9]+%')"
+
+  $wallpaper ~/Pictures/Wallpapers/wallpaper.png
+}
+
+# Waybar
+bar {
+  swaybar_command waybar
+}
+
+# Daemons and dbus/systemd envs
+exec {
+  kanshi
+  systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+  dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP=sway
+  mako
+  ~/.local/bin/import-gsettings
+  wl-paste --watch cliphist -max-items 100 store
+}
+
+# General Settings
+default_orientation horizontal
+font pango:$font_name $font_size
+default_floating_border pixel 2px
+output * bg $wallpaper fill
+hide_edge_borders smart
+default_border pixel 2
+#xwayland disable
+smart_gaps off
+gaps inner 0
+gaps outer 0
+
+# Cursor
+seat * xcursor_theme $cursor $cursor_size
+focus_follows_mouse no
+
+# Import theme colors
+include themes/catppuccin-mocha
+
+# Load configs
+include ~/.config/sway/conf.d/*
+
+# vi: ft=swayconfig

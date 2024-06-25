@@ -1,0 +1,64 @@
+# App rules
+
+for_window [app_id="blueman-manager"] {
+  floating enable
+  resize set 700 500
+}
+
+for_window [app_id="pavucontrol"] {
+  floating enable
+  resize set 700 500
+}
+
+for_window [app_id="floating-alacritty"] {
+  floating enable
+  resize set 900 600
+}
+
+for_window [app_id="thunar"] {
+  floating enable
+  resize set 900 600
+}
+
+for_window [app_id="nm-connection-editor"] {
+  floating enable
+  resize set 900 600
+}
+
+for_window [title="Picture[- ]in[- ][Pp]icture"] {
+  floating enable
+  resize set 400 250
+  sticky enable
+  move position 1500px 20px
+}
+
+for_window [title=".*Bitwarden.*"] {
+  floating enable
+}
+
+for_window [app_id="firefox"] focus_on_window_activation urgent
+for_window [app_id="firefox" title="About Mozilla Firefox"] floating enable
+for_window [app_id="firefox" title="Library"] floating enable
+for_window [app_id="firefox" title="Firefox — Sharing Indicator"] floating enable
+
+for_window [app_id="Windscribe"] floating enable
+for_window [app_id="xfce-polkit"] floating enable
+
+for_window [app_id="io.github.kaii_lb.Overskride"] {
+  floating enable
+  resize set 1200 800
+}
+
+
+for_window [app_id="xdg-desktop-portal-gtk"] {
+  floating enable
+  resize set 1200 800
+}
+
+# Apps default workspace
+# assign [app_id="^Alacritty$"] 1
+assign [app_id="firefox"] 2
+assign [app_id="neovide"] 3
+assign [app_id="org.qbittorrent.qBittorrent"] 5
+
+# vi: ft=swayconfig

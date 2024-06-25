@@ -1,0 +1,61 @@
+# resize mode
+mode "mode_resize" {
+  bindsym {
+    $left resize shrink width 10px
+    $down resize grow height 10px
+    $up resize shrink height 10px
+    $right resize grow width 10px
+  }
+
+  bindsym Escape mode "default"
+}
+
+bindsym $mod+r mode "mode_resize"
+
+
+
+# Snap mode
+mode "mode_snap" {
+  bindsym {
+    a mode default, exec $snaparea
+    f mode default, exec $snapfull
+  }
+
+  bindsym Escape mode "default"
+}
+
+bindsym $mod+p mode "mode_snap"
+
+
+# Vim mode
+mode "mode_vim" {
+  bindsym {
+    h exec wtype -k left
+    j exec wtype -k down
+    k exec wtype -k up
+    l exec wtype -k right
+    0 exec wtype -k home
+    dollar exec wtype -k end
+    Ctrl+u exec wtype -k pageup
+    Ctrl+d exec wtype -k pagedown
+  }
+
+  bindsym Escape mode "default"
+}
+
+bindsym $mod+n mode "mode_vim"
+
+
+# Vim mode
+mode "split_mode" {
+  bindsym {
+    v split v
+    h split h
+  }
+
+  bindsym Escape mode "default"
+}
+
+bindsym $mod+s mode "split_mode"
+
+# vi: ft=swayconfig

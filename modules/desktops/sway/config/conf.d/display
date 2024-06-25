@@ -1,0 +1,7 @@
+output eDP-1 {
+  scale 2
+  render_bit_depth 8
+  adaptive_sync on
+} 
+
+# vi: ft=swayconfig
