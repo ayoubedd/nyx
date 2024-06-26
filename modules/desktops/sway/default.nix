@@ -42,25 +42,21 @@
     };
 
     iconTheme = {
-      name = "elementary-Xfce-dark";
-      package = pkgs.elementary-xfce-icon-theme;
+      package = (pkgs.colloid-icon-theme.override { schemeVariants = ["nord"]; });
+      name = "Colloid-nord-dark";
     };
 
     theme = {
-      name = "zukitre-dark";
-      package = pkgs.zuki-themes;
+      package = (pkgs.colloid-gtk-theme.override { tweaks = [ "nord" ]; colorVariants = [ "dark" ]; });
+      name = "Colloid-Dark-Nord";
     };
 
     gtk3.extraConfig = {
-      Settings = ''
-        gtk-application-prefer-dark-theme=1
-      '';
+      gtk-application-prefer-dark-theme = 1;
     };
 
     gtk4.extraConfig = {
-      Settings = ''
-        gtk-application-prefer-dark-theme=1
-      '';
+      gtk-application-prefer-dark-theme = 1;
     };
   };
 
