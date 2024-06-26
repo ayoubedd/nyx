@@ -2,11 +2,12 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, inputs, hostname ? "nixos", ... }@args:
+{ config, lib, pkgs, inputs, hostname ? "nixos", nixos-hardware, ... }@args:
 
 {
   imports = [
     ./hardware-configuration.nix
+    nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
   ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];

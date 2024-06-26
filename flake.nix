@@ -2,13 +2,14 @@
   description = "My personal NixOS/User configuration";
 
   inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
+  inputs.nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   inputs.home-manager = {
     url = "github:nix-community/home-manager";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nixos-hardware, ... }@inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
@@ -21,6 +22,7 @@
         x1 = lib.nixosSystem {
           specialArgs = {
             inherit inputs;
+            inherit nixos-hardware;
             hostname = "x1";
           };
           modules = [ ./hosts/x1 ];
