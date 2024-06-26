@@ -45,9 +45,11 @@
   programs.dconf.enable = true;
 
   # Services
+
   services = {
     openssh.enable = true;
     devmon.enable = true;
+    gnome.gnome-keyring.enable = true;
 
     pipewire = {
       enable = true;
@@ -72,6 +74,9 @@
   };
 
   security.polkit.enable = true;
+  programs.sway.enable = true;
+  # security.pam.swaylock = {};
+
   systemd = {
     user.services.polkit-gnome-authentication-agent-1 = {
       description = "polkit-gnome-authentication-agent-1";
