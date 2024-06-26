@@ -42,7 +42,7 @@
     };
 
     iconTheme = {
-      package = (pkgs.colloid-icon-theme.override { schemeVariants = ["nord"]; });
+      package = (pkgs.colloid-icon-theme.override { schemeVariants = [ "nord" ]; });
       name = "Colloid-nord-dark";
     };
 
