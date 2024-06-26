@@ -6,8 +6,6 @@
     mpv
     zathura
 
-    (ldm.override { mountPath = "/mnt/"; })
-
     yazi
 
     # CMD
@@ -32,8 +30,6 @@
     axel
 
     delta
-    #papirus-icon-theme
-    fprintd
     fx
     thermald
     lazygit
@@ -46,9 +42,6 @@
     sof-firmware
     wireguard-tools
     procps
-    catppuccin-cursors.mochaMauve
     ripdrag
-    ldm
-    overskride
   ];
 }
