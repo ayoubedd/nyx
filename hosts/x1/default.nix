@@ -8,24 +8,14 @@
   imports = [
     ./hardware-configuration.nix
     nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
+    ../../modules/nixos/common.nix
   ];
-
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = hostname;
-  networking.networkmanager.enable = true;
 
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-  };
-
-  networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ ];
-  networking.firewall.allowedUDPPorts = [ ];
 
   # Set your time zone.
   time.timeZone = "Africa/Casablanca";
@@ -36,7 +26,6 @@
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
-    #driSupport32Bit = true;
     extraPackages = with pkgs; [
       intel-media-driver
     ];
@@ -45,21 +34,7 @@
   programs.dconf.enable = true;
 
   # Services
-
   services = {
-    openssh.enable = true;
-    devmon.enable = true;
-    gnome.gnome-keyring.enable = true;
-
-    pipewire = {
-      enable = true;
-      pulse.enable = true;
-    };
-
-    blueman.enable = true;
-
-    libinput.enable = true;
-
     greetd = {
       enable = true;
       settings = {
@@ -69,8 +44,6 @@
         };
       };
     };
-
-    flatpak.enable = true;
   };
 
   security.polkit.enable = true;

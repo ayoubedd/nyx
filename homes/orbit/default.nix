@@ -5,11 +5,11 @@
     ./files.nix
     ./fonts.nix
 
-    ../../modules/desktops/sway
+    ../../modules/home-manager/desktops/sway
 
-    ../../modules/editors/neovim
-    ../../modules/terminals/alacritty
-    ../../modules/shells/zsh
+    ../../modules/home-manager/editors/neovim
+    ../../modules/home-manager/terminals/alacritty
+    ../../modules/home-manager/shells/zsh
   ];
 
   home.sessionVariables = import ./vars.nix;
