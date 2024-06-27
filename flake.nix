@@ -3,15 +3,17 @@
 
   inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+  inputs.flake-utils.url = "github:numtide/flake-utils";
   inputs.home-manager = {
     url = "github:nix-community/home-manager";
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-hardware, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nixos-hardware, flake-utils, ... }@inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
+      local-lib = import ./lib { inherit flake-utils; };
     in
     {
       # Hosts configurations
@@ -35,6 +37,11 @@
         };
       };
 
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
+      formatter = local-lib.forAllSystems (system:
+        let
+            pkgs = import nixpkgs { inherit system; };
+        in
+          pkgs.nixpkgs-fmt
+      );
     };
 }
