@@ -9,9 +9,10 @@
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-hardware, flake-utils, ... }@inputs:
+  outputs = { self, ... }@inputs:
     let
       inherit (self) outputs;
+      inherit (inputs) nixpkgs home-manager nixos-hardware flake-utils;
       lib = nixpkgs.lib // home-manager.lib;
       local-lib = import ./lib { inherit flake-utils; };
     in
@@ -39,9 +40,9 @@
 
       formatter = local-lib.forAllSystems (system:
         let
-            pkgs = import nixpkgs { inherit system; };
+          pkgs = import nixpkgs { inherit system; };
         in
-          pkgs.nixpkgs-fmt
+        pkgs.nixpkgs-fmt
       );
     };
 }
