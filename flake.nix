@@ -8,21 +8,18 @@
     inputs.nixpkgs.follows = "nixpkgs";
   };
 
-
   outputs = { self, nixpkgs, home-manager, nixos-hardware, ... }@inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
     in
     {
-
       # Hosts configurations
       nixosConfigurations = {
         # Personal laptop
         x1 = lib.nixosSystem {
           specialArgs = {
-            inherit inputs;
-            inherit nixos-hardware;
+            inherit inputs nixos-hardware;
             hostname = "x1";
           };
           modules = [ ./hosts/x1 ];
@@ -34,11 +31,10 @@
         orbit = lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           extraSpecialArgs = { inherit inputs outputs; };
-          modules = [
-            ./homes/orbit
-          ];
+          modules = [ ./homes/orbit ];
         };
       };
+
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
     };
 }
