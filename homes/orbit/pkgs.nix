@@ -6,6 +6,7 @@
     mpv
     zathura
 
+    pulseaudio
     yazi
 
     # CMD
