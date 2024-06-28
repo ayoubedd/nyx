@@ -7,7 +7,7 @@ export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 export WORDCHARS=${WORDCHARS//\//}
 
 # SSH Agent socket
-export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gcr/ssh"
+export SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
 
 # Include volta in path
 export VOLTA_HOME="$XDG_DATA_HOME/volta"

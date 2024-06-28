@@ -1,8 +1,13 @@
 {
-  blueman-applet.enable = true;
+  services.blueman-applet.enable = true;
 
-  cliphist = {
+  services.cliphist = {
     enable = true;
     allowImages = true;
+  };
+
+  services.gnome-keyring = {
+    enable = true;
+    components = ["secrets" "ssh"];
   };
 }

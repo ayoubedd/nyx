@@ -4,6 +4,7 @@
     ./pkgs.nix
     ./files.nix
     ./fonts.nix
+    ./services.nix
 
     ../../modules/home-manager/desktops/sway
 

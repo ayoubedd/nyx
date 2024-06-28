@@ -7,7 +7,10 @@
     zathura
 
     pulseaudio
+    gnome.seahorse
     yazi
+    file
+    killall
 
     # CMD
     btop
@@ -20,6 +23,8 @@
     bat
     eza
     python3
+    ripgrep
+    fd
 
     pavucontrol
 
