@@ -4,50 +4,37 @@
     firefox
     qbittorrent
     mpv
+    ripdrag
     zathura
-
-    pulseaudio
+    pavucontrol
     gnome.seahorse
+
+    # CMD
     yazi
     file
     killall
-
-    # CMD
     btop
-    vim
     wget
     curl
-    bat
+    axel
     git
     tree
     bat
     eza
-    python3
     ripgrep
     fd
-
-    pavucontrol
-
+    procps
     zip
     unzip
+    p7zip
     github-cli
     glow
-    bear
-    axel
-
     delta
-    fx
-    thermald
     lazygit
-    lynx
     exiftool
     atool
     nettools
-    p7zip
     nftables
     sof-firmware
-    wireguard-tools
-    procps
-    ripdrag
   ];
 }
