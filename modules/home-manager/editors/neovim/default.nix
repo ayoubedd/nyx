@@ -1,11 +1,11 @@
 { pkgs, ... }: {
-  programs.neovim.enable = true;
+  programs.neovim = with pkgs; {
+    enable = true;
+    extraPackages = [ nodejs gcc git cargo ];
+  };
 
   home.file.".config/nvim" = {
     source = ./nvim;
     recursive = true;
   };
-
-  # GCC required to compile tree-sitter highlight's
-  home.packages = with pkgs; [ gcc ];
 }

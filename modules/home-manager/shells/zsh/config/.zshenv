@@ -1,7 +1,10 @@
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_STATE_HOME="$HOME/.local/state"
+# Environment variables
+. "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+
+# Only source this once
+if [[ -z "$__HM_ZSH_SESS_VARS_SOURCED" ]]; then
+  export __HM_ZSH_SESS_VARS_SOURCED=1
+fi
 
 export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 export WORDCHARS=${WORDCHARS//\//}
