@@ -36,5 +36,6 @@
     nettools
     nftables
     sof-firmware
+    bind # for dig
   ];
 }
