@@ -3,6 +3,7 @@
   imports = [
     ./fonts.nix
     ./services.nix
+    ./scripts.nix
 
     ../applets/wofi
     ../applets/waybar
@@ -20,6 +21,8 @@
     slurp
     grim
     wtype
+    wofi-emoji
+    jq
   ];
 
   wayland.windowManager.sway = {
