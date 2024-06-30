@@ -1,7 +1,6 @@
 { pkgs, ... }@args: {
   home.packages = with pkgs; [
     # GUI
-    firefox
     qbittorrent
     mpv
     ripdrag
