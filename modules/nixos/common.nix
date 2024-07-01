@@ -8,4 +8,6 @@
     ./users.nix
     ./power.nix
   ];
+
+  security.rtkit.enable = true;
 }

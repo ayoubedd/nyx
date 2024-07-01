@@ -4,6 +4,7 @@
     ./fonts.nix
     ./services.nix
     ./scripts.nix
+    ./config.nix
 
     ../applets/wofi
     ../applets/waybar
@@ -24,23 +25,6 @@
     wofi-emoji
     jq
   ];
-
-  programs.dconf.enable = true;
-
-  wayland.windowManager.sway = {
-    enable = true;
-    systemd.enable = true;
-    wrapperFeatures = {
-      gtk = true;
-      base = true;
-    };
-  };
-
-  xdg.configFile."sway" = {
-    enable = true;
-    source = ./config;
-    recursive = true;
-  };
 
   gtk = {
     enable = true;
@@ -80,32 +64,8 @@
     };
   };
 
-  xdg.portal = {
+  services.gnome-keyring = {
     enable = true;
-    extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr ];
-    xdgOpenUsePortal = true;
-    config = {
-      common = {
-        default = [
-          "gtk"
-        ];
-      };
-      # pantheon = {
-      #   default = [
-      #     "pantheon"
-      #     "gtk"
-      #   ];
-      #   "org.freedesktop.impl.portal.Secret" = [
-      #     "gnome-keyring"
-      #   ];
-      # };
-      # x-cinnamon = {
-      #   default = [
-      #     "xapp"
-      #     "gtk"
-      #   ];
-      # };
-    };
   };
 
   services.poweralertd.enable = true;

@@ -17,13 +17,12 @@
   boot.binfmt.emulatedSystems = [
     "wasm32-wasi"
     "aarch64-linux"
-    "aarch32-linux"
     "riscv64-linux"
     "riscv32-linux"
   ];
 
+  programs.nix-ld.enable = true;
   networking.hostName = hostname;
-
 
   # Set your time zone.
   time.timeZone = "Africa/Casablanca";
@@ -45,11 +44,19 @@
       enable = true;
       settings = {
         default_session = {
-          command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd sway";
+          command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd ${pkgs.sway}/bin/sway";
           user = "greeter";
         };
       };
     };
+  };
+
+  programs.dconf.enable = true;
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr ];
+    config.common.default = "wlr";
   };
 
   security.polkit.enable = true;
@@ -71,6 +78,7 @@
     };
   };
 
+  programs.zsh.enable = true;
   users.users.orbit = with pkgs; {
     initialPassword = "toor";
     isNormalUser = true;
@@ -90,6 +98,7 @@
     vim
     curl
     qemu
+    qt5.qtwayland
   ];
 
   system.stateVersion = "24.11";
