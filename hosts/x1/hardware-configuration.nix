@@ -14,6 +14,17 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
+  boot.kernelParams = [
+    "quiet"
+    "loglevel=3"
+    "systemd.show_status=auto"
+    "rd.udev.log_level=3"
+
+    "i915.modeset=1"
+    "i915.enable_psr=0"
+    "i915.fastboot=1"
+  ];
+
   fileSystems."/" =
     {
       device = "/dev/disk/by-uuid/3df7578c-8353-4de7-a255-ad43d16fb67b";
