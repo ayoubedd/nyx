@@ -9,5 +9,6 @@
     ./power.nix
   ];
 
-  security.rtkit.enable = true;
+  security.rtkit.enable = true; # For processs niceness and priority adjusment through dbus, used by browsers.
+  services.fprintd.enable = true;
 }

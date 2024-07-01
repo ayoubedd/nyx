@@ -57,7 +57,10 @@
     enable = true;
     extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr ];
     config.common.default = "wlr";
+    xdgOpenUsePortal = true;
   };
+
+  xdg.terminal-exec.enable = true;
 
   security.polkit.enable = true;
   programs.sway.enable = true;
@@ -87,6 +90,7 @@
   };
 
   virtualisation.docker = {
+    autoPrune.enable = true;
     enable = true;
     rootless = {
       enable = true;
