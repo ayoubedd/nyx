@@ -73,7 +73,6 @@ in
       screen_brightness_up = "${brightnessctl} set +5% && notify-send \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%')\"";
       screen_brightness_down = "${brightnessctl} set 5%- && notify-send \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%');\"";
 
-      wallpaper = "~/Pictures/Wallpapers/wallpaper.png";
 
       font_name = "Cantarell Bold";
       font_size = 12;
@@ -277,7 +276,14 @@ in
       ];
     };
 
-  # wayland.windowManager.sway.extraConfigEarly = '''';
+  wayland.windowManager.sway.extraConfig =
+    let
+      wallpaper = ./wallpapers/wallpaper.png;
+    in
+    ''
+      output * bg ${wallpaper} fill
+    '';
+
   wayland.windowManager.sway.extraSessionCommands = ''
     export QT_QPA_PLATFORM=wayland
     export QT_QPA_PLATFORMTHEME=qt6ct
