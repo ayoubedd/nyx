@@ -283,6 +283,8 @@ in
     in
     ''
       output * bg ${wallpaper} fill
+      default_floating_border pixel 2
+      titlebar_border_thickness 0
     '';
 
   wayland.windowManager.sway.extraSessionCommands = ''
