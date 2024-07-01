@@ -5,5 +5,6 @@
     gnome.gnome-keyring.enable = true;
     libinput.enable = true;
     flatpak.enable = true;
+    blueman.enable = true;
   };
 }
