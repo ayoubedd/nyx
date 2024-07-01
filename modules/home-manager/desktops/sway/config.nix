@@ -1,4 +1,12 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+let
+  gen_floating_rule = { criteria, height, width }:
+    [{
+      inherit criteria;
+      command = "floating enable, resize set ${toString width} ${toString height}";
+    }];
+in
+{
   wayland.windowManager.sway = {
     enable = true;
     systemd.enable = true;
@@ -236,18 +244,6 @@
       window.border = 2;
       window.commands = [
         {
-          command = "floating enable";
-          criteria = {
-            app_id = ".blueman-manager-wrapped";
-          };
-        }
-        {
-          command = "resize set 700 500";
-          criteria = {
-            app_id = ".blueman-manager-wrapped";
-          };
-        }
-        {
           command = "inhibit_idle focus";
           criteria = {
             app_id = "mpv";
@@ -259,7 +255,16 @@
             app_id = "firefox";
           };
         }
-      ];
+      ]
+      ++ (gen_floating_rule { criteria.app_id = ".blueman-manager-wrapped"; width = 700; height = 500; })
+      ++ (gen_floating_rule { criteria.app_id = "pavucontrol"; width = 700; height = 500; })
+      ++ (gen_floating_rule { criteria.app_id = "floating-alacritty"; width = 900; height = 600; })
+      ++ (gen_floating_rule { criteria.title = ".*Bitwarden.*"; width = 350; height = 600; })
+      ++ (gen_floating_rule { criteria.app_id = "nm-connection-editor"; width = 700; height = 500; })
+      ++ (gen_floating_rule { criteria.app_id = "seahorse"; width = 900; height = 700; })
+      ++ (gen_floating_rule { criteria.app_id = "org.gnome.Nautilus"; width = 900; height = 700; });
+
+
 
       startup = [
         { command = "${firefox}"; }
