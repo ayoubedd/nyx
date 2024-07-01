@@ -53,7 +53,7 @@ in
 
       floating_term = "${term} --class floating-alacritty --title 'Floating Alacritty'";
       file_manager = "${term} --class floating-alacritty --title '${yazi}' -e 'yazi'";
-      clipboard_mngr = "${cliphist}/bin/cliphist list | ${wofi}/bin/wofi -d | cliphist decode | wl-copy";
+      clipboard_mngr = "${cliphist} list | ${wofi} -d | ${cliphist} decode | ${wl-copy}";
 
       color_picker = "${wl-color-picker} clipboard";
       emoji_picker = "${wofi-emoji}";
@@ -267,6 +267,7 @@ in
 
 
       startup = [
+        { command = "${cliphist} wipe"; }
         { command = "${firefox}"; }
         { command = "${waybar}"; }
         {
