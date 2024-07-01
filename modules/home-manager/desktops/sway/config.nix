@@ -44,6 +44,7 @@ in
       pactl = "${pkgs.pulseaudio}/bin/pactl";
       brightnessctl = "${pkgs.brightnessctl}/bin/brightnessctl";
       wofi-emoji = "${pkgs.wofi-emoji}/bin/wofi-emoji";
+      notify-send = "${pkgs.libnotify}/bin/notify-send";
 
       launcher = "~/.local/bin/app_launcher";
       execmd = "~/.local/bin/execmd";
@@ -70,8 +71,8 @@ in
       player_prev = "${playerctl} previous";
 
       # Screen;
-      screen_brightness_up = "${brightnessctl} set +5% && notify-send \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%')\"";
-      screen_brightness_down = "${brightnessctl} set 5%- && notify-send \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%');\"";
+      screen_brightness_up = "${brightnessctl} set +5% && ${notify-send} \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%')\"";
+      screen_brightness_down = "${brightnessctl} set 5%- && ${notify-send} \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%');\"";
 
 
       font_name = "Cantarell Bold";
