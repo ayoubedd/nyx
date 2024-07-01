@@ -22,6 +22,7 @@
       "extensions.activeThemeID" = "firefox-compact-dark@mozilla.org";
       "browser.search.suggest.enabled" = false;
       "browser.urlbar.suggest.searches" = false;
+      "view_source.wrap_long_lines" = true;
     };
 
     search.engines =

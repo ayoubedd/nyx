@@ -6,7 +6,6 @@
     ripdrag
     zathura
     pavucontrol
-    gnome.seahorse
 
     # CMD
     yazi
