@@ -35,6 +35,7 @@
       playerctl = "${pkgs.playerctl}/bin/playerctl";
       pactl = "${pkgs.pulseaudio}/bin/pactl";
       brightnessctl = "${pkgs.brightnessctl}/bin/brightnessctl";
+      wofi-emoji = "${pkgs.wofi-emoji}/bin/wofi-emoji";
 
       launcher = "~/.local/bin/app_launcher";
       execmd = "~/.local/bin/execmd";
@@ -45,7 +46,6 @@
       floating_term = "${term} --class floating-alacritty --title 'Floating Alacritty'";
       file_manager = "${term} --class floating-alacritty --title '${yazi}' -e 'yazi'";
       clipboard_mngr = "${cliphist}/bin/cliphist list | ${wofi}/bin/wofi -d | cliphist decode | wl-copy";
-      wofi-emoji = "${pkgs.wofi-emoji}/bin/wofi-emoji";
 
       color_picker = "${wl-color-picker} clipboard";
       emoji_picker = "${wofi-emoji}";
