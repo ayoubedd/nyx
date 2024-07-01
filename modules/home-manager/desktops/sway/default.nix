@@ -25,12 +25,19 @@
     jq
   ];
 
+  programs.dconf.enable = true;
+
   wayland.windowManager.sway = {
     enable = true;
     systemd.enable = true;
+    wrapperFeatures = {
+      gtk = true;
+      base = true;
+    };
   };
 
-  home.file.".config/sway" = {
+  xdg.configFile."sway" = {
+    enable = true;
     source = ./config;
     recursive = true;
   };
@@ -72,4 +79,34 @@
       createDirectories = true;
     };
   };
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr ];
+    xdgOpenUsePortal = true;
+    config = {
+      common = {
+        default = [
+          "gtk"
+        ];
+      };
+      # pantheon = {
+      #   default = [
+      #     "pantheon"
+      #     "gtk"
+      #   ];
+      #   "org.freedesktop.impl.portal.Secret" = [
+      #     "gnome-keyring"
+      #   ];
+      # };
+      # x-cinnamon = {
+      #   default = [
+      #     "xapp"
+      #     "gtk"
+      #   ];
+      # };
+    };
+  };
+
+  services.poweralertd.enable = true;
 }

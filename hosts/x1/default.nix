@@ -14,6 +14,14 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  boot.binfmt.emulatedSystems = [
+    "wasm32-wasi"
+    "aarch64-linux"
+    "aarch32-linux"
+    "riscv64-linux"
+    "riscv32-linux"
+  ];
+
   networking.hostName = hostname;
 
 
@@ -31,8 +39,6 @@
     ];
   };
 
-  programs.dconf.enable = true;
-
   # Services
   services = {
     greetd = {
@@ -48,7 +54,6 @@
 
   security.polkit.enable = true;
   programs.sway.enable = true;
-  # security.pam.swaylock = {};
 
   systemd = {
     user.services.polkit-gnome-authentication-agent-1 = {
@@ -66,13 +71,6 @@
     };
   };
 
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr ];
-    config.common.default = "gtk";
-  };
-
-  programs.zsh.enable = true;
   users.users.orbit = with pkgs; {
     initialPassword = "toor";
     isNormalUser = true;
@@ -90,7 +88,6 @@
 
   environment.systemPackages = with pkgs; [
     vim
-    wget
     curl
     qemu
   ];
