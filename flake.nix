@@ -8,8 +8,14 @@
     url = "github:nix-community/home-manager";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.nur.url = "github:nix-community/NUR";
 
-  outputs = { self, ... }@inputs:
+  inputs.firefox-addons = {
+    url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = { self, firefox-addons, ... }@inputs:
     let
       inherit (self) outputs;
       inherit (inputs) nixpkgs home-manager nixos-hardware flake-utils;
@@ -31,9 +37,12 @@
 
       # Home configurations
       homeConfigurations = {
-        orbit = lib.homeManagerConfiguration {
+        orbit = lib.homeManagerConfiguration rec {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-          extraSpecialArgs = { inherit inputs outputs; };
+          extraSpecialArgs = {
+            inherit inputs outputs;
+            system = "x86_64-linux";
+          };
           modules = [ ./homes/orbit ];
         };
       };
