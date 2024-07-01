@@ -98,7 +98,7 @@ in
         eDP-1 = {
           # bg = "~/path/to/background.png fill";
           scale = "2";
-          render_bit_depth = "10";
+          render_bit_depth = "8";
           adaptive_sync = "on";
         };
 
