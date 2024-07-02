@@ -229,6 +229,16 @@
     enable = true;
   };
 
+  home.pointerCursor = {
+    size = 24;
+    name = "volantes_cursors";
+    package = pkgs.volantes-cursors;
+    x11 = {
+      enable = true;
+      defaultCursor = "volantes_cursors";
+    };
+  };
+
   services.poweralertd.enable = true;
 }
 

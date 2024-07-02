@@ -7,6 +7,11 @@ let
     }];
 in
 {
+
+  home.packages = with pkgs; [
+    volantes-cursors # Cursor Theme
+  ];
+
   wayland.windowManager.sway = {
     enable = true;
     systemd.enable = true;
@@ -77,6 +82,9 @@ in
 
       font_name = "Cantarell Bold";
       font_size = 12;
+
+      cursor_theme = "volantes_cursors";
+      cursor_size = 24;
     in
     {
       modifier = mod;
@@ -107,6 +115,7 @@ in
       seat = {
         "*" = {
           hide_cursor = "when-typing enable";
+          xcursor_theme = "${cursor_theme} ${toString cursor_size}";
         };
       };
 
