@@ -128,9 +128,6 @@
           Locked = true;
         };
       };
-      SearchEngines = {
-        PreventInstalls = true;
-      };
       ShowHomeButton = false;
       StartDownloadsInTempDirectory = true;
     };
