@@ -12,7 +12,8 @@
     ../../modules/home-manager/editors/neovim
     ../../modules/home-manager/terminals/alacritty
     ../../modules/home-manager/shells/zsh
-    ../../modules/home-manager/media-players/mpv
+    ../../modules/home-manager/media/mpv
+    ../../modules/home-manager/mux/zellij
 
     ./git.nix
   ];
