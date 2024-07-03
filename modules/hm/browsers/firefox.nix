@@ -27,9 +27,12 @@
     };
 
     search.force = true;
+    search.default = "Google";
 
     search.engines =
       {
+        "Google".metaData.alias = "@g"; # builtin engines only support specifying one additional alias
+
         "Nix Packages" = {
           urls = [{
             template = "https://search.nixos.org/packages";
@@ -39,23 +42,36 @@
             ];
           }];
           definedAliases = [ "@np" ];
+          iconUpdateURL = "https://search.nixos.org/favicon.png";
+          updateInterval = 24 * 60 * 60 * 1000; # every day
         };
 
         "NixOS Wiki" = {
           urls = [{ template = "https://wiki.nixos.org/index.php?search={searchTerms}"; }];
-          iconUpdateURL = "https://wiki.nixos.org/favicon.png";
+          iconUpdateURL = "https://wiki.nixos.org/favicon.ico";
           updateInterval = 24 * 60 * 60 * 1000; # every day
           definedAliases = [ "@nw" ];
         };
 
+
+        "Github" = {
+          urls = [{ template = "https://github.com/search?q={searchTerms}"; }];
+          iconUpdateURL = "https://github.com/favicon.ico";
+          updateInterval = 24 * 60 * 60 * 1000; # every day
+          definedAliases = [ "@gh" ];
+        };
+
+        "YouTube" = {
+          urls = [{ template = "https://www.youtube.com/results?search_query={searchTerms}"; }];
+          iconUpdateURL = "https://www.youtube.com/favicon.ico";
+          updateInterval = 24 * 60 * 60 * 1000; # every day
+          definedAliases = [ "@yt" ];
+        };
+
+        # Disable these
         "Bing".metaData.hidden = true;
         "Ebay".metaData.hidden = true;
         "Amazon.com".metaData.hidden = true;
-        "Google".metaData.alias = "@g"; # builtin engines only support specifying one additional alias
-        "Github" = {
-          urls = [{ template = "https://github.com/search?q={searchTerms}"; }];
-          definedAliases = [ "@gh" ];
-        };
       };
   };
 
