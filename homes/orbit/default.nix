@@ -6,14 +6,14 @@
     ./fonts.nix
     ./services.nix
 
-    ../../modules/home-manager/desktops/sway
+    ../../modules/hm/desktops/sway
 
-    ../../modules/home-manager/browsers/firefox.nix
-    ../../modules/home-manager/editors/neovim
-    ../../modules/home-manager/terminals/alacritty
-    ../../modules/home-manager/shells/zsh
-    ../../modules/home-manager/media/mpv
-    ../../modules/home-manager/mux/zellij
+    ../../modules/hm/browsers/firefox.nix
+    ../../modules/hm/editors/neovim
+    ../../modules/hm/terminals/alacritty
+    ../../modules/hm/shells/zsh
+    ../../modules/hm/media/mpv
+    ../../modules/hm/mux/zellij
 
     ./git.nix
   ];

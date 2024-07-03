@@ -23,7 +23,10 @@
       "browser.search.suggest.enabled" = false;
       "browser.urlbar.suggest.searches" = false;
       "view_source.wrap_long_lines" = true;
+      "extensions.autoDisableScopes" = 0;
     };
+
+    search.force = true;
 
     search.engines =
       {
