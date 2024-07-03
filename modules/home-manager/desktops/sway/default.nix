@@ -71,6 +71,18 @@
       let
         gen_default_app = app: list: builtins.listToAttrs (map (type: { name = type; value = app; }) list);
       in
+      gen_default_app "firefox.desktop" [
+        "x-scheme-handler/http"
+        "x-scheme-handler/https"
+        "x-scheme-handler/chrome"
+        "text/html"
+        "application/x-extension-htm"
+        "application/x-extension-html"
+        "application/x-extension-shtml"
+        "application/xhtml+xml"
+        "application/x-extension-xhtml"
+        "application/x-extension-xht"
+      ] //
       gen_default_app "swayimg.desktop" [
         "image/avif"
         "image/bmp"

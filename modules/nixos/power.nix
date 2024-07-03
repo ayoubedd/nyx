@@ -1,8 +1,11 @@
 { ... }: {
   services.upower.enable = true; # For informing applications of the current power plan mode.
 
-  services.thermald.enable = true;
-  services.thermald.ignoreCpuidCheck = true;
+  # services.thermald.enable = true;
+  # services.thermald.ignoreCpuidCheck = true;
+
+  # services.throttled.enable = true;
+
   services.tlp = {
     enable = true;
     settings = {

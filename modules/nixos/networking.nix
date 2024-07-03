@@ -1,10 +1,10 @@
 { ... }: {
   networking.networkmanager.enable = true;
 
+  networking.nftables.enable = true;
   networking.firewall.enable = true;
   networking.firewall.allowedTCPPorts = [ ];
   networking.firewall.allowedUDPPorts = [ ];
-  networking.nftables.enable = true;
 
   services.resolved = {
     enable = true;

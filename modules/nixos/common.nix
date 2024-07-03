@@ -7,8 +7,11 @@
     ./audio.nix
     ./users.nix
     ./power.nix
+    ./sysctl.nix
   ];
 
+
+  programs.nix-ld.enable = true;
   security.rtkit.enable = true; # For processs niceness and priority adjusment through dbus, used by browsers.
   services.fprintd.enable = true;
 
