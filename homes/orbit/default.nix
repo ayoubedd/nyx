@@ -12,6 +12,7 @@
     ../../modules/home-manager/editors/neovim
     ../../modules/home-manager/terminals/alacritty
     ../../modules/home-manager/shells/zsh
+    ../../modules/home-manager/media-players/mpv
 
     ./git.nix
   ];
