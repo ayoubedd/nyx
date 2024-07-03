@@ -11,6 +11,7 @@
 
     # CMD
     yazi
+    ueberzugpp
     file
     killall
     btop
