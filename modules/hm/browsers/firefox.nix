@@ -122,6 +122,17 @@
         ExcludedDomains = [ "example.com" ];
         Fallback = true;
       };
+      Permissions = {
+        Notifications = {
+          BlockNewRequests = true;
+          Locked = true;
+        };
+      };
+      SearchEngines = {
+        PreventInstalls = true;
+      };
+      ShowHomeButton = false;
+      StartDownloadsInTempDirectory = true;
     };
   };
 
