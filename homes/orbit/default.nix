@@ -9,11 +9,13 @@
     ../../modules/hm/desktops/sway
 
     ../../modules/hm/browsers/firefox.nix
-    ../../modules/hm/editors/neovim
+    ../../modules/hm/browsers/chromium.nix
+
     ../../modules/hm/terminals/alacritty
     ../../modules/hm/shells/zsh
-    ../../modules/hm/media/mpv
     ../../modules/hm/mux/zellij
+    ../../modules/hm/editors/neovim
+    ../../modules/hm/media/mpv
 
     ./git.nix
   ];
