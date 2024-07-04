@@ -21,6 +21,11 @@ in
     };
   };
 
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+    };
+  };
 
   wayland.windowManager.sway.config =
     let
