@@ -13,8 +13,22 @@
   fonts.fontconfig = {
     enable = true;
     defaultFonts = {
-      serif = [ "Noto Serif" "Source Han Serif" ];
-      sansSerif = [ "Noto Sans" "Source Han Sans" ];
+      emoji = [ "Noto Color Emoji" ];
+      monospace = [
+        "Noto Sans Mono"
+        "Noto Naskh Arabic UI"
+        "Noto Sans Arabic"
+      ];
+      serif = [
+        "Noto Serif"
+        "Noto Naskh Arabic UI"
+        "Noto Sans Arabic"
+      ];
+      sansSerif = [
+        "Noto Sans"
+        "Noto Naskh Arabic UI"
+        "Noto Sans Arabic"
+      ];
     };
   };
 }
