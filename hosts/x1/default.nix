@@ -10,6 +10,8 @@
     ./hardware-configuration.nix
     ./modprobe.nix
     ./services.nix
+    ./udev.nix
+    ./power.nix
     ../../modules/nixos/common.nix
   ];
 
@@ -41,8 +43,6 @@
     ];
   };
 
-  programs.dconf.enable = true;
-
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr ];
@@ -54,7 +54,10 @@
   security.polkit.enable = true;
   programs.sway.enable = true;
 
+  security.pam.services.swaylock = {};
+
   programs.zsh.enable = true;
+
   users.users.orbit = with pkgs; {
     initialPassword = "toor";
     isNormalUser = true;

@@ -52,5 +52,28 @@
         in
         pkgs.nixpkgs-fmt
       );
+
+      packages = local-lib.forAllSystems (system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
+        {
+          hello = pkgs.hello;
+        }
+      );
+
+      devShells = local-lib.forAllSystems (system:
+        let
+          pkgs = import nixpkgs { inherit system; };
+        in
+        {
+          default =
+            pkgs.mkShell {
+              packages = with pkgs; [
+                cargo
+              ];
+            };
+        }
+      );
     };
 }
