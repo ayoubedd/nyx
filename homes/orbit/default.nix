@@ -6,7 +6,8 @@
     ./fonts.nix
     ./services.nix
 
-    ../../modules/hm/desktops/sway
+    # ../../modules/hm/desktops/sway
+    ../../modules/hm/desktops/hyprland
 
     ../../modules/hm/browsers/firefox.nix
     ../../modules/hm/browsers/chromium.nix

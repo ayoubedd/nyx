@@ -52,9 +52,11 @@
   xdg.terminal-exec.enable = true;
 
   security.polkit.enable = true;
-  programs.sway.enable = true;
 
-  security.pam.services.swaylock = {};
+  programs.sway.enable = true;
+  programs.hyprland.enable = true;
+
+  security.pam.services.swaylock = { };
 
   programs.zsh.enable = true;
 

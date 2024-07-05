@@ -21,11 +21,6 @@ in
     };
   };
 
-  dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
-    };
-  };
 
   wayland.windowManager.sway.config =
     let
@@ -293,7 +288,7 @@ in
 
   wayland.windowManager.sway.extraConfig =
     let
-      wallpaper = ./wallpapers/wallpaper.png;
+      wallpaper = ../../../../media/images/homescreen.png;
     in
     ''
       output * bg ${wallpaper} fill
