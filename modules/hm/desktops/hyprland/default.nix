@@ -1,28 +1,21 @@
 { pkgs, ... }:
-let
-  brightnessctl = "${pkgs.brightnessctl}/bin/brightnessctl";
-  loginctl = "${pkgs.systemd}/bin/loginctl";
-  hyprlock = "${pkgs.hyprlock}/bin/hyprlock";
-  hyprctl = "${pkgs.hyprland}/bin/hyprctl";
-  systemctl = "${pkgs.systemd}/bin/systemctl";
-  pidof = "${pkgs.procps}/bin/pidof";
-
-  homescreen_img = ../../../../media/images/homescreen.png;
-  lockscreen_img = ../../../../media/images/lockscreen.png;
-in
 {
 
   imports = [
+    ./hyprland.nix
+
     ../applets/waybar
+    ../applets/wofi
     ./kanshi.nix
 
+    ./fonts.nix
 
     ../theming/cursor_volantes.nix
     ../theming/gtk_colloid.nix
-    ./hyprland.nix
+
+    ../dconf/common.nix
 
     ../xdg/common.nix
-    ../dconf/common.nix
   ];
 
   home.packages = with pkgs; [
@@ -35,4 +28,22 @@ in
     jq
     pkgs.wl-clip-persist # should write a module for this
   ];
+
+  xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal-hyprland ];
+
+  xdg.portal.config = {
+    hyprland = {
+      default = [
+        "hyprland"
+        "gtk"
+      ];
+    };
+
+    sway = {
+      default = [
+        "wlr"
+        "gtk"
+      ];
+    };
+  };
 }

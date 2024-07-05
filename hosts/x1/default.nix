@@ -4,6 +4,7 @@
 
 { config, lib, pkgs, inputs, hostname ? "nixos", nixos-hardware, ... }:
 
+
 {
   imports = [
     nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
@@ -43,19 +44,39 @@
     ];
   };
 
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr ];
-    config.common.default = "wlr";
-  };
-
   xdg.terminal-exec.enable = true;
 
-  security.polkit.enable = true;
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal-hyprland ];
+
+    config = {
+      common = {
+        default = [
+          "gtk"
+        ];
+      };
+      hyprland = {
+        default = [
+          "hyprland"
+          "gtk"
+        ];
+      };
+      sway = {
+        default = [
+          "wlr"
+          "gtk"
+        ];
+      };
+    };
+  };
+
+
 
   programs.sway.enable = true;
   programs.hyprland.enable = true;
 
+  security.polkit.enable = true;
   security.pam.services.swaylock = { };
 
   programs.zsh.enable = true;

@@ -51,6 +51,7 @@ in
 
       bind = [
         "$mod, Return, exec, $terminal"
+        "$mod_SHIFT, Return, exec, $terminal --class alacritty-float"
         "$mod_SHIFT, q, killactive,"
         "$mod, M, exit,"
         "$mod_SHIFT, space, togglefloating,"
@@ -61,10 +62,15 @@ in
         "$mod, k, movefocus, u"
         "$mod, j, movefocus, d"
 
-        "$mod SHIFT, l, moveactive, 30 0"
-        "$mod SHIFT, h, moveactive, -30 0"
-        "$mod SHIFT, k, moveactive, 0 -30"
-        "$mod SHIFT, j, moveactive, 0 30"
+        "$mod SHIFT, l, movewindow, r"
+        "$mod SHIFT, h, movewindow, l"
+        "$mod SHIFT, k, movewindow, u"
+        "$mod SHIFT, j, movewindow, d"
+
+        "$mod_Control, l, moveactive, 30 0"
+        "$mod_Control, h, moveactive, -30 0"
+        "$mod_Control, k, moveactive, 0 -30"
+        "$mod_Control, j, moveactive, 0 30"
 
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
@@ -77,7 +83,7 @@ in
         "$mod, 9, workspace, 9"
         "$mod, 0, workspace, 10"
 
-        "$mod_SHIFT, l, exec, ${loginctl} lock-session"
+        "$mod_ALT, l, exec, ${loginctl} lock-session"
         "$mod, d, exec, ${wofi}"
 
         "$mod SHIFT, 1, movetoworkspace, 1"
@@ -126,7 +132,17 @@ in
         rounding = 5;
       };
 
-      misc.vfr = true;
+      misc = {
+        vfr = true;
+        font_family = "Cantarell";
+        mouse_move_enables_dpms = true;
+        key_press_enables_dpms = true;
+      };
+
+      gestures = {
+        workspace_swipe = true;
+        workspace_swipe_touch = true;
+      };
 
       animations = {
         enabled = true;
@@ -140,7 +156,6 @@ in
         sensitivity = 0.1;
         accel_profile = "flat";
         force_no_accel = true;
-        natural_scroll = true;
 
         mouse_refocus = false;
         follow_mouse = 0;
@@ -152,7 +167,32 @@ in
         };
       };
 
+      cursor = {
+        hide_on_key_press = true;
+      };
+
       # plugins = [ ];
+      windowrulev2 = [
+        "float,class:alacritty-float"
+        "center,class:alacritty-float"
+        "size 900 600,class:alacritty-float"
+
+        "float,class:.blueman-manager-wrapped"
+
+        "float,class:seahorse"
+        "size 900 700,class:seahorse"
+
+        "float,class:org.gnome.Nautilus"
+
+        "float,title:^(.*)(Bitwarden)(.*)$"
+
+        "float,class:pavucontrol"
+        "center,class:pavucontrol"
+        "size 700 500,class:pavucontrol"
+
+        "idleinhibit focus,class:mpv"
+        "idleinhibit focus,class:org.pwmt.zathura"
+      ];
     };
 
 
