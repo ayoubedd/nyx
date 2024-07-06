@@ -1,8 +1,12 @@
 { ... }: {
-  # services.thermald.enable = true;
-  # services.thermald.ignoreCpuidCheck = true;
+  services.thermald.enable = true;
+  services.thermald.ignoreCpuidCheck = true;
 
   # services.throttled.enable = true;
+
+  # boot.kernel.sysctl = {
+  #   "dev.i915.perf_stream_paranoid"  = 0;
+  # };
 
   services.tlp = {
     enable = true;
@@ -91,7 +95,7 @@
       #   active, passive, guided(*).
       # Default: <none>
       CPU_DRIVER_OPMODE_ON_AC = "active";
-      CPU_DRIVER_OPMODE_ON_BAT = "active";
+      CPU_DRIVER_OPMODE_ON_BAT = "passive";
 
       # Select a CPU frequency scaling governor.
       # Intel CPU with intel_pstate driver or
@@ -153,7 +157,7 @@
       CPU_MIN_PERF_ON_AC = 0;
       CPU_MAX_PERF_ON_AC = 100;
       CPU_MIN_PERF_ON_BAT = 0;
-      CPU_MAX_PERF_ON_BAT = 50;
+      CPU_MAX_PERF_ON_BAT = 60;
 
       # Set the CPU "turbo boost" (Intel) or "turbo core" (AMD) feature:
       #   0=disable, 1=allow.
@@ -205,7 +209,7 @@
       # by not enabling this.
       # Default: <none>
 
-      MEM_SLEEP_ON_AC = "s2idle";
+      MEM_SLEEP_ON_AC = "deep";
       MEM_SLEEP_ON_BAT = "deep";
 
       # Define disk devices on which the following DISK/AHCI_RUNTIME parameters act.
@@ -288,14 +292,14 @@
 
       # Default: on (AC), auto (BAT)
 
-      #AHCI_RUNTIME_PM_ON_AC=on
-      #AHCI_RUNTIME_PM_ON_BAT=auto
+      AHCI_RUNTIME_PM_ON_AC = "on";
+      AHCI_RUNTIME_PM_ON_BAT = "auto";
 
       # Seconds of inactivity before disk is suspended.
       # Note: effective only when AHCI_RUNTIME_PM_ON_AC/BAT is activated.
       # Default: 15
 
-      #AHCI_RUNTIME_PM_TIMEOUT=15
+      AHCI_RUNTIME_PM_TIMEOUT = 15;
 
       # Power off optical drive in UltraBay/MediaBay: 0=disable, 1=enable.
       # Drive can be powered on again by releasing (and reinserting) the eject lever
@@ -365,7 +369,7 @@
       # systems without PulseAudio may require 10.
       # Default: 1
 
-      SOUND_POWER_SAVE_ON_AC = 100;
+      SOUND_POWER_SAVE_ON_AC = 0;
       SOUND_POWER_SAVE_ON_BAT = 40;
 
       # Disable controller too (HDA only): Y/N.
@@ -385,8 +389,8 @@
       # Runtime Power Management for PCIe bus devices: on=disable, auto=enable.
       # Default: on (AC), auto (BAT)
 
-      #RUNTIME_PM_ON_AC=on
-      #RUNTIME_PM_ON_BAT=auto
+      RUNTIME_PM_ON_AC = "on";
+      RUNTIME_PM_ON_BAT = "auto";
 
       # Exclude listed PCIe device adresses from Runtime PM.
       # Note: this preserves the kernel driver default, to force a certain state
@@ -467,7 +471,7 @@
       # Note: use as a workaround for USB devices that cause shutdown problems.
       # Default: 0
 
-      #USB_AUTOSUSPEND_DISABLE_ON_SHUTDOWN=0
+      USB_AUTOSUSPEND_DISABLE_ON_SHUTDOWN = 0;
 
       # Restore radio device state (Bluetooth, WiFi, WWAN) from previous shutdown
       # on system startup: 0=disable, 1=enable.
@@ -475,19 +479,19 @@
       # are ignored when this is enabled.
       # Default: 0
 
-      #RESTORE_DEVICE_STATE_ON_STARTUP=0
+      RESTORE_DEVICE_STATE_ON_STARTUP = 0;
 
       # Radio devices to disable on startup: bluetooth, nfc, wifi, wwan.
       # Separate multiple devices with spaces.
       # Default: <none>
 
-      DEVICES_TO_DISABLE_ON_STARTUP = "bluetooth";
+      DEVICES_TO_DISABLE_ON_STARTUP = "bluetooth nfc";
 
       # Radio devices to enable on startup: bluetooth, nfc, wifi, wwan.
       # Separate multiple devices with spaces.
       # Default: <none>
 
-      #DEVICES_TO_ENABLE_ON_STARTUP="wifi"
+      DEVICES_TO_ENABLE_ON_STARTUP = "wifi";
 
       # Radio devices to disable on shutdown: bluetooth, nfc, wifi, wwan.
       # Note: use as a workaround for devices that are blocking shutdown.
@@ -575,13 +579,13 @@
 
       # Radio devices to disable on connect.
 
-      DEVICES_TO_DISABLE_ON_LAN_CONNECT = "wifi wwan";
-      DEVICES_TO_DISABLE_ON_WIFI_CONNECT = "wwan";
-      DEVICES_TO_DISABLE_ON_WWAN_CONNECT = "wifi";
+      # DEVICES_TO_DISABLE_ON_LAN_CONNECT = "wifi wwan";
+      # DEVICES_TO_DISABLE_ON_WIFI_CONNECT = "wwan";
+      # DEVICES_TO_DISABLE_ON_WWAN_CONNECT = "wifi";
 
       # Radio devices to enable on disconnect.
 
-      DEVICES_TO_ENABLE_ON_LAN_DISCONNECT = "wifi";
+      # DEVICES_TO_ENABLE_ON_LAN_DISCONNECT = "wifi";
       #DEVICES_TO_ENABLE_ON_WIFI_DISCONNECT=""
       #DEVICES_TO_ENABLE_ON_WWAN_DISCONNECT=""
 

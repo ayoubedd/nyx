@@ -21,10 +21,16 @@
     "rd.udev.log_level=3"
     "nmi_watchdog=0"
 
-    "i915.modeset=1"
-    "i915.enable_psr=0"
-    "i915.fastboot=1"
+    # "i915.modeset=1"
+    # "i915.enable_psr=0"
+    # "i915.fastboot=1"
+    # "i915.enable_fbc=1"
+
+    "i915.force_probe=!9a49"
+    "xe.force_probe=9a49"
   ];
+
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   fileSystems."/" =
     {
@@ -50,4 +56,5 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+  hardware.enableAllFirmware = true;
 }
