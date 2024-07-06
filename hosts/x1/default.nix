@@ -17,6 +17,8 @@
     (import ../../modules/nixos/polkit_pantheon_agent.nix { inherit pkgs; wantedBy = "hyprland-session.target"; })
   ];
 
+  services.devmon.enable = lib.mkForce false;
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
