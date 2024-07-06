@@ -248,7 +248,9 @@ in
   programs.hyprlock = {
     enable = true;
     settings = {
-      grace = 10;
+      general = {
+        grace = 10;
+      };
       background = {
         path = toString lockscreen_img;
       };
