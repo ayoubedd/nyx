@@ -16,6 +16,8 @@
     ../dconf/common.nix
 
     ../xdg/common.nix
+
+    ./mime_apps.nix
   ];
 
   home.packages = with pkgs; [

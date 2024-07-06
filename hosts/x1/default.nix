@@ -14,6 +14,7 @@
     ./udev.nix
     ./power.nix
     ../../modules/nixos/common.nix
+    (import ../../modules/nixos/polkit_pantheon_agent.nix { inherit pkgs; wantedBy = "hyprland-session.target"; })
   ];
 
   boot.loader.systemd-boot.enable = true;
@@ -25,6 +26,16 @@
     "riscv64-linux"
     "riscv32-linux"
   ];
+
+  programs.thunar.enable = true;
+  programs.thunar.plugins = with pkgs.xfce; [
+    thunar-archive-plugin
+    thunar-volman
+    thunar-media-tags-plugin
+  ];
+  services.gvfs.enable = true; # Mount, trash, and other functionalities
+  programs.xfconf.enable = true;
+  services.tumbler.enable = true;
 
   boot.consoleLogLevel = 4;
 

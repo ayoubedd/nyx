@@ -7,7 +7,6 @@
     zathura
     pavucontrol
     gnome.seahorse
-    gnome.nautilus
 
     # CMD
     yazi

@@ -153,7 +153,7 @@ in
         repeat_rate = 35;
         repeat_delay = 300;
 
-        sensitivity = 0.1;
+        sensitivity = 0.2;
         accel_profile = "flat";
         force_no_accel = true;
 
@@ -182,7 +182,8 @@ in
         "float,class:seahorse"
         "size 900 700,class:seahorse"
 
-        "float,class:org.gnome.Nautilus"
+        "float,class:thunar"
+        "size 900 600,class:thunar"
 
         "float,title:^(.*)(Bitwarden)(.*)$"
 
