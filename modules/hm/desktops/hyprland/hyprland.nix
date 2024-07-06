@@ -116,7 +116,8 @@ in
       ];
 
       general = {
-        gaps_out = 0;
+        gaps_out = 2;
+        gaps_in = "2,2,2,2";
         layout = "dwindle";
       };
 
@@ -182,8 +183,8 @@ in
         "float,class:seahorse"
         "size 900 700,class:seahorse"
 
-        "float,class:thunar"
-        "size 900 600,class:thunar"
+        "float,class:[tT]hunar"
+        "size 900 600,class:[tT]hunar"
 
         "float,title:^(.*)(Bitwarden)(.*)$"
 
