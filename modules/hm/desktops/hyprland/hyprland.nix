@@ -250,6 +250,8 @@ in
     settings = {
       general = {
         grace = 10;
+        disable_loading_bar = true;
+        hide_cursor = true;
       };
       background = {
         path = toString lockscreen_img;
