@@ -1,4 +1,12 @@
-{ ... }: {
+{ ... }:
+let
+    lock-screen-icon = builtins.toString ../../../../../../media/icons/system-lock-screen.svg;
+    logout-icon = builtins.toString ../../../../../../media/icons/system-log-out.svg;
+    suspend-icon = builtins.toString ../../../../../../media/icons/system-suspend.svg;
+    shutdown-icon = builtins.toString ../../../../../../media/icons/system-shutdown.svg;
+    reboot-icon = builtins.toString ../../../../../../media/icons/system-reboot.svg;
+in 
+{
   programs.nwg-piotr = {
     enable = true;
 
@@ -6,27 +14,27 @@
       {
         label = "Lock";
         exec = "loginctl lock-session self";
-        icon = builtins.toString ./images/system-lock-screen.svg;
+        icon = lock-screen-icon;
       }
       {
         label = "Logout";
         exec = "loginctl kill-session self";
-        icon = builtins.toString ./images/system-log-out.svg;
+        icon = logout-icon;
       }
       {
         label = "Suspend";
         exec = "systemctl -i suspend";
-        icon = builtins.toString ./images/system-suspend.svg;
+        icon = suspend-icon;
       }
       {
         label = "Shutdown";
         exec = "systemctl -i poweroff";
-        icon = builtins.toString ./images/system-shutdown.svg;
+        icon = shutdown-icon;
       }
       {
         label = "Reboot";
         exec = "systemctl -i reboot";
-        icon = builtins.toString ./images/system-reboot.svg;
+        icon = reboot-icon;
       }
     ];
 

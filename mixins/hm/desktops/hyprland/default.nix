@@ -2,9 +2,11 @@
 {
 
   imports = [
+    # import home manager custom modules
+    ../../../../modules/hm
+
     # Hyprland config
     ./hyprland.nix
-
 
     # Fonts and GTK theming
     ./fonts.nix
@@ -14,14 +16,7 @@
     ./xdg.nix
 
     # Applets
-    ./applets/waybar.nix
-    ./applets/mako.nix
-    ./applets/wofi.nix
-    ./applets/kanshi.nix
-    ./applets/nwg-piotr
-
-
-    ../../../../modules/hm
+    ./applets
   ];
 
   home.packages = with pkgs; [
