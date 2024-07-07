@@ -2,7 +2,7 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, inputs, hostname ? "nixos", nixos-hardware, ... }:
+{ lib, pkgs, nixos-hardware, ... }:
 
 
 {
@@ -13,8 +13,9 @@
     ./services.nix
     ./udev.nix
     ./power.nix
-    ../../modules/nixos/common.nix
-    (import ../../modules/nixos/polkit_pantheon_agent.nix { inherit pkgs; wantedBy = "hyprland-session.target"; })
+    ../../mixins/nixos/common.nix
+    (import ../../mixins/nixos/polkit_pantheon_agent.nix { inherit pkgs; wantedBy = "hyprland-session.target"; })
+    ./xdg.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -23,6 +24,7 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   boot.binfmt.emulatedSystems = [
     "wasm32-wasi"
@@ -30,69 +32,15 @@
     "riscv64-linux"
     "riscv32-linux"
   ];
-
-  programs.thunar.enable = true;
-  programs.thunar.plugins = with pkgs.xfce; [
-    thunar-archive-plugin
-    thunar-volman
-    thunar-media-tags-plugin
-  ];
-  services.gvfs.enable = true; # Mount, trash, and other functionalities
-  programs.xfconf.enable = true;
-  services.tumbler.enable = true;
-
   boot.consoleLogLevel = 4;
 
-  networking.hostName = hostname;
+  networking.hostName = "x1";
 
   # Set your time zone.
   time.timeZone = "Africa/Casablanca";
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-    extraPackages = with pkgs; [
-      intel-media-driver
-      vaapiVdpau
-      libvdpau-va-gl
-    ];
-  };
-
-  environment.sessionVariables = {
-    LIBVA_DRIVER_NAME = "iHD";
-  };
-
-  xdg.terminal-exec.enable = true;
-
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal-hyprland ];
-
-    config = {
-      common = {
-        default = [
-          "gtk"
-        ];
-      };
-      hyprland = {
-        default = [
-          "hyprland"
-          "gtk"
-        ];
-      };
-      sway = {
-        default = [
-          "wlr"
-          "gtk"
-        ];
-      };
-    };
-  };
-
-
 
   programs.sway.enable = true;
   programs.hyprland.enable = true;
@@ -102,6 +50,7 @@
 
   programs.zsh.enable = true;
 
+  # Users
   users.users.orbit = with pkgs; {
     initialPassword = "toor";
     isNormalUser = true;
@@ -109,6 +58,7 @@
     shell = zsh;
   };
 
+  # Docker
   virtualisation.docker = {
     autoPrune.enable = true;
     enable = true;
@@ -118,12 +68,24 @@
     };
   };
 
+  # System packages
   environment.systemPackages = with pkgs; [
     vim
     curl
     qemu
     qt5.qtwayland
   ];
+
+  # Thunar
+  programs.thunar.enable = true;
+  programs.thunar.plugins = with pkgs.xfce; [
+    thunar-archive-plugin
+    thunar-volman
+    thunar-media-tags-plugin
+  ];
+  services.gvfs.enable = true; # Mount, trash, and other functionalities
+  programs.xfconf.enable = true;
+  services.tumbler.enable = true;
 
   system.stateVersion = "24.11";
 }

@@ -28,7 +28,6 @@
         x1 = lib.nixosSystem {
           specialArgs = {
             inherit inputs nixos-hardware;
-            hostname = "x1";
           };
           modules = [ ./hosts/x1 ];
         };
@@ -36,7 +35,7 @@
 
       # Home configurations
       homeConfigurations = {
-        orbit = lib.homeManagerConfiguration rec {
+        orbit = lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           extraSpecialArgs = {
             inherit inputs outputs;
@@ -51,29 +50,6 @@
           pkgs = import nixpkgs { inherit system; };
         in
         pkgs.nixpkgs-fmt
-      );
-
-      packages = local-lib.forAllSystems (system:
-        let
-          pkgs = import nixpkgs { inherit system; };
-        in
-        {
-          hello = pkgs.hello;
-        }
-      );
-
-      devShells = local-lib.forAllSystems (system:
-        let
-          pkgs = import nixpkgs { inherit system; };
-        in
-        {
-          default =
-            pkgs.mkShell {
-              packages = with pkgs; [
-                cargo
-              ];
-            };
-        }
       );
     };
 }
