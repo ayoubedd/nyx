@@ -25,7 +25,6 @@ let
   wofi = "${pkgs.wofi}/bin/wofi";
   nwg-bar = "${pkgs.nwg-bar}/bin/nwg-bar";
 
-  waybar = "${pkgs.waybar}/bin/waybar";
   wl-clip-persist = "${pkgs.wl-clip-persist}/bin/wl-clip-persist";
 
   homescreen_img = ../../../../media/images/homescreen.png;
@@ -41,7 +40,6 @@ in
       "$file_manager" = "${pkgs.yazi}/bin/yazi";
 
       exec-once = [
-        "${waybar}"
         "${wl-clip-persist} --clipboard both"
       ];
 
