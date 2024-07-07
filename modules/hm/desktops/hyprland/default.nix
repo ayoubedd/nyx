@@ -4,22 +4,22 @@
   imports = [
     ./hyprland.nix
 
-    ../applets/waybar
-    ../applets/wofi
-    ./kanshi.nix
+    ../common/applets/wofi
+    ./applets/kanshi.nix
 
     ./fonts.nix
 
-    ../theming/cursor_volantes.nix
-    ../theming/gtk_colloid.nix
+    ../common/theming/cursor_volantes.nix
+    ../common/theming/gtk_colloid.nix
 
-    ../dconf/common.nix
+    ../common/dconf/common.nix
 
-    ../xdg/common.nix
+    ../common/xdg/common.nix
 
     ./mime_apps.nix
 
     ./applets/waybar.nix
+    ./applets/mako.nix
   ];
 
   home.packages = with pkgs; [

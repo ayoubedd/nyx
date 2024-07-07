@@ -30,11 +30,21 @@
 
         "hyprland/workspaces" = {
           "disable-scroll" = true;
+          "format" = "{icon}";
           "persistent_workspaces" = {
             "1" = [ ];
             "2" = [ ];
             "3" = [ ];
             "4" = [ ];
+          };
+          "format-icons" = {
+            "1" = "🐧";
+            "2" = "🦊";
+            "3" = "🪶";
+            "4" = "🎻";
+            "5" = "💭";
+            "urgent" = "🚨";
+            "default" = "";
           };
         };
 
@@ -126,12 +136,11 @@
           color: #7c818c;
           background: transparent;
           padding: 5px;
-          font-size: 18px;
+          font-size: 12px;
       }
 
       #workspaces button.persistent {
           color: #7c818c;
-          font-size: 12px;
       }
 
       /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
@@ -148,6 +157,14 @@
           color: white;
       }
 
+      #workspaces button.active {
+          transition: none;
+          box-shadow: inherit;
+          text-shadow: inherit;
+          border-radius: inherit;
+          color: #383c4a;
+          background: #7c818c;
+      }
 
       #mode {
           padding-left: 16px;

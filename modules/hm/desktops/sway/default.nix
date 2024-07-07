@@ -6,20 +6,20 @@
     ./scripts.nix
     ./sway.nix
 
-    ../applets/wofi
-    ../applets/waybar
-    ../applets/swaylock
-    ../applets/mako
-    ../applets/swayimg
+    ../common/applets/wofi
+    ../common/applets/waybar
+    ../common/applets/swaylock
+    ../common/applets/mako
+    ../common/applets/swayimg
 
     ./kanshi.nix
 
 
-    ../theming/gtk_colloid.nix
-    ../theming/cursor_volantes.nix
+    ../common/theming/gtk_colloid.nix
+    ../common/theming/cursor_volantes.nix
 
-    ../xdg/common.nix
-    ../dconf/common.nix
+    ../common/xdg/common.nix
+    ../common/dconf/common.nix
     ./mime_apps.nix
   ];
 
@@ -34,12 +34,5 @@
     wofi-emoji
     jq
   ];
-
-
-  services.gnome-keyring = {
-    enable = true;
-  };
-
-  services.poweralertd.enable = true;
 }
 

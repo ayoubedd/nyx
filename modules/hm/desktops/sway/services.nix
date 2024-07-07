@@ -31,4 +31,10 @@
     systemd.enable = true;
     systemd.target = "sway-session.target";
   };
+
+  services.gnome-keyring = {
+    enable = true;
+  };
+
+  services.poweralertd.enable = true;
 }
