@@ -28,6 +28,9 @@
 
     "i915.force_probe=!9a49"
     "xe.force_probe=9a49"
+    "xe.enable_psr=1"
+    "xe.enable_fbc=1"
+    "xe.enable_dc=1"
   ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;

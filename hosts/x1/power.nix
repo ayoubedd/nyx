@@ -1,12 +1,11 @@
-{ ... }: {
+{ pkgs, ... }: {
   services.thermald.enable = true;
   services.thermald.ignoreCpuidCheck = true;
 
-  # services.throttled.enable = true;
-
-  # boot.kernel.sysctl = {
-  #   "dev.i915.perf_stream_paranoid"  = 0;
-  # };
+  powerManagement.powertop.enable = true;
+  environment.systemPackages = with pkgs; [
+    powertop
+  ];
 
   services.tlp = {
     enable = true;
@@ -94,7 +93,7 @@
       # AMD Zen 2 or newer CPU with amd-pstate_driver as of kernel 6.3/6.4(*):
       #   active, passive, guided(*).
       # Default: <none>
-      CPU_DRIVER_OPMODE_ON_AC = "active";
+      CPU_DRIVER_OPMODE_ON_AC = "passive";
       CPU_DRIVER_OPMODE_ON_BAT = "passive";
 
       # Select a CPU frequency scaling governor.
@@ -114,7 +113,7 @@
       # Default: <none>
 
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
-      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
+      CPU_SCALING_GOVERNOR_ON_BAT = "schedutil";
 
       # Set the min/max frequency available for the scaling governor.
       # Possible values depend on your CPU. For available frequencies see
@@ -146,7 +145,7 @@
       # Default: balance_performance (AC), balance_power (BAT)
 
       CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-      CPU_ENERGY_PERF_POLICY_ON_BAT = "balance_power";
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "balance_performance";
 
       # Set Intel CPU P-state performance: 0..100 (%).
       # Limit the max/min P-state to control the power dissipation of the CPU.
