@@ -1,5 +1,4 @@
-{ pkgs, inputs, ... }:
-
+{ pkgs, ... }:
 let
   pactl = "${pkgs.pulseaudio}/bin/pactl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
@@ -24,6 +23,7 @@ let
 
   wofi = "${pkgs.wofi}/bin/wofi";
   nwg-bar = "${pkgs.nwg-bar}/bin/nwg-bar";
+  firefox = "${pkgs.firefox}/bin/firefox";
 
   wl-clip-persist = "${pkgs.wl-clip-persist}/bin/wl-clip-persist";
 
@@ -38,8 +38,10 @@ in
       "$mod" = "SUPER";
       "$terminal" = "${pkgs.alacritty}/bin/alacritty";
       "$file_manager" = "${pkgs.yazi}/bin/yazi";
+      "$browser" = "${firefox}";
 
       exec-once = [
+        "$browser"
         "${wl-clip-persist} --clipboard both"
       ];
 
