@@ -252,7 +252,6 @@ in
     enable = true;
     settings = {
       general = {
-        grace = 10;
         disable_loading_bar = true;
         hide_cursor = true;
       };

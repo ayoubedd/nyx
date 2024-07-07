@@ -5,24 +5,35 @@
     config = [
       {
         label = "Lock";
-        exec = "swaylock -f -c 000000";
-        icon = "/usr/share/nwg-bar/images/system-lock-screen.svg";
+        exec = "loginctl lock-session self";
+        icon = builtins.toString ./images/system-lock-screen.svg;
       }
       {
-        label = "Lock";
-        exec = "swaylock -f -c 000000";
-        icon = "/usr/share/nwg-bar/images/system-lock-screen.svg";
+        label = "Logout";
+        exec = "loginctl kill-session self";
+        icon = builtins.toString ./images/system-log-out.svg;
       }
       {
-        label = "Lock";
-        exec = "swaylock -f -c 000000";
-        icon = "/usr/share/nwg-bar/images/system-lock-screen.svg";
+        label = "Suspend";
+        exec = "systemctl -i suspend";
+        icon = builtins.toString ./images/system-suspend.svg;
+      }
+      {
+        label = "Shutdown";
+        exec = "systemctl -i poweroff";
+        icon = builtins.toString ./images/system-shutdown.svg;
+      }
+      {
+        label = "Reboot";
+        exec = "systemctl -i reboot";
+        icon = builtins.toString ./images/system-reboot.svg;
       }
     ];
 
     style = ''
       window {
-              background-color: rgba (0, 0, 0, 1.0)
+              background-color: rgba (0, 0, 0, 1.0);
+              border-radius: 5px;
       }
 
       /* Outer bar container, takes all the window width/height */

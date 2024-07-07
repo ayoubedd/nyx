@@ -18,7 +18,7 @@
     ./applets/mako.nix
     ./applets/wofi.nix
     ./applets/kanshi.nix
-    ./applets/nwg-piotr.nix
+    ./applets/nwg-piotr
 
 
     ../../../../modules/hm
