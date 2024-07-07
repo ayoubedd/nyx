@@ -18,6 +18,8 @@
     ../xdg/common.nix
 
     ./mime_apps.nix
+
+    ./applets/waybar.nix
   ];
 
   home.packages = with pkgs; [
@@ -30,22 +32,4 @@
     jq
     pkgs.wl-clip-persist # should write a module for this
   ];
-
-  xdg.portal.extraPortals = with pkgs; [ xdg-desktop-portal-gtk xdg-desktop-portal-wlr xdg-desktop-portal-hyprland ];
-
-  xdg.portal.config = {
-    hyprland = {
-      default = [
-        "hyprland"
-        "gtk"
-      ];
-    };
-
-    sway = {
-      default = [
-        "wlr"
-        "gtk"
-      ];
-    };
-  };
 }
