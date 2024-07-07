@@ -5,7 +5,7 @@
     # Hyprland config
     ./hyprland.nix
 
-    
+
     # Fonts and GTK theming
     ./fonts.nix
     ./theming.nix
@@ -18,6 +18,10 @@
     ./applets/mako.nix
     ./applets/wofi.nix
     ./applets/kanshi.nix
+    ./applets/nwg-piotr.nix
+
+
+    ../../../../modules/hm
   ];
 
   home.packages = with pkgs; [

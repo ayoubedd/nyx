@@ -6,17 +6,17 @@
     ./fonts.nix
     ./services.nix
 
-    # ../../modules/hm/desktops/sway
-    ../../modules/hm/desktops/hyprland
+    # ../../mixins/hm/desktops/sway
+    ../../mixins/hm/desktops/hyprland
 
-    ../../modules/hm/browsers/firefox.nix
-    ../../modules/hm/browsers/chromium.nix
+    ../../mixins/hm/browsers/firefox.nix
+    ../../mixins/hm/browsers/chromium.nix
 
-    ../../modules/hm/terminals/alacritty
-    ../../modules/hm/shells/zsh
-    ../../modules/hm/mux/zellij
-    ../../modules/hm/editors/neovim
-    ../../modules/hm/media/mpv
+    ../../mixins/hm/terminals/alacritty
+    ../../mixins/hm/shells/zsh
+    ../../mixins/hm/mux/zellij
+    ../../mixins/hm/editors/neovim
+    ../../mixins/hm/media/mpv
 
     ./git.nix
   ];

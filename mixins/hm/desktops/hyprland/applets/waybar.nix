@@ -50,25 +50,25 @@
 
         "clock" = {
           "tooltip-format" = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
-          "format" = "{:%a, %d %b, %I:%M %p}";
+          "format" = "{:%a, %d %b, %H:%M}";
         };
 
         "pulseaudio" = {
           "reverse-scrolling" = 1;
           "format" = "{volume}% {icon} {format_source}";
-          "format-bluetooth" = "{volume}% {icon} {format_source}";
-          "format-bluetooth-muted" = " {icon} {format_source}";
-          "format-muted" = "婢 {format_source}";
+          "format-bluetooth" = "{volume}% {icon}   {format_source}";
+          "format-bluetooth-muted" = "{icon}   {format_source}";
+          "format-muted" = "{format_source}";
           "format-source" = "{volume}% ";
           "format-source-muted" = "";
           "format-icons" = {
             "headphone" = "";
-            "hands-free" = "";
-            "headset" = "";
+            "hands-free" = "";
+            "headset" = "";
             "phone" = "";
             "portable" = "";
             "car" = "";
-            "default" = [ "奄" "奔" "墳" ];
+            # "default" = [ "奄" "奔" "墳" ];
           };
           "on-click" = "pavucontrol";
           "min-length" = 13;

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 
 let
   pactl = "${pkgs.pulseaudio}/bin/pactl";
@@ -23,6 +23,7 @@ let
   screen_brightness_down = "${brightnessctl} set 5%- && ${notify-send} \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%')\"";
 
   wofi = "${pkgs.wofi}/bin/wofi";
+  nwg-bar = "${pkgs.nwg-bar}/bin/nwg-bar";
 
   waybar = "${pkgs.waybar}/bin/waybar";
   wl-clip-persist = "${pkgs.wl-clip-persist}/bin/wl-clip-persist";
@@ -56,6 +57,8 @@ in
         "$mod, M, exit,"
         "$mod_SHIFT, space, togglefloating,"
         "$mod, d, exec, $menu"
+
+        "$mod, x, exec, ${nwg-bar}"
 
         "$mod, l, movefocus, r"
         "$mod, h, movefocus, l"
