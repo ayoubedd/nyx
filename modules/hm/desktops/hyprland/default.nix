@@ -2,24 +2,22 @@
 {
 
   imports = [
+    # Hyprland config
     ./hyprland.nix
 
-    ../common/applets/wofi
-    ./applets/kanshi.nix
-
+    
+    # Fonts and GTK theming
     ./fonts.nix
+    ./theming.nix
 
-    ../common/theming/cursor_volantes.nix
-    ../common/theming/gtk_colloid.nix
+    # XDG stuff
+    ./xdg.nix
 
-    ../common/dconf/common.nix
-
-    ../common/xdg/common.nix
-
-    ./mime_apps.nix
-
+    # Applets
     ./applets/waybar.nix
     ./applets/mako.nix
+    ./applets/wofi.nix
+    ./applets/kanshi.nix
   ];
 
   home.packages = with pkgs; [
@@ -30,6 +28,6 @@
     # wtype
     wofi-emoji
     jq
-    pkgs.wl-clip-persist # should write a module for this
+    wl-clip-persist # should write a module for this
   ];
 }

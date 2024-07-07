@@ -1,5 +1,17 @@
 { ... }: {
+  home.preferXdgDirectories = true;
+
+  xdg = {
+    enable = true;
+    userDirs = {
+      enable = true;
+      createDirectories = true;
+    };
+  };
+
+  xdg.mime.enable = true;
   xdg.mimeApps = {
+    enable = true;
     defaultApplications =
       let
         gen_default_app = app: list: builtins.listToAttrs (map (type: { name = type; value = app; }) list);
