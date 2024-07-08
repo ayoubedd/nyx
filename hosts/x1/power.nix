@@ -93,7 +93,7 @@
       # AMD Zen 2 or newer CPU with amd-pstate_driver as of kernel 6.3/6.4(*):
       #   active, passive, guided(*).
       # Default: <none>
-      CPU_DRIVER_OPMODE_ON_AC = "passive";
+      CPU_DRIVER_OPMODE_ON_AC = "active";
       CPU_DRIVER_OPMODE_ON_BAT = "passive";
 
       # Select a CPU frequency scaling governor.
