@@ -59,6 +59,18 @@
           updateInterval = 24 * 60 * 60 * 1000; # every day
         };
 
+        "My Nixos" = {
+          urls = [{
+            template = "https://mynixos.com/search";
+            params = [
+              { name = "q"; value = "{searchTerms}"; }
+            ];
+          }];
+          definedAliases = [ "@mn" ];
+          iconUpdateURL = "https://mynixos.com/favicon.ico";
+          updateInterval = 24 * 60 * 60 * 1000; # every day
+        };
+
         "NixOS Wiki" = {
           urls = [{ template = "https://wiki.nixos.org/index.php?search={searchTerms}"; }];
           iconUpdateURL = "https://wiki.nixos.org/favicon.ico";
