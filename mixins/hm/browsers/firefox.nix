@@ -85,6 +85,18 @@
           definedAliases = [ "@gh" ];
         };
 
+        "Docker hub" = {
+          urls = [{
+            template = "https://hub.docker.com/search";
+            params = [
+              { name = "q"; value = "{searchTerms}"; }
+            ];
+          }];
+          definedAliases = [ "@dh" ];
+          iconUpdateURL = "https://hub.docker.com/favicon.ico";
+          updateInterval = 24 * 60 * 60 * 1000; # every day
+        };
+
         "YouTube" = {
           urls = [{ template = "https://www.youtube.com/results?search_query={searchTerms}"; }];
           iconUpdateURL = "https://www.youtube.com/favicon.ico";
