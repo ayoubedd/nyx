@@ -10,7 +10,7 @@
 
     # CMD
     yazi
-    ueberzugpp
+    # ueberzugpp
     file
     killall
     btop

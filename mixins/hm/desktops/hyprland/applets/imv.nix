@@ -4,7 +4,7 @@
     settings = {
       options = {
         recursively = true;
-        fullscreen =true;
+        fullscreen = true;
       };
     };
   };

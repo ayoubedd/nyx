@@ -37,12 +37,14 @@
       homeConfigurations = {
         orbit = lib.homeManagerConfiguration rec {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-          extraSpecialArgs = let
-            my-pkgs = import ./packages { inherit pkgs; };
-          in {
-            inherit inputs outputs my-pkgs;
-            system = "x86_64-linux";
-          };
+          extraSpecialArgs =
+            let
+              my-pkgs = import ./packages { inherit pkgs; };
+            in
+            {
+              inherit inputs outputs my-pkgs;
+              system = "x86_64-linux";
+            };
           modules = [ ./homes/orbit ];
         };
       };

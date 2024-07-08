@@ -1,3 +1,3 @@
 { pkgs, ... }: {
-  realod-failed-services = pkgs.callPackage ./reload-failed-services {};
+  realod-failed-services = pkgs.callPackage ./reload-failed-services { };
 }
