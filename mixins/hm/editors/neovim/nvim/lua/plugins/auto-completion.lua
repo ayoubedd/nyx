@@ -1,17 +1,17 @@
 return {
-{
-    'jmbuhr/otter.nvim',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter',
-    },
-    setup = function ()
-      local otter = require('otter');
-      otter.activate({ "css" }, true, true, nil);
-    end
-},
-  {
-    'github/copilot.vim'
-  },
+-- {
+--     'jmbuhr/otter.nvim',
+--     dependencies = {
+--       'nvim-treesitter/nvim-treesitter',
+--     },
+--     setup = function ()
+--       local otter = require('otter');
+--       otter.activate({ "css" }, true, true, nil);
+--     end
+-- },
+  -- {
+  --   'github/copilot.vim'
+  -- },
   {
     'windwp/nvim-autopairs',
     event = "InsertEnter",
