@@ -5,5 +5,6 @@
     ./wofi.nix
     ./kanshi.nix
     ./nwg-piotr.nix
+    ./imv.nix
   ];
 }

@@ -28,7 +28,7 @@
         "application/x-extension-xhtml"
         "application/x-extension-xht"
       ] //
-      gen_default_app "swayimg.desktop" [
+      gen_default_app "imv.desktop" [
         "image/avif"
         "image/bmp"
         "image/gif"
