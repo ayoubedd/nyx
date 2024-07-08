@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, my-pkgs, ... }:
 {
 
   imports = [
@@ -19,14 +19,16 @@
     ./applets
   ];
 
-  home.packages = with pkgs; [
-    wl-clipboard
-    wl-color-picker
-    slurp
-    grim
-    # wtype
-    wofi-emoji
-    jq
-    wl-clip-persist # should write a module for this
-  ];
+  home.packages = with pkgs;
+    [
+      my-pkgs.realod-failed-services
+      wl-clipboard
+      wl-color-picker
+      slurp
+      grim
+      # wtype
+      wofi-emoji
+      jq
+      wl-clip-persist # should write a module for this
+    ];
 }

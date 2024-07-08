@@ -35,10 +35,12 @@
 
       # Home configurations
       homeConfigurations = {
-        orbit = lib.homeManagerConfiguration {
+        orbit = lib.homeManagerConfiguration rec {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-          extraSpecialArgs = {
-            inherit inputs outputs;
+          extraSpecialArgs = let
+            my-pkgs = import ./packages { inherit pkgs; };
+          in {
+            inherit inputs outputs my-pkgs;
             system = "x86_64-linux";
           };
           modules = [ ./homes/orbit ];

@@ -25,10 +25,13 @@ let
   nwg-bar = "${pkgs.nwg-bar}/bin/nwg-bar";
   firefox = "${pkgs.firefox}/bin/firefox";
 
+  waybar = "${pkgs.waybar}/bin/waybar";
+
   wl-clip-persist = "${pkgs.wl-clip-persist}/bin/wl-clip-persist";
 
   homescreen_img = ../../../../media/images/homescreen.png;
   lockscreen_img = ../../../../media/images/lockscreen.png;
+  cliphist = "${pkgs.cliphist}/bin/cliphist";
 in
 {
   wayland.windowManager.hyprland.enable = true;
@@ -42,7 +45,13 @@ in
 
       exec-once = [
         "$browser"
+        "${waybar}"
+        "sleep 3; ${cliphist} wipe" # wipe clipboard history from last session
         "${wl-clip-persist} --clipboard both"
+      ];
+
+      exec = [
+        # "${pkgs.callPackage ./scripts/restart_failed_services.nix {}}/bin/ayoub"
       ];
 
       bindm = [
@@ -137,6 +146,8 @@ in
       };
 
       misc = {
+        disable_hyprland_logo = true;
+        force_default_wallpaper = 0;
         vfr = true;
         font_family = "Cantarell";
         mouse_move_enables_dpms = true;
@@ -177,6 +188,8 @@ in
 
       # plugins = [ ];
       windowrulev2 = [
+        "workspace 2,class:firefox"
+
         "float,class:alacritty-float"
         "center,class:alacritty-float"
         "size 900 600,class:alacritty-float"

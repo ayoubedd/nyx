@@ -46,13 +46,25 @@
           updateInterval = 24 * 60 * 60 * 1000; # every day
         };
 
+        "Nix Options" = {
+          urls = [{
+            template = "https://search.nixos.org/options";
+            params = [
+              { name = "type"; value = "options"; }
+              { name = "query"; value = "{searchTerms}"; }
+            ];
+          }];
+          definedAliases = [ "@no" ];
+          iconUpdateURL = "https://search.nixos.org/favicon.png";
+          updateInterval = 24 * 60 * 60 * 1000; # every day
+        };
+
         "NixOS Wiki" = {
           urls = [{ template = "https://wiki.nixos.org/index.php?search={searchTerms}"; }];
           iconUpdateURL = "https://wiki.nixos.org/favicon.ico";
           updateInterval = 24 * 60 * 60 * 1000; # every day
           definedAliases = [ "@nw" ];
         };
-
 
         "Github" = {
           urls = [{ template = "https://github.com/search?q={searchTerms}"; }];
@@ -72,6 +84,7 @@
         "Bing".metaData.hidden = true;
         "Ebay".metaData.hidden = true;
         "Amazon.com".metaData.hidden = true;
+        "Wikipedia (en)".metaData.hidden = true;
       };
   };
 
