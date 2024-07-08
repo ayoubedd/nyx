@@ -15,4 +15,9 @@
       "8.4.4.8"
     ];
   };
+
+  programs.nm-applet = {
+    enable = true;
+    indicator = true;
+  };
 }

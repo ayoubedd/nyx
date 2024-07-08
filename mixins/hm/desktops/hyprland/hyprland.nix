@@ -44,6 +44,9 @@ in
       "$browser" = "${firefox}";
 
       exec-once = [
+        "systemctl --user is-active xdg-desktop-portal-gtk.service && systemctl --user stop xdg-desktop-portal-gtk.service"
+        "systemctl --user is-active xdg-desktop-portal-hyprland.service && systemctl --user stop xdg-desktop-portal-hyprland.service"
+        "systemctl --user restart xdg-desktop-portal.service"
         "$browser"
         "${waybar}"
         "sleep 3; ${cliphist} wipe" # wipe clipboard history from last session

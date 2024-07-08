@@ -2,7 +2,7 @@
   # depedent packges
   home.packages = with pkgs; [
     font-awesome
-    liberation_ttf
+    cantarell-fonts
   ];
 
   programs.waybar = {
@@ -62,7 +62,7 @@
           "reverse-scrolling" = 1;
           "format" = "{volume}% {icon} {format_source}";
           "format-bluetooth" = "{volume}% {icon}   {format_source}";
-          "format-bluetooth-muted" = "{icon}   {format_source}";
+          "format-bluetooth-muted" = "{icon}  {format_source}";
           "format-muted" = "{format_source}";
           "format-source" = "{volume}% ";
           "format-source-muted" = "";
@@ -73,7 +73,7 @@
             "phone" = "";
             "portable" = "";
             "car" = "";
-            # "default" = [ "奄" "奔" "墳" ];
+            "default" = [ "Speaker" ];
           };
           "on-click" = "pavucontrol";
           "min-length" = 13;
@@ -84,12 +84,15 @@
           "format" = "{temperatureC}°C {icon}";
           "format-icons" = [ "" "" "" "" "" ];
           "tooltip" = false;
+          "hwmon-path" = [
+            "/sys/class/hwmon/hwmon5/temp1_input"
+          ];
         };
 
         "backlight" = {
           "device" = "intel_backlight";
           "format" = "{percent}% {icon}";
-          "format-icons" = [ "" "" "" "" "" "" "" ];
+          "format-icons" = [ "" "" "" "" ];
           "min-length" = 7;
         };
 
@@ -107,7 +110,7 @@
 
         "tray" = {
           "icon-size" = 16;
-          "spacing" = 0;
+          "spacing" = 10;
         };
       };
     };
@@ -117,7 +120,7 @@
           border: none;
           border-radius: 0;
           /* `otf-font-awesome` is required to be installed for icons */
-          font-family: Liberation Mono;
+          font-family: Cantarell;
           min-height: 20px;
       }
 
