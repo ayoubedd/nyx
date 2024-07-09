@@ -70,7 +70,7 @@
 
   # System packages
   environment.systemPackages = with pkgs; [
-    vim
+    neovim
     curl
     qemu
     qt5.qtwayland

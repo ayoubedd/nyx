@@ -12,16 +12,18 @@
       ./nvidia.nix
       ./services.nix
       ../../mixins/nixos/common.nix
+      (import ../../mixins/nixos/polkit_pantheon_agent.nix { inherit pkgs; wantedBy = "hyprland-session.target"; })
+      ./xdg.nix
     ];
+
+  boot.kernelParams = [
+    # "amd-pstate=active"
+  ];
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  programs.sway.enable = true;
-  programs.hyprland.enable = true;
-
-  nixpkgs.config.allowUnfree = true;
 
   # Hostname
   networking.hostName = "kraken"; # Define your hostname.
@@ -32,6 +34,21 @@
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
+  hardware.bluetooth.powerOnBoot = lib.mkForce true; # Overriding common nixos config
+
+  boot.binfmt.emulatedSystems = [
+    "wasm32-wasi"
+    "aarch64-linux"
+    "riscv64-linux"
+    "riscv32-linux"
+  ];
+  boot.consoleLogLevel = 4;
+
+  programs.hyprland.enable = true;
+  security.polkit.enable = true;
+
+  nixpkgs.config.allowUnfree = true;
+
   # Users
   users.users.orbit = with pkgs; {
     initialPassword = "toor";
@@ -40,13 +57,35 @@
     shell = zsh;
   };
 
+  # Docker
+  virtualisation.docker = {
+    autoPrune.enable = true;
+    enable = true;
+    rootless = {
+      enable = true;
+      setSocketVariable = true;
+    };
+  };
+
+  # System packages
   environment.systemPackages = with pkgs; [
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    wget
+    neovim
     curl
-    git
+    qemu
+    qt5.qtwayland
   ];
 
-  system.stateVersion = "24.05"; # Did you read the comment?
+  # Thunar
+  programs.thunar.enable = true;
+  programs.thunar.plugins = with pkgs.xfce; [
+    thunar-archive-plugin
+    thunar-volman
+    thunar-media-tags-plugin
+  ];
+  services.gvfs.enable = true; # Mount, trash, and other functionalities
+  programs.xfconf.enable = true;
+  services.tumbler.enable = true;
+
+  system.stateVersion = "24.11"; # Did you read the comment?
 }
 

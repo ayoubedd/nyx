@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }: {
   services = {
     greetd = {
       enable = true;
@@ -12,4 +12,5 @@
   };
 
   services.openssh.enable = true;
+  services.devmon.enable = lib.mkForce false; # reason: thunar takes care of it
 }
