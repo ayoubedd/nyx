@@ -22,7 +22,6 @@ plug "jeffreytse/zsh-vi-mode"
 plug "wazum/zsh-directory-dot-expansion"
 plug "hlissner/zsh-autopair"
 plug "kutsan/zsh-system-clipboard"
-plug "TiagoAraujoDev/fzf-zellij"
 
 # Adding local completions to fpath
 fpath+=($ZDOTDIR/completions)
