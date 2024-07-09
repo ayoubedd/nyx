@@ -31,11 +31,18 @@
           };
           modules = [ ./hosts/x1 ];
         };
+
+        kraken = lib.nixosSystem {
+          specialArgs = {
+            inherit inputs;
+          };
+          modules = [ ./hosts/kraken ];
+        };
       };
 
       # Home configurations
       homeConfigurations = {
-        orbit = lib.homeManagerConfiguration rec {
+        "orbit@x1" = lib.homeManagerConfiguration rec {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
           extraSpecialArgs =
             let
@@ -44,6 +51,21 @@
             {
               inherit inputs outputs my-pkgs;
               system = "x86_64-linux";
+              host = "x1";
+            };
+          modules = [ ./homes/orbit ];
+        };
+
+        "orbit@kraken" = lib.homeManagerConfiguration rec {
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          extraSpecialArgs =
+            let
+              my-pkgs = import ./packages { inherit pkgs; };
+            in
+            {
+              inherit inputs outputs my-pkgs;
+              system = "x86_64-linux";
+              host = "kraken";
             };
           modules = [ ./homes/orbit ];
         };

@@ -1,4 +1,4 @@
-{ pkgs, my-pkgs, ... }:
+{ pkgs, my-pkgs, host, ... }:
 {
 
   imports = [
@@ -17,6 +17,8 @@
 
     # Applets
     ./applets
+
+    ./device/${host}
   ];
 
   home.packages = with pkgs;
