@@ -13,6 +13,9 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
+  boot.blacklistedKernelModules = [
+    "iTCO_wdt"
+  ];
 
   boot.kernelParams = [
     "quiet"
@@ -20,11 +23,6 @@
     "systemd.show_status=auto"
     "rd.udev.log_level=3"
     "nmi_watchdog=0"
-
-    # "i915.modeset=1"
-    # "i915.enable_psr=0"
-    # "i915.fastboot=1"
-    # "i915.enable_fbc=1"
 
     "i915.force_probe=!9a49"
     "xe.force_probe=9a49"
@@ -72,5 +70,4 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-  hardware.enableAllFirmware = true;
 }

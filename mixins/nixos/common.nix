@@ -7,6 +7,7 @@
     ./audio.nix
     ./users.nix
     ./power.nix
+    ./sysctl.nix
   ];
 
 
@@ -20,5 +21,6 @@
   };
 
   programs.dconf.enable = true;
+  hardware.enableAllFirmware = true;
 }
 

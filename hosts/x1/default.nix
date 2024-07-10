@@ -3,19 +3,22 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
 { lib, pkgs, nixos-hardware, ... }:
-
-
+let
+  mixins = ../../mixins/nixos;
+in
 {
   imports = [
     nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
     ./hardware-configuration.nix
-    ./modprobe.nix
     ./services.nix
     ./udev.nix
     ./power.nix
-    ../../mixins/nixos/common.nix
-    (import ../../mixins/nixos/polkit_pantheon_agent.nix { inherit pkgs; wantedBy = "hyprland-session.target"; })
     ./xdg.nix
+    (builtins.toPath "${mixins}/common.nix")
+    (builtins.toPath "${mixins}/qemu.nix")
+    (builtins.toPath "${mixins}/docker.nix")
+    (builtins.toPath "${mixins}/thunar.nix")
+    (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") { inherit pkgs; wantedBy = "hyprland-session.target"; })
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -32,7 +35,6 @@
     "riscv64-linux"
     "riscv32-linux"
   ];
-  boot.consoleLogLevel = 4;
 
   networking.hostName = "x1";
 
@@ -48,31 +50,25 @@
   security.polkit.enable = true;
   security.pam.services.swaylock = { };
 
-  programs.zsh.enable = true;
-
   # Users
   users.users.orbit = with pkgs; {
     initialPassword = "toor";
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "video" "docker" "audio" ];
+    extraGroups = [
+      "wheel"
+      "video"
+      "audio"
+    ]
+    ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
+    ++ lib.optional config.virtualisation.docker.enable "docker"
+    ++ lib.optional config.networking.networkmanager.enable "networkmanager";
     shell = zsh;
-  };
-
-  # Docker
-  virtualisation.docker = {
-    autoPrune.enable = true;
-    enable = true;
-    rootless = {
-      enable = true;
-      setSocketVariable = true;
-    };
   };
 
   # System packages
   environment.systemPackages = with pkgs; [
     neovim
     curl
-    qemu
     qt5.qtwayland
   ];
 

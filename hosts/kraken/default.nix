@@ -3,7 +3,9 @@
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
 { config, lib, pkgs, ... }:
-
+let
+  mixins = ../../mixins/nixos;
+in
 {
   imports =
     [
@@ -11,9 +13,12 @@
       ./hardware-configuration.nix
       ./nvidia.nix
       ./services.nix
-      ../../mixins/nixos/common.nix
-      (import ../../mixins/nixos/polkit_pantheon_agent.nix { inherit pkgs; wantedBy = "hyprland-session.target"; })
       ./xdg.nix
+      (builtins.toPath "${mixins}/common.nix")
+      (builtins.toPath "${mixins}/qemu.nix")
+      (builtins.toPath "${mixins}/docker.nix")
+      (builtins.toPath "${mixins}/thunar.nix")
+      (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") { inherit pkgs; wantedBy = "hyprland-session.target"; })
     ];
 
   boot.kernelParams = [
@@ -53,38 +58,23 @@
   users.users.orbit = with pkgs; {
     initialPassword = "toor";
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "video" "audio" ];
+    extraGroups = [
+      "wheel"
+      "video"
+      "audio"
+    ]
+    ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
+    ++ lib.optional config.virtualisation.docker.enable "docker"
+    ++ lib.optional config.networking.networkmanager.enable "networkmanager";
     shell = zsh;
-  };
-
-  # Docker
-  virtualisation.docker = {
-    autoPrune.enable = true;
-    enable = true;
-    rootless = {
-      enable = true;
-      setSocketVariable = true;
-    };
   };
 
   # System packages
   environment.systemPackages = with pkgs; [
     neovim
     curl
-    qemu
     qt5.qtwayland
   ];
-
-  # Thunar
-  programs.thunar.enable = true;
-  programs.thunar.plugins = with pkgs.xfce; [
-    thunar-archive-plugin
-    thunar-volman
-    thunar-media-tags-plugin
-  ];
-  services.gvfs.enable = true; # Mount, trash, and other functionalities
-  programs.xfconf.enable = true;
-  services.tumbler.enable = true;
 
   system.stateVersion = "24.11"; # Did you read the comment?
 }
