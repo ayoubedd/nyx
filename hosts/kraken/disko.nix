@@ -33,6 +33,7 @@
             content = {
               type = "filesystem";
               format = "xfs";
+              mountpoint = "/";
             };
           };
         };
