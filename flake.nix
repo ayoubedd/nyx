@@ -4,11 +4,15 @@
   inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.nur.url = "github:nix-community/NUR";
   inputs.home-manager = {
     url = "github:nix-community/home-manager";
     inputs.nixpkgs.follows = "nixpkgs";
   };
-  inputs.nur.url = "github:nix-community/NUR";
+  inputs.disko = {
+    url = "github:nix-community/disko";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   outputs = { self, nur, ... }@inputs:
     let

@@ -2,7 +2,7 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 let
   mixins = ../../mixins/nixos;
 in
@@ -14,6 +14,10 @@ in
       ./nvidia.nix
       ./services.nix
       ./xdg.nix
+
+      inputs.disko.nixosModules.disko
+      (import ./disko.nix { device = "/dev/xxx"; })
+
       (builtins.toPath "${mixins}/common.nix")
       (builtins.toPath "${mixins}/qemu.nix")
       (builtins.toPath "${mixins}/docker.nix")
@@ -24,6 +28,10 @@ in
   boot.kernelParams = [
     # "amd-pstate=active"
   ];
+
+  programs.steam = {
+    enable = true;
+  };
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
