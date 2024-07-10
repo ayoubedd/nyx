@@ -8,6 +8,7 @@
     ./users.nix
     ./power.nix
     ./sysctl.nix
+    ./fs.nix
   ];
 
 
