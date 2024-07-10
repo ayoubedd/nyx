@@ -9,12 +9,8 @@
     inputs.nixpkgs.follows = "nixpkgs";
   };
   inputs.nur.url = "github:nix-community/NUR";
-  inputs.firefox-addons = {
-    url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
 
-  outputs = { self, ... }@inputs:
+  outputs = { self, nur, ... }@inputs:
     let
       inherit (self) outputs;
       inherit (inputs) nixpkgs home-manager nixos-hardware flake-utils;
@@ -53,7 +49,10 @@
               system = "x86_64-linux";
               host = "x1";
             };
-          modules = [ ./homes/orbit ];
+          modules = [
+            ./homes/orbit
+            nur.hmModules.nur
+          ];
         };
 
         "orbit@kraken" = lib.homeManagerConfiguration rec {
@@ -67,7 +66,10 @@
               system = "x86_64-linux";
               host = "kraken";
             };
-          modules = [ ./homes/orbit ];
+          modules = [
+            ./homes/orbit
+            nur.hmModules.nur
+          ];
         };
       };
 

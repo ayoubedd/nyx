@@ -1,11 +1,11 @@
-{ pkgs, inputs, system, ... }:
+{ pkgs, inputs, system, options, ... }:
 {
   programs.firefox.profiles."orbit" = {
     name = "orbit";
     isDefault = true;
     id = 0;
 
-    extensions = with inputs.firefox-addons.packages.${system}; [
+    extensions = with options.nur.default.repos.rycee.firefox-addons; [
       bitwarden
       darkreader
       ublock-origin
