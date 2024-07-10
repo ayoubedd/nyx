@@ -42,7 +42,7 @@
     "kernel.nmi_watchdog" = 0;
 
     # Enable the sysctl setting kernel.unprivileged_userns_clone to allow normal users to run unprivileged containers.
-    "kernel.unprivileged_userns_clone" = 1;
+    # "kernel.unprivileged_userns_clone" = 1;
 
     # To hide any kernel messages from the console
     "kernel.printk" = "3 3 3 3";
