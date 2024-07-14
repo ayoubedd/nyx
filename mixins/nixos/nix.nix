@@ -17,6 +17,10 @@
         "read-only-local-store"
       ];
 
+      trusted-users = [
+        "@wheel"
+      ];
+
       warn-dirty = false;
     };
   };
