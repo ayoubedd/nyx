@@ -5,6 +5,15 @@
 { config, lib, pkgs, inputs, ... }:
 let
   mixins = ../../mixins/nixos;
+
+  common = (builtins.toPath "${mixins}/common.nix");
+  qemu = (builtins.toPath "${mixins}/qemu.nix");
+  docker = (builtins.toPath "${mixins}/docker.nix");
+  thunar = (builtins.toPath "${mixins}/thunar.nix");
+
+  disko = import ./disko.nix { device = "/dev/xxx"; };
+
+  polkitAgent = (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") { inherit pkgs; wantedBy = "hyprland-session.target"; });
 in
 {
   imports =
@@ -16,13 +25,13 @@ in
       ./xdg.nix
 
       inputs.disko.nixosModules.disko
-      (import ./disko.nix { device = "/dev/xxx"; })
+      disko
 
-      (builtins.toPath "${mixins}/common.nix")
-      (builtins.toPath "${mixins}/qemu.nix")
-      (builtins.toPath "${mixins}/docker.nix")
-      (builtins.toPath "${mixins}/thunar.nix")
-      (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") { inherit pkgs; wantedBy = "hyprland-session.target"; })
+      common
+      qemu
+      docker
+      thunar
+      polkitAgent
     ];
 
   boot.kernelParams = [
@@ -40,6 +49,7 @@ in
 
   # Hostname
   networking.hostName = "kraken"; # Define your hostname.
+  networking.firewall.allowedTCPPorts = [ 1337 ]; # for quick file sharing
 
   # Timezone
   time.timeZone = "Africa/Casablanca";
@@ -55,7 +65,7 @@ in
     "riscv64-linux"
     "riscv32-linux"
   ];
-  boot.consoleLogLevel = 4;
+  boot.consoleLogLevel = 3;
 
   programs.hyprland.enable = true;
   security.polkit.enable = true;
