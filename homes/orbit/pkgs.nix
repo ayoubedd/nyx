@@ -8,6 +8,9 @@
     pavucontrol
     gnome.seahorse
 
+    devenv
+    httplz
+
     # CMD
     yazi
     # ueberzugpp
