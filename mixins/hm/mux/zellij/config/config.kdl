@@ -1,5 +1,6 @@
 // If you'd like to override the default keybindings completely, be sure to change "keybinds" to "keybinds clear-defaults=true"
 
+
 keybinds {
     normal {
         // uncomment this and adjust key if using copy_on_select=false
@@ -275,25 +276,25 @@ pane_frames false
 // Once these themes are defined, one of them should to be selected in the "theme" section of this file
 //
 themes {
-  catppuccin-mocha {
-    bg "#585b70" // Surface2
-    fg "#cdd6f4"
-    red "#f38ba8"
-    green "#a6e3a1"
-    blue "#89b4fa"
-    yellow "#f9e2af"
-    magenta "#f5c2e7" // Pink
-    orange "#fab387" // Peach
-    cyan "#89dceb" // Sky
-    black "#181825" // Mantle
-    white "#cdd6f4"
+  carbonfox {
+    bg "#161616"
+    fg "#f2f4f8"
+    red "#ee5396"
+    green "#25be6a"
+    blue "#78a9ff"
+    yellow "#08bdba"
+    magenta "#be95ff"
+    orange "#3ddbd9"
+    cyan "#33b1ff"
+    black "#353535"
+    white "#b6b8bb"
   }
 }
 
 // Choose the theme that is specified in the themes section.
 // Default: default
 //
-theme "catppuccin-mocha"
+theme "carbonfox"
 
 // The name of the default layout to load on startup
 // Default: "default"
