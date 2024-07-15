@@ -9,6 +9,7 @@
     ./power.nix
     ./sysctl.nix
     ./fs.nix
+    ./documentation.nix
   ];
 
 
@@ -20,6 +21,9 @@
     package = pkgs.ananicy-cpp;
     rulesProvider = pkgs.ananicy-rules-cachyos;
   };
+
+  environment.homeBinInPath = true;
+  fonts.enableDefaultPackages = true;
 
   programs.dconf.enable = true;
   hardware.enableAllFirmware = true;

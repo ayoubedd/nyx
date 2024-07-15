@@ -16,7 +16,7 @@
     ../../mixins/hm/shells/zsh
     ../../mixins/hm/mux/zellij
     ../../mixins/hm/editors/neovim
-    ../../mixins/hm/media/mpv
+    ../../mixins/hm/media/mpv.nix
 
     ./git.nix
   ];

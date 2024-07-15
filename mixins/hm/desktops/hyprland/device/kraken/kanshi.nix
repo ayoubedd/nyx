@@ -2,9 +2,10 @@
   services.kanshi = {
     enable = true;
     systemdTarget = "hyprland-session.target";
-    profiles = {
-      main = {
-        outputs = [
+    settings = [
+      {
+        profile.name = "main";
+        profile.outputs = [
           {
             criteria = "DP-3";
             adaptiveSync = true;
@@ -16,7 +17,7 @@
             status = "disable";
           }
         ];
-      };
-    };
+      }
+    ];
   };
 }

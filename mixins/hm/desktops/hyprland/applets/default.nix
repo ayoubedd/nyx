@@ -4,6 +4,6 @@
     ./mako.nix
     ./wofi.nix
     ./nwg-piotr.nix
-    ./imv.nix
+    ../../../../../mixins/hm/media/imv.nix
   ];
 }
