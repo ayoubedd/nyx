@@ -24,6 +24,7 @@
       "browser.urlbar.suggest.searches" = false;
       "view_source.wrap_long_lines" = true;
       "extensions.autoDisableScopes" = 0;
+      "browser.startup.page" = 3;
     };
 
     search.force = true;
