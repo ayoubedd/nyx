@@ -2,6 +2,8 @@ local opt = vim.opt
 local g = vim.g
 local o = vim.o
 
+vim.o.background = "dark" -- or "light" for light mode
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -61,8 +63,7 @@ opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 opt.list = false
--- opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', eol = '↵' }
--- opt.listchars = { tab = ' ', trail = '·', nbsp = '␣', eol = '↵' }
+opt.listchars = { trail = "·" }
 
 -- Preview substitutions live, as you type!
 opt.inccommand = "split"
