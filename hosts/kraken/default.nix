@@ -35,8 +35,10 @@ in
     ];
 
   boot.kernelParams = [
-    # "amd-pstate=active"
+    "amd-pstate=active"
   ];
+
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   programs.steam = {
     enable = true;
