@@ -7,5 +7,8 @@ fi
 # zoxide
 eval "$(zoxide init zsh)"
 
+# direnv
+eval "$(direnv hook zsh)"
+
 # fzf
 source <(fzf --zsh)
