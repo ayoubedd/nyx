@@ -7,6 +7,7 @@
     zathura
     pavucontrol
     seahorse
+    gnome.gnome-software
 
     devenv
     httplz
@@ -41,4 +42,8 @@
     sof-firmware
     bind # for dig
   ];
+
+  programs.direnv = {
+    enable = true;
+  };
 }
