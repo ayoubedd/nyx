@@ -6,7 +6,7 @@
     ripdrag
     zathura
     pavucontrol
-    gnome.seahorse
+    seahorse
 
     devenv
     httplz
