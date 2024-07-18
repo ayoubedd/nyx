@@ -15,6 +15,7 @@
   boot.extraModulePackages = [ ];
   boot.blacklistedKernelModules = [
     "iTCO_wdt"
+    "xe"
   ];
 
   boot.kernelParams = [
@@ -23,20 +24,14 @@
     "systemd.show_status=auto"
     "rd.udev.log_level=3"
     "nmi_watchdog=0"
-
-    "i915.force_probe=!9a49"
-    "xe.force_probe=9a49"
-    "xe.enable_psr=1"
-    "xe.enable_fbc=1"
-    "xe.enable_dc=1"
   ];
 
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
     extraPackages = with pkgs; [
-      intel-media-driver
-      vaapiVdpau
+      intel-media-driver # LIBVA_DRIVER_NAME=iHD
+      intel-vaapi-driver # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
       libvdpau-va-gl
     ];
   };
