@@ -1,2 +1,2 @@
-require("config.neovim")
+require("config.options")
 require("config.lazy")
