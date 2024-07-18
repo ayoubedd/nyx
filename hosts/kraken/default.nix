@@ -11,7 +11,7 @@ let
   docker = (builtins.toPath "${mixins}/docker.nix");
   thunar = (builtins.toPath "${mixins}/thunar.nix");
 
-  disko = import ./disko.nix { device = "/dev/xxx"; };
+  disko = import ./disk-config.nix { device = "/dev/xxx"; };
 
   polkitAgent = (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") { inherit pkgs; wantedBy = "hyprland-session.target"; });
 in
@@ -51,7 +51,6 @@ in
 
   # Hostname
   networking.hostName = "kraken"; # Define your hostname.
-  networking.firewall.allowedTCPPorts = [ 1337 ]; # for quick file sharing
 
   # Timezone
   time.timeZone = "Africa/Casablanca";
@@ -67,7 +66,6 @@ in
     "riscv64-linux"
     "riscv32-linux"
   ];
-  boot.consoleLogLevel = 3;
 
   programs.hyprland.enable = true;
   security.polkit.enable = true;
@@ -88,13 +86,6 @@ in
     ++ lib.optional config.networking.networkmanager.enable "networkmanager";
     shell = zsh;
   };
-
-  # System packages
-  environment.systemPackages = with pkgs; [
-    neovim
-    curl
-    qt5.qtwayland
-  ];
 
   system.stateVersion = "24.11"; # Did you read the comment?
 }
