@@ -33,7 +33,7 @@
     profile = "gpu-hq";
 
     # Enables best HW decoder; turn off for software decoding
-    hwdec = "auto";
+    hwdec = "auto-safe";
 
     # Saves the seekbar position on exit
     save-position-on-quit = "yes";
