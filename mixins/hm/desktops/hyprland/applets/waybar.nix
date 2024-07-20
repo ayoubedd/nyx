@@ -2,7 +2,7 @@
   # depedent packges
   home.packages = with pkgs; [
     font-awesome
-    noto-sans
+    noto-fonts
   ];
 
   programs.waybar = {
