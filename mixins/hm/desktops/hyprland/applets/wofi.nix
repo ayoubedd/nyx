@@ -23,11 +23,11 @@
 
     style = ''
       @define-color clear rgba(0, 0, 0, 0.0);
-      @define-color fg #cdd6f4;
-      @define-color bg #1e1e2e;
-      @define-color brd #b4befe;
-      @define-color ip_bg #585b70;
-      @define-color slt_bg #7f849c;
+      @define-color fg #f2f4f8;
+      @define-color bg #161616;
+      @define-color brd #f2f4f8;
+      @define-color ip_bg #353535;
+      @define-color slt_bg #484848;
 
       window {
           border: 1px solid @brd;

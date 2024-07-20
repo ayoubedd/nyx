@@ -11,12 +11,13 @@
           border: none;
           border-radius: 0;
           /* `otf-font-awesome` is required to be installed for icons */
-          font-family: Cantarell;
-          min-height: 20px;
+          font-family: Noto Sans;
+          font-size: 14px;
+          min-height: 24px;
       }
 
       window#waybar {
-          background: transparent;
+          background: #161616;
       }
 
       window#waybar.hidden {
@@ -25,9 +26,8 @@
 
       #workspaces {
           margin-right: 8px;
-          border-radius: 10px;
           transition: none;
-          background: #383c4a;
+          background: #161616;
       }
 
       #workspaces button {
@@ -35,7 +35,6 @@
           color: #7c818c;
           background: transparent;
           padding: 5px;
-          font-size: 12px;
       }
 
       #workspaces button.persistent {
@@ -48,7 +47,7 @@
           box-shadow: inherit;
           text-shadow: inherit;
           border-radius: inherit;
-          color: #383c4a;
+          color: #161616;
           background: #7c818c;
       }
 
@@ -61,7 +60,7 @@
           box-shadow: inherit;
           text-shadow: inherit;
           border-radius: inherit;
-          color: #383c4a;
+          color: #161616;
           background: #7c818c;
       }
 
@@ -71,7 +70,7 @@
           border-radius: 10px;
           transition: none;
           color: #ffffff;
-          background: #383c4a;
+          background: #161616;
       }
 
       #clock {
@@ -80,7 +79,7 @@
           border-radius: 10px;
           transition: none;
           color: #ffffff;
-          background: #383c4a;
+          background: #161616;
       }
 
       #pulseaudio {
@@ -90,7 +89,7 @@
           border-radius: 10px;
           transition: none;
           color: #ffffff;
-          background: #383c4a;
+          background: #161616;
       }
 
       #pulseaudio.muted {
@@ -100,21 +99,62 @@
 
       #memory {
           padding-left: 5px;
-          padding-right: 16px;
-          margin-right: 8px;
-          border-radius:  0 10px 10px 0;
+          padding-right: 5px;
           transition: none;
           color: #ffffff;
-          background: #383c4a;
+          background: #161616;
       }
 
+      #backlight {
+          margin-right: 8px;
+          padding-left: 16px;
+          padding-right: 16px;
+          border-radius: 10px;
+          transition: none;
+          color: #ffffff;
+          background: #161616;
+      }
+
+      #battery {
+          margin-right: 8px;
+          padding-left: 16px;
+          padding-right: 16px;
+          border-radius: 10px;
+          transition: none;
+          color: #ffffff;
+          background: #161616;
+      }
+
+      #battery.charging {
+          color: #ffffff;
+          background-color: #26A65B;
+      }
+
+      #battery.warning:not(.charging) {
+          background-color: #ffbe61;
+          color: black;
+      }
+
+      #battery.critical:not(.charging) {
+          background-color: #f53c3c;
+          color: #ffffff;
+          animation-name: blink;
+          animation-duration: 0.5s;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+          animation-direction: alternate;
+      }
+
+
+
       #cpu {
+          /* margin-right: 8px; */
           padding-left: 16px;
           padding-right: 5px;
           border-radius: 10px 0 0 10px;
           transition: none;
           color: #ffffff;
-          background: #383c4a;
+          background: #161616;
       }
 
       #network {
@@ -124,8 +164,32 @@
           border-radius: 10px;
           transition: none;
           color: #ffffff;
-          background: #383c4a;
+          background: #161616;
       }
+
+      #temperature {
+          padding-left: 5px;
+          padding-right: 5px;
+          transition: none;
+          color: #ffffff;
+          background: #161616;
+      }
+
+      #temperature.critical {
+          background-color: #eb4d4b;
+      }
+
+      #upower {
+          margin-right: 8px;
+          padding-left: 5px;
+          padding-right: 16px;
+          border-radius:  0 10px 10px 0;
+          transition: none;
+          color: #ffffff;
+          background: #161616;
+      }
+
+
 
       #tray {
           padding-left: 16px;
@@ -133,7 +197,7 @@
           border-radius: 10px;
           transition: none;
           color: #ffffff;
-          background: #383c4a;
+          background: #161616;
       }
 
       @keyframes blink {

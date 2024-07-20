@@ -13,8 +13,13 @@
     url = "github:nix-community/disko";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.stylix = {
+    url = "github:danth/stylix";
+    inputs.nixpkgs.follows = "nixpkgs";
+    inputs.home-manager.follows = "home-manager";
+  };
 
-  outputs = { self, nur, ... }@inputs:
+  outputs = { self, nur, stylix, ... }@inputs:
     let
       inherit (self) outputs;
       inherit (inputs) nixpkgs home-manager nixos-hardware flake-utils;
@@ -73,6 +78,7 @@
           modules = [
             ./homes/orbit
             nur.hmModules.nur
+            stylix.homeManagerModules.stylix
           ];
         };
       };
