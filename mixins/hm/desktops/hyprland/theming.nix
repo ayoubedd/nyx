@@ -83,5 +83,7 @@
       base0E = "be95ff";
       base0F = "ff7eb6";
     };
+
+    targets.firefox.profileNames = [ "orbit" ];
   };
 }
