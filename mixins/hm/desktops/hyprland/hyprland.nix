@@ -21,6 +21,13 @@ let
   screen_brightness_up = "${brightnessctl} set +5% && ${notify-send} \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%')\"";
   screen_brightness_down = "${brightnessctl} set 5%- && ${notify-send} \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%')\"";
 
+  grim = "${pkgs.grim}/bin/grim";
+  slurp = "${pkgs.slurp}/bin/slurp";
+  wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
+
+  snaparea = "${grim} -g \"$(${slurp})\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | ${wl-copy} -t 'image/png'";
+  snapfull = "${grim} -g \"$(${slurp} -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | ${wl-copy} -t 'image/png'";
+
   wofi = "${pkgs.wofi}/bin/wofi";
   nwg-bar = "${pkgs.nwg-bar}/bin/nwg-bar";
   firefox = "${pkgs.firefox}/bin/firefox";
@@ -36,12 +43,38 @@ in
 {
   wayland.windowManager.hyprland.enable = true;
 
+  wayland.windowManager.hyprland.extraConfig = ''
+    bind=ALT, p, submap, snapshot
+
+    submap=snapshot
+    bind=, f, exec, ${snapfull} && ${hyprctl} dispatch submap reset
+    bind=, a, exec, ${snaparea} && ${hyprctl} dispatch submap reset
+    bind=, escape, submap, reset 
+    submap=reset
+
+
+    bind=ALT, r, submap, resize
+
+    submap=resize
+    binde=, $right, resizeactive,15 0
+    binde=, $left, resizeactive,-15 0
+    binde=, $up, resizeactive,0 -15
+    binde=, $down, resizeactive,0 15
+    bind=, escape, submap, reset 
+    submap=reset
+  '';
+
   wayland.windowManager.hyprland.settings =
     {
       "$mod" = "SUPER";
       "$terminal" = "${pkgs.alacritty}/bin/alacritty";
       "$file_manager" = "${pkgs.yazi}/bin/yazi";
       "$browser" = "${firefox}";
+
+      "$left" = "h";
+      "$right" = "l";
+      "$up" = "k";
+      "$down" = "j";
 
       exec-once = [
         "systemctl --user is-active xdg-desktop-portal-gtk.service && systemctl --user stop xdg-desktop-portal-gtk.service"
@@ -71,6 +104,8 @@ in
         "$mod, d, exec, $menu"
 
         "$mod, x, exec, ${nwg-bar}"
+        "$mod_SHIFT, v, exec, ${cliphist} list | sort -r | ${wofi} --dmenu | ${cliphist} decode | ${wl-copy}"
+        "$mod_SHIFT, s, exec, ${snaparea}"
 
         "$mod, l, movefocus, r"
         "$mod, h, movefocus, l"
@@ -129,6 +164,7 @@ in
         ",XF86MonBrightnessUp, exec, ${screen_brightness_up}"
         ",XF86MonBrightnessDown, exec, ${screen_brightness_down}"
       ];
+
 
       general = {
         gaps_out = 2;
@@ -221,8 +257,8 @@ in
     enable = true;
     settings = {
       ipc = "on";
-      preload = toString homescreen_img;
-      wallpaper = ",${toString homescreen_img}";
+      preload = toString lockscreen_img;
+      wallpaper = ",${toString lockscreen_img}";
     };
   };
 
