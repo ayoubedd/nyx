@@ -1,5 +1,6 @@
 { pkgs, ... }:
 let
+  alacritty = "${pkgs.alacritty}/bin/alacritty";
   pactl = "${pkgs.pulseaudio}/bin/pactl";
   playerctl = "${pkgs.playerctl}/bin/playerctl";
 
@@ -31,6 +32,7 @@ let
   wofi = "${pkgs.wofi}/bin/wofi";
   nwg-bar = "${pkgs.nwg-bar}/bin/nwg-bar";
   firefox = "${pkgs.firefox}/bin/firefox";
+  thunar = "${pkgs.xfce.thunar}/bin/thunar";
 
   waybar = "${pkgs.waybar}/bin/waybar";
 
@@ -62,14 +64,25 @@ in
     binde=, $down, resizeactive,0 15
     bind=, escape, submap, reset 
     submap=reset
+
+    bind=ALT, m, submap, move
+
+    submap=move
+    binde=, $right, moveactive,20 0
+    binde=, $left, moveactive,-20 0
+    binde=, $up, moveactive,0 -20
+    binde=, $down, moveactive,0 20
+    bind=, escape, submap, reset 
+    submap=reset
+
   '';
 
   wayland.windowManager.hyprland.settings =
     {
       "$mod" = "SUPER";
-      "$terminal" = "${pkgs.alacritty}/bin/alacritty";
-      "$file_manager" = "${pkgs.yazi}/bin/yazi";
-      "$browser" = "${firefox}";
+      "$terminal" = alacritty;
+      "$file_manager" = thunar;
+      "$browser" = firefox;
 
       "$left" = "h";
       "$right" = "l";
@@ -91,8 +104,8 @@ in
       ];
 
       bindm = [
-        "ALT,mouse:272,resizewindow"
-        "ALT_SHIFT,mouse:272,movewindow"
+        "ALT,mouse:272,movewindow"
+        "ALT_SHIFT,mouse:272,resizewindow"
       ];
 
       bind = [
@@ -107,6 +120,9 @@ in
         "$mod_SHIFT, v, exec, ${cliphist} list | sort -r | ${wofi} --dmenu | ${cliphist} decode | ${wl-copy}"
         "$mod_SHIFT, s, exec, ${snaparea}"
 
+        "$mod_SHIFT, f, exec, $file_manager"
+        "$mod_SHIFT, b, exec, $browser"
+
         "$mod, l, movefocus, r"
         "$mod, h, movefocus, l"
         "$mod, k, movefocus, u"
@@ -117,10 +133,6 @@ in
         "$mod SHIFT, k, movewindow, u"
         "$mod SHIFT, j, movewindow, d"
 
-        "$mod_Control, l, moveactive, 30 0"
-        "$mod_Control, h, moveactive, -30 0"
-        "$mod_Control, k, moveactive, 0 -30"
-        "$mod_Control, j, moveactive, 0 30"
 
         "$mod, 1, workspace, 1"
         "$mod, 2, workspace, 2"
