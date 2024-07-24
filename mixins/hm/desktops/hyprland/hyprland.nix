@@ -41,6 +41,7 @@ let
   homescreen_img = ../../../../media/images/homescreen.png;
   lockscreen_img = ../../../../media/images/lockscreen.png;
   cliphist = "${pkgs.cliphist}/bin/cliphist";
+  hyprpicker = "${pkgs.hyprpicker}/bin/hyprpicker";
 in
 {
   wayland.windowManager.hyprland.enable = true;
@@ -119,6 +120,7 @@ in
         "$mod, x, exec, ${nwg-bar}"
         "$mod_SHIFT, v, exec, ${cliphist} list | sort -r | ${wofi} --dmenu | ${cliphist} decode | ${wl-copy}"
         "$mod_SHIFT, s, exec, ${snaparea}"
+        "$mod_SHIFT, c, exec, ${hyprpicker} | wl-copy"
 
         "$mod_SHIFT, f, exec, $file_manager"
         "$mod_SHIFT, b, exec, $browser"
