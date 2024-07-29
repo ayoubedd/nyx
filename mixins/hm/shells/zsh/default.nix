@@ -4,7 +4,7 @@
     curl
     git
     gnutar
-    # unrar
+    unrar
     unzip
     p7zip
     bzip2

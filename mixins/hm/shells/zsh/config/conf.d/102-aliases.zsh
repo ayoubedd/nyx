@@ -10,9 +10,6 @@ alias -- -='cd -'
 alias d='dirs -v'
 for index ({1..9}) alias "$index"="cd +${index}"; unset index
 
-# Pacman boring commands
-alias {update,install}="sudo pacman -Syu"
-
 # to check if vpn works
 alias myip="curl icanhazip.com"
 
