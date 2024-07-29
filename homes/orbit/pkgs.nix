@@ -11,6 +11,7 @@
 
     devenv
     httplz
+    tokei
 
     # CMD
     yazi
