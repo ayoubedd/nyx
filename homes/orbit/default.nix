@@ -21,6 +21,8 @@
     ./git.nix
   ];
 
+  nixpkgs.config.allowUnfree = true;
+
   home.sessionVariables = import ./vars.nix;
 
   home.username = "orbit";
