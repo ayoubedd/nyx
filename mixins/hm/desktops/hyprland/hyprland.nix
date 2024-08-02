@@ -119,7 +119,6 @@ in
 
         "$mod, x, exec, ${nwg-bar}"
         "$mod_SHIFT, v, exec, ${cliphist} list | sort -r | ${wofi} --dmenu | ${cliphist} decode | ${wl-copy}"
-        "$mod_SHIFT, s, exec, ${snaparea}"
         "$mod_SHIFT, c, exec, ${hyprpicker} | wl-copy"
 
         "$mod_SHIFT, f, exec, $file_manager"
