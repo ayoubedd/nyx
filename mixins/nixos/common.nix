@@ -25,11 +25,11 @@
   programs.nix-ld.enable = true;
   security.rtkit.enable = true; # For processs niceness and priority adjusment through dbus, used by browsers.
 
-  services.ananicy = {
-    enable = true;
-    package = pkgs.ananicy-cpp;
-    rulesProvider = pkgs.ananicy-rules-cachyos;
-  };
+  # services.ananicy = {
+  #   enable = true;
+  #   package = pkgs.ananicy-cpp;
+  #   rulesProvider = pkgs.ananicy-rules-cachyos;
+  # };
 
   environment.homeBinInPath = true;
   fonts.enableDefaultPackages = true;

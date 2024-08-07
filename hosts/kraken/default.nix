@@ -7,7 +7,7 @@ let
   mixins = ../../mixins/nixos;
 
   common = (builtins.toPath "${mixins}/common.nix");
-  qemu = (builtins.toPath "${mixins}/qemu.nix");
+  # qemu = (builtins.toPath "${mixins}/qemu.nix");
   docker = (builtins.toPath "${mixins}/docker.nix");
   thunar = (builtins.toPath "${mixins}/thunar.nix");
 
@@ -28,7 +28,7 @@ in
       disko
 
       common
-      qemu
+      # qemu
       docker
       thunar
       polkitAgent
@@ -39,10 +39,6 @@ in
   ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
-
-  programs.steam = {
-    enable = true;
-  };
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;

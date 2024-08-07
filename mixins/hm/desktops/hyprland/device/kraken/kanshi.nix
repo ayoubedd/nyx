@@ -10,7 +10,7 @@
             criteria = "DP-3";
             adaptiveSync = true;
             status = "enable";
-            mode = "1920x1080@144.00Hz";
+            mode = "1920x1080@119.98Hz";
           }
         ];
       }

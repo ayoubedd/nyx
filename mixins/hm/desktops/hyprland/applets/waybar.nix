@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ lib, pkgs, ... }: {
   # depedent packges
   home.packages = with pkgs; [
     font-awesome

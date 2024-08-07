@@ -41,6 +41,7 @@
     image = ../../../../media/images/homescreen.png;
 
     targets.hyprpaper.enable = lib.mkForce false;
+    targets.wofi.enable = false;
 
     cursor.name = "volantes_cursors";
     cursor.size = 24;
