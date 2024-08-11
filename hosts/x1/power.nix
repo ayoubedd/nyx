@@ -544,9 +544,9 @@
       # Default: <none>
 
       # Battery charge level below which charging will begin.
-      START_CHARGE_THRESH_BAT0 = 75;
+      START_CHARGE_THRESH_BAT0 = 90;
       # Battery charge level above which charging will stop.
-      STOP_CHARGE_THRESH_BAT0 = 80;
+      STOP_CHARGE_THRESH_BAT0 = 100;
 
       # BAT1: Secondary / Ultrabay / Slice / Replaceable battery
       # Note: primary on some laptops
