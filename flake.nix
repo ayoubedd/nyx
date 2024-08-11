@@ -61,6 +61,7 @@
           modules = [
             ./homes/orbit
             nur.hmModules.nur
+            stylix.homeManagerModules.stylix
           ];
         };
 
