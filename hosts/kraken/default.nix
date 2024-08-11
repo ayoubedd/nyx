@@ -22,6 +22,7 @@ in
       ./hardware-configuration.nix
       ./nvidia.nix
       ./services.nix
+      ./virtualisation.nix
       ./xdg.nix
 
       inputs.disko.nixosModules.disko
@@ -82,6 +83,8 @@ in
     ++ lib.optional config.networking.networkmanager.enable "networkmanager";
     shell = zsh;
   };
+
+  hardware.nvidia-container-toolkit.enable = true;
 
   system.stateVersion = "24.11"; # Did you read the comment?
 }

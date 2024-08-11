@@ -1,0 +1,5 @@
+{ ... }: {
+  virtualisation.docker = {
+    enableNvidia = true;
+  };
+}
