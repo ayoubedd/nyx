@@ -9,6 +9,7 @@ Explore the reposity take what you like.
 ![Terminal](/assets/images/doc/primary.png)
 ![GUI file manager](/assets/images/doc/gui-file-manager.png)
 ![TUI file manager](/assets/images/doc/tui-file-manager.png)
+![Application Launcher](/assets/images/doc/application-launcher.png)
 
 ## Sofware
 
