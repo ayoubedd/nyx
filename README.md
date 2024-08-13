@@ -8,10 +8,10 @@ Explore the reposity take what you like.
 
 Currently i use nix everywhere i can, because it's actually worth it. For the moment i only use of my two primary machines. But i have plans to migrate my homelab to be full nix.
 
-| Hostname | CPU         | RAM  | GPU      | OS  |
-| -------- | ----------- | ---- | -------- | --- |
-| `x1`     | i7 11th gen | 32Gb | iris xe  | Nix |
-| `kraken` | R5 3600     | 32Gb | RTX 3060 | Nix |
+| Hostname | Brand                    | CPU         | RAM  | GPU      | OS  |
+| -------- | ------------------------ | ----------- | ---- | -------- | --- |
+| `x1`     | Lenovo X1 carbon (gen 9) | i7 11th gen | 32Gb | iris xe  | Nix |
+| `kraken` | n/a (custom built)       | R5 3600     | 32Gb | RTX 3060 | Nix |
 
 ## Screenshots
 
