@@ -11,7 +11,7 @@ Currently i use nix everywhere i can, because it's actually worth it. For the mo
 | Hostname | Brand                    | CPU         | RAM  | GPU      | OS  |
 | -------- | ------------------------ | ----------- | ---- | -------- | --- |
 | `x1`     | Lenovo X1 carbon (gen 9) | i7 11th gen | 32Gb | iris xe  | Nix |
-| `kraken` | n/a (custom built)       | R5 3600     | 32Gb | RTX 3060 | Nix |
+| `kraken` | n/a (custom built)       | R5 3600     | 32Gb | RTX 2060 | Nix |
 
 ## Screenshots
 
