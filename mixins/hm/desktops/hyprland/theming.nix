@@ -38,7 +38,7 @@
 
   stylix = {
     enable = true;
-    image = ../../../../media/images/homescreen.png;
+    image = ../../../../assets/images/homescreen.png;
 
     targets.hyprpaper.enable = lib.mkForce false;
     targets.wofi.enable = false;

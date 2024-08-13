@@ -38,8 +38,8 @@ let
 
   wl-clip-persist = "${pkgs.wl-clip-persist}/bin/wl-clip-persist";
 
-  homescreen_img = ../../../../media/images/homescreen.png;
-  lockscreen_img = ../../../../media/images/lockscreen.png;
+  homescreen_img = ../../../../assets/images/homescreen.png;
+  lockscreen_img = ../../../../assets/images/lockscreen.png;
   cliphist = "${pkgs.cliphist}/bin/cliphist";
   hyprpicker = "${pkgs.hyprpicker}/bin/hyprpicker";
 in
