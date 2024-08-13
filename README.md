@@ -24,7 +24,7 @@ Explore the reposity take what you like.
 
 ## Credit
 
-Special thanks to many of the community members wihthout them this config woudn't be possible. Some of them are:
+Special thanks to many of the community members without them this config woudn't be possible. Some of them are:
 
 - [Misterio77](https://github.com/Misterio77/nix-config)
 - [Aylur](https://github.com/Aylur/dotfiles)
