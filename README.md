@@ -1,6 +1,6 @@
 # nyx
 
-This is my not overly over engineerd nix flake for managing my nix machines (currently for both my desktop and laptop).
+This is my not overly engineerd nix flake for managing my nix machines (currently for both my desktop and laptop).
 
 Explore the reposity take what you like.
 
