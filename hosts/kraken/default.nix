@@ -24,6 +24,7 @@ in
       ./services.nix
       ./virtualisation.nix
       ./xdg.nix
+      ./sysctl.nix
 
       inputs.disko.nixosModules.disko
       disko
