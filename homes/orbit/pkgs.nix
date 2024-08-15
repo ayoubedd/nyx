@@ -12,6 +12,7 @@
     devenv
     httplz
     tokei
+    whois
 
     # CMD
     yazi
