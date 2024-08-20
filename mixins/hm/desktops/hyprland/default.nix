@@ -1,4 +1,4 @@
-{ pkgs, my-pkgs, host, ... }:
+{ pkgs, lo-pkgs, host, ... }:
 {
 
   imports = [
@@ -23,7 +23,7 @@
 
   home.packages = with pkgs;
     [
-      my-pkgs.realod-failed-services
+      lo-pkgs.realod-failed-services
       wl-clipboard
       wl-color-picker
       slurp

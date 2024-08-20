@@ -36,5 +36,6 @@
 
   programs.dconf.enable = true;
   hardware.enableAllFirmware = true;
+  programs.gnupg.agent.enable = true;
 }
 
