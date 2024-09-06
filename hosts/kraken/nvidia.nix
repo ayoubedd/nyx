@@ -25,6 +25,7 @@ in
     hardware.nvidia.modesetting.enable = true;
     hardware.nvidia.package = nvidiaPackage;
     hardware.nvidia.powerManagement.enable = false;
+    hardware.nvidia.open = false;
 
     services.xserver = {
       videoDrivers = [ "nvidia" ];

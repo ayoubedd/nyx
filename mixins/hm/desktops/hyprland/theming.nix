@@ -19,7 +19,7 @@
 
     iconTheme = {
       package = (pkgs.colloid-icon-theme.override { colorVariants = [ "grey" ]; });
-      name = "Colloid-grey-dark";
+      name = "Colloid-Grey-Dark";
     };
 
     # theme = {
