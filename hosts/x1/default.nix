@@ -7,7 +7,7 @@ let
   mixins = ../../mixins/nixos;
 
   common = (builtins.toPath "${mixins}/common.nix");
-  qemu = (builtins.toPath "${mixins}/qemu.nix");
+  # qemu = (builtins.toPath "${mixins}/qemu.nix");
   docker = (builtins.toPath "${mixins}/docker.nix");
   thunar = (builtins.toPath "${mixins}/thunar.nix");
 
@@ -23,7 +23,7 @@ in
     ./xdg.nix
 
     common
-    qemu
+    # qemu
     docker
     thunar
     polkitAgent
@@ -36,13 +36,6 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
-
-  boot.binfmt.emulatedSystems = [
-    "wasm32-wasi"
-    "aarch64-linux"
-    "riscv64-linux"
-    "riscv32-linux"
-  ];
 
   networking.hostName = "x1";
 

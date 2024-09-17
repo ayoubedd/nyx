@@ -7,7 +7,7 @@
     zathura
     pavucontrol
     seahorse
-    gnome.gnome-software
+    gnome-software
 
     devenv
     httplz

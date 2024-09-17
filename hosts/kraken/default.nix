@@ -22,7 +22,7 @@ in
       ./hardware-configuration.nix
       ./nvidia.nix
       ./services.nix
-      ./virtualisation.nix
+      # ./virtualisation.nix
       ./xdg.nix
       ./sysctl.nix
 
@@ -58,13 +58,6 @@ in
 
   hardware.bluetooth.powerOnBoot = lib.mkForce true; # Overriding common nixos config
 
-  boot.binfmt.emulatedSystems = [
-    "wasm32-wasi"
-    "aarch64-linux"
-    "riscv64-linux"
-    "riscv32-linux"
-  ];
-
   programs.hyprland.enable = true;
   security.polkit.enable = true;
 
@@ -84,8 +77,6 @@ in
     ++ lib.optional config.networking.networkmanager.enable "networkmanager";
     shell = zsh;
   };
-
-  hardware.nvidia-container-toolkit.enable = true;
 
   system.stateVersion = "24.11"; # Did you read the comment?
 }
