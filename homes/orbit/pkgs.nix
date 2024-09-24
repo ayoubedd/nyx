@@ -1,5 +1,10 @@
 { pkgs, ... }@args: {
   home.packages = with pkgs; [
+    # Nix stuff
+    nix-index
+    nix-tree
+    comma
+
     # GUI
     qbittorrent
     mpv

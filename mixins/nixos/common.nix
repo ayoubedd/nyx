@@ -19,7 +19,6 @@
     git
     curl
     qt5.qtwayland
-    comma
   ];
 
   programs.nix-ld.enable = true;
