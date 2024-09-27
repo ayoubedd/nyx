@@ -6,6 +6,28 @@
   environment.systemPackages = with pkgs; [
     powertop
   ];
+  services.acpid = {
+    enable = true;
+    handlers.energy_perf_bias = {
+      # ac_adapter ACPI0003:00 00000080 00000000 # unplugging
+      # ac_adapter ACPI0003:00 00000080 00000001 # pluggin
+      action = ''
+        vals=($1)  # space separated string to array of multiple values
+        case ''${vals[3]} in
+            00000000)
+                echo 15 | tee /sys/devices/system/cpu/cpu*/power/energy_perf_bias
+                ;;
+            00000001)
+                echo 0 | tee /sys/devices/system/cpu/cpu*/power/energy_perf_bias
+                ;;
+            *)
+                echo unknown >> /tmp/acpi.log
+                ;;
+        esac
+      '';
+      event = "ac_adapter/*";
+    };
+  };
 
   services.tlp = {
     enable = true;
@@ -94,7 +116,7 @@
       #   active, passive, guided(*).
       # Default: <none>
       CPU_DRIVER_OPMODE_ON_AC = "active";
-      CPU_DRIVER_OPMODE_ON_BAT = "passive";
+      CPU_DRIVER_OPMODE_ON_BAT = "active";
 
       # Select a CPU frequency scaling governor.
       # Intel CPU with intel_pstate driver or
@@ -113,7 +135,7 @@
       # Default: <none>
 
       CPU_SCALING_GOVERNOR_ON_AC = "performance";
-      CPU_SCALING_GOVERNOR_ON_BAT = "schedutil";
+      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
 
       # Set the min/max frequency available for the scaling governor.
       # Possible values depend on your CPU. For available frequencies see
@@ -145,7 +167,7 @@
       # Default: balance_performance (AC), balance_power (BAT)
 
       CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-      CPU_ENERGY_PERF_POLICY_ON_BAT = "balance_performance";
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "balance_power";
 
       # Set Intel CPU P-state performance: 0..100 (%).
       # Limit the max/min P-state to control the power dissipation of the CPU.
@@ -369,7 +391,7 @@
       # Default: 1
 
       SOUND_POWER_SAVE_ON_AC = 0;
-      SOUND_POWER_SAVE_ON_BAT = 40;
+      SOUND_POWER_SAVE_ON_BAT = 10;
 
       # Disable controller too (HDA only): Y/N.
       # Note: effective only when SOUND_POWER_SAVE_ON_AC/BAT is activated.

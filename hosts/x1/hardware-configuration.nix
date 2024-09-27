@@ -24,6 +24,7 @@
     "systemd.show_status=auto"
     "rd.udev.log_level=3"
     "nmi_watchdog=0"
+    "intel_pstate=enable"
   ];
 
   hardware.graphics = {
