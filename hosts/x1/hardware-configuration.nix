@@ -15,7 +15,7 @@
   boot.extraModulePackages = [ ];
   boot.blacklistedKernelModules = [
     "iTCO_wdt"
-    # "xe"
+    "xe"
   ];
 
   boot.kernelParams = [
@@ -25,8 +25,8 @@
     "rd.udev.log_level=3"
     "nmi_watchdog=0"
     "intel_pstate=enable"
-    "i915.force_probe=!9a49" # 9a49
-    "xe.force_probe=9a49"
+    # "i915.force_probe=!9a49" # 9a49
+    # "xe.force_probe=9a49"
   ];
 
   hardware.graphics = {
