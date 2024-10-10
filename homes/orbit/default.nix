@@ -15,7 +15,7 @@
     ../../mixins/hm/terminals/alacritty
     ../../mixins/hm/shells/zsh
     ../../mixins/hm/mux/zellij
-    ../../mixins/hm/editors/neovim
+    # ../../mixins/hm/editors/neovim
     ../../mixins/hm/media/mpv.nix
 
     ./git.nix
