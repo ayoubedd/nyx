@@ -9,7 +9,7 @@
     qbittorrent
     mpv
     ripdrag
-    zathura
+    # zathura
     pavucontrol
     seahorse
     gnome-software

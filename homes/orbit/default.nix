@@ -17,6 +17,7 @@
     ../../mixins/hm/mux/zellij
     # ../../mixins/hm/editors/neovim
     ../../mixins/hm/media/mpv.nix
+    ../../mixins/hm/media/zathura.nix
 
     ./git.nix
   ];
