@@ -55,8 +55,6 @@
             };
             modules = [
               ./homes/orbit
-              nur.hmModules.nur
-              stylix.homeManagerModules.stylix
             ];
           };
           "orbit@kraken" = lib.lo.mkHome {
@@ -67,8 +65,6 @@
             };
             modules = [
               ./homes/orbit
-              nur.hmModules.nur
-              stylix.homeManagerModules.stylix
             ];
           };
         };

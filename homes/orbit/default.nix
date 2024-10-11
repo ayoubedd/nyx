@@ -1,6 +1,9 @@
-{ config, pkgs, lib, ... }: {
+{ config, pkgs, lib, inputs, ... }: {
 
   imports = [
+    inputs.nur.hmModules.nur
+    inputs.stylix.homeManagerModules.stylix
+
     ./pkgs.nix
     ./files.nix
     ./fonts.nix
