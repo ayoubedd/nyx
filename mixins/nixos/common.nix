@@ -24,6 +24,8 @@
   programs.nix-ld.enable = true;
   security.rtkit.enable = true; # For processs niceness and priority adjusment through dbus, used by browsers.
 
+  time.hardwareClockInLocalTime = false;
+
   # services.ananicy = {
   #   enable = true;
   #   package = pkgs.ananicy-cpp;
