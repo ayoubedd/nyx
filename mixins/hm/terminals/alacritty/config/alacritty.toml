@@ -1,4 +1,4 @@
-import = ["~/.config/alacritty/carbonfox.toml"]
+general.import = ["~/.config/alacritty/carbonfox.toml"]
 
 [env]
 TERM = "xterm-256color"

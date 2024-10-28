@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }: {
   xdg.terminal-exec.enable = true;
 
   xdg.portal = {
@@ -18,7 +18,7 @@
         ];
       };
       sway = {
-        default = [
+        default = lib.mkDefault [
           "wlr"
           "gtk"
         ];
