@@ -91,6 +91,7 @@ in
       "$down" = "j";
 
       exec-once = [
+        "systemctl --user restart pipewire pipewire.socket"
         "systemctl --user is-active xdg-desktop-portal-gtk.service && systemctl --user stop xdg-desktop-portal-gtk.service"
         "systemctl --user is-active xdg-desktop-portal-hyprland.service && systemctl --user stop xdg-desktop-portal-hyprland.service"
         "systemctl --user restart xdg-desktop-portal.service"
@@ -186,7 +187,7 @@ in
       };
 
       monitor = [
-        "eDP-1,preferred,auto,2,bitdepth,10"
+        "eDP-1,preferred,auto,2,bitdepth,8"
       ];
 
       decoration = {
