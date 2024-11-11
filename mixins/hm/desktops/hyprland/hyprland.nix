@@ -19,8 +19,8 @@ let
   pidof = "${pkgs.procps}/bin/pidof";
 
   notify-send = "${pkgs.libnotify}/bin/notify-send";
-  screen_brightness_up = "${brightnessctl} set +5% && ${notify-send} \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%')\"";
-  screen_brightness_down = "${brightnessctl} set 5%- && ${notify-send} \"Brightness\" \"Brightness: $(brightnessctl | grep -Eo '[0-9]+%')\"";
+  screen_brightness_up = "${brightnessctl} set +5% && ${notify-send} \"Brightness\" \"Brightness: $(${brightnessctl} | grep -Eo '[0-9]+%')\"";
+  screen_brightness_down = "${brightnessctl} set 5%- && ${notify-send} \"Brightness\" \"Brightness: $(${brightnessctl} | grep -Eo '[0-9]+%')\"";
 
   grim = "${pkgs.grim}/bin/grim";
   slurp = "${pkgs.slurp}/bin/slurp";
