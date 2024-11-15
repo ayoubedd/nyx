@@ -167,7 +167,7 @@
       # Default: balance_performance (AC), balance_power (BAT)
 
       CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-      CPU_ENERGY_PERF_POLICY_ON_BAT = "balance_power";
+      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
 
       # Set Intel CPU P-state performance: 0..100 (%).
       # Limit the max/min P-state to control the power dissipation of the CPU.
@@ -178,7 +178,7 @@
       CPU_MIN_PERF_ON_AC = 0;
       CPU_MAX_PERF_ON_AC = 100;
       CPU_MIN_PERF_ON_BAT = 0;
-      CPU_MAX_PERF_ON_BAT = 60;
+      CPU_MAX_PERF_ON_BAT = 40;
 
       # Set the CPU "turbo boost" (Intel) or "turbo core" (AMD) feature:
       #   0=disable, 1=allow.
@@ -218,7 +218,7 @@
       # Default: <none>
 
       PLATFORM_PROFILE_ON_AC = "performance";
-      PLATFORM_PROFILE_ON_BAT = "balanced";
+      PLATFORM_PROFILE_ON_BAT = "low-power";
 
       # System suspend mode:
       #   s2idle: Idle standby - a pure software, light-weight, system sleep state,
