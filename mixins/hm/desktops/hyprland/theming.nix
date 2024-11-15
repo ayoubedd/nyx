@@ -42,6 +42,9 @@
 
     targets.hyprpaper.enable = lib.mkForce false;
     targets.wofi.enable = false;
+    targets.neovim.enable = false;
+    targets.hyprlock.enable = false;
+    targets.hyprland.enable = false;
 
     cursor.name = "volantes_cursors";
     cursor.size = 24;

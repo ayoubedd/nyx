@@ -194,7 +194,9 @@ in
         blur = {
           enabled = false;
         };
-        drop_shadow = false;
+        shadow = {
+          enabled = false;
+        };
         rounding = 5;
       };
 
