@@ -15,12 +15,8 @@
   boot.extraModulePackages = [ ];
   boot.blacklistedKernelModules = [
     "iTCO_wdt"
-    "i915"
+    # "i915"
   ];
-
-  boot.extraModprobeConfig = ''
-    blacklist i915
-  '';
 
   boot.kernelParams = [
     "quiet"
@@ -30,17 +26,17 @@
     "nmi_watchdog=0"
     "intel_pstate=enable"
 
-    # "i915.fastboot=1"
-    # "i915.enable_psr=2"
-    # "i915.enable_psr2_sel_fetch=1"
-    # "i915.enable_guc=2"
-    # "i915.enable_fbc=1"
+    "i915.fastboot=1"
+    "i915.enable_psr=2"
+    "i915.enable_psr2_sel_fetch=1"
+    "i915.enable_guc=2"
+    "i915.enable_fbc=1"
 
-    "i915.force_probe=!9a49" # 9a49
-    "xe.force_probe=9a49"
-    "xe.enable_psr=2"
-    "xe.enable_psr2_sel_fetch=1"
-    "xe.enable_fbc=1"
+    # "i915.force_probe=!9a49" # 9a49
+    # "xe.force_probe=9a49"
+    # "xe.enable_psr=2"
+    # "xe.enable_psr2_sel_fetch=1"
+    # "xe.enable_fbc=1"
   ];
 
   hardware.graphics = {
