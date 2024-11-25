@@ -3,6 +3,7 @@
   imports = [
     inputs.nur.hmModules.nur
     inputs.stylix.homeManagerModules.stylix
+    inputs.orbit-nvim.homeManagerModules.orbit-nvim
 
     ./pkgs.nix
     ./files.nix
@@ -24,6 +25,9 @@
 
     ./git.nix
   ];
+
+  orbit-nvim.enable = true;
+  orbit-nvim.neovide = true;
 
   nixpkgs.config.allowUnfree = true;
 

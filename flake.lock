@@ -237,6 +237,22 @@
         "url": "https://github.com/NixOS/nixpkgs/archive/cc2f28000298e1269cea6612cd06ec9979dd5d7f.tar.gz"
       }
     },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1731139594,
+        "narHash": "sha256-IigrKK3vYRpUu+HEjPL/phrfh7Ox881er1UEsZvw9Q4=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "76612b17c0ce71689921ca12d9ffdc9c23ce40b2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nur": {
       "locked": {
         "lastModified": 1731581363,
@@ -252,6 +268,24 @@
         "type": "github"
       }
     },
+    "orbit-nvim": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1732550063,
+        "narHash": "sha256-ry+bMaWjHkkS1T07DrenHrsmvmnop9eZwnyestbeWro=",
+        "owner": "ayoubedd",
+        "repo": "nvim",
+        "rev": "e558458c7089dad745369ed9b710eeaed7efefe8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ayoubedd",
+        "repo": "nvim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "disko": "disko",
@@ -260,6 +294,7 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
         "nur": "nur",
+        "orbit-nvim": "orbit-nvim",
         "stylix": "stylix"
       }
     },

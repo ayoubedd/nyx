@@ -3,7 +3,7 @@
 
   inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-  # inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.orbit-nvim.url = "github:ayoubedd/nvim";
   inputs.nur.url = "github:nix-community/NUR";
   inputs.home-manager = {
     url = "github:nix-community/home-manager";
