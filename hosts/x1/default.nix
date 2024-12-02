@@ -7,7 +7,7 @@ let
   mixins = ../../mixins/nixos;
 
   common = (builtins.toPath "${mixins}/common.nix");
-  # qemu = (builtins.toPath "${mixins}/qemu.nix");
+  qemu = (builtins.toPath "${mixins}/qemu.nix");
   docker = (builtins.toPath "${mixins}/docker.nix");
   thunar = (builtins.toPath "${mixins}/thunar.nix");
 
@@ -23,11 +23,13 @@ in
     ./xdg.nix
 
     common
-    # qemu
+    qemu
     docker
     thunar
     polkitAgent
   ];
+
+  services.logind.lidSwitch = "ignore";
 
   nixpkgs.config.allowUnfree = true;
 

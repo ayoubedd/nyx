@@ -22,10 +22,12 @@
 
   outputs = { self, ... }@inputs:
     let
-      inherit (inputs) nixpkgs nixos-hardware flake-parts nur stylix home-manager;
-      lib = nixpkgs.lib // home-manager.lib // { lo = (import ./lib { inherit lib nixpkgs; }); };
-    in
-    flake-parts.lib.mkFlake { inherit inputs; } {
+      inherit (inputs)
+        nixpkgs nixos-hardware flake-parts nur stylix home-manager;
+      lib = nixpkgs.lib // home-manager.lib // {
+        lo = (import ./lib { inherit lib nixpkgs; });
+      };
+    in flake-parts.lib.mkFlake { inherit inputs; } {
       systems = lib.lo.systems;
       perSystem = { config, inputs', pkgs, system, ... }: {
         formatter = pkgs.nixpkgs-fmt;
@@ -33,15 +35,11 @@
       flake = {
         nixosConfigurations = {
           x1 = lib.nixosSystem {
-            specialArgs = {
-              inherit inputs nixos-hardware;
-            };
+            specialArgs = { inherit inputs nixos-hardware; };
             modules = [ ./hosts/x1 ];
           };
           kraken = lib.nixosSystem {
-            specialArgs = {
-              inherit inputs;
-            };
+            specialArgs = { inherit inputs; };
             modules = [ ./hosts/kraken ];
           };
         };
@@ -53,9 +51,7 @@
               system = "x86_64-linux";
               host = "x1";
             };
-            modules = [
-              ./homes/orbit
-            ];
+            modules = [ ./homes/orbit ];
           };
           "orbit@kraken" = lib.lo.mkHome {
             specialArgs = {
@@ -63,9 +59,7 @@
               system = "x86_64-linux";
               host = "kraken";
             };
-            modules = [
-              ./homes/orbit
-            ];
+            modules = [ ./homes/orbit ];
           };
         };
       };
