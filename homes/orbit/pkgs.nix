@@ -4,6 +4,7 @@
     nix-index
     nix-tree
     comma
+    vlc
 
     # GUI
     qbittorrent
