@@ -1,11 +1,15 @@
 { pkgs, inputs, system, options, ... }:
 {
+  programs.firefox = {
+    enable = true;
+  };
+
   programs.firefox.profiles."orbit" = {
     name = "orbit";
     isDefault = true;
     id = 0;
 
-    extensions = with options.nur.default.repos.rycee.firefox-addons; [
+    extensions = with pkgs.nur.repos.rycee.firefox-addons; [
       bitwarden
       darkreader
       ublock-origin
@@ -114,7 +118,6 @@
   };
 
   programs.firefox = {
-    enable = true;
     policies = {
       BlockAboutConfig = false;
       DefaultDownloadDirectory = "\${home}/Downloads";
@@ -142,7 +145,7 @@
       OfferToSaveLogins = false;
       PasswordManagerEnabled = false;
       PostQuantumKeyAgreementEnabled = true;
-      TranslateEnabled = true;
+      TranslateEnabled = false;
       FirefoxHome = {
         Search = false;
         TopSites = false;

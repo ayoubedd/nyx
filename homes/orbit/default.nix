@@ -1,7 +1,7 @@
 { config, pkgs, lib, inputs, ... }: {
 
   imports = [
-    inputs.nur.hmModules.nur
+    inputs.nur.modules.homeManager.default
     inputs.stylix.homeManagerModules.stylix
     inputs.orbit-nvim.homeManagerModules.orbit-nvim
 
