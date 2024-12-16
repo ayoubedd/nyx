@@ -27,7 +27,8 @@
       lib = nixpkgs.lib // home-manager.lib // {
         lo = (import ./lib { inherit lib nixpkgs; });
       };
-    in flake-parts.lib.mkFlake { inherit inputs; } {
+    in
+    flake-parts.lib.mkFlake { inherit inputs; } {
       systems = lib.lo.systems;
       perSystem = { config, inputs', pkgs, system, ... }: {
         formatter = pkgs.nixpkgs-fmt;
