@@ -52,11 +52,9 @@ in
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
-  programs.sway.enable = true;
   programs.hyprland.enable = true;
 
   security.polkit.enable = true;
-  security.pam.services.swaylock = { };
 
   # Users
   users.users.orbit = with pkgs; {
