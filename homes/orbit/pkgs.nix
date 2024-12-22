@@ -5,6 +5,7 @@
     nix-tree
     comma
     vlc
+    rclone
 
     # GUI
     qbittorrent
