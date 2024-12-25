@@ -28,7 +28,7 @@ System wide config is managed through nix and nix modules everything else is man
 - Terminal multiplexer: [Zellij](https://github.com/zellij-org/zellij)
 - Shell: zsh
 - Editor: Neovim
-- Desktop: Hyprland / Sway
+- Desktop: Hyprland
 - Browser: Firefox
 - Media: [imv](https://sr.ht/~exec64/imv/) + mpv + zathura
 - Theme: [Night fox](https://github.com/EdenEast/nightfox.nvim/blob/main/extra/carbonfox/base16.yaml) + [Sylix](https://github.com/danth/stylix) for easy system-wide colorscheming
