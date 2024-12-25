@@ -10,16 +10,13 @@
     ./fonts.nix
     ./services.nix
 
-    # ../../mixins/hm/desktops/sway
     ../../mixins/hm/desktops/hyprland
 
     ../../mixins/hm/browsers/firefox.nix
-    ../../mixins/hm/browsers/chromium.nix
 
     ../../mixins/hm/terminals/alacritty
     ../../mixins/hm/shells/zsh
     ../../mixins/hm/mux/zellij
-    # ../../mixins/hm/editors/neovim
     ../../mixins/hm/media/mpv.nix
     ../../mixins/hm/media/zathura.nix
 
