@@ -2,7 +2,7 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ lib, pkgs, nixos-hardware, config, ... }:
+{ lib, pkgs, nixos-hardware, config, inputs, ... }:
 let
   mixins = ../../mixins/nixos;
 
@@ -11,16 +11,22 @@ let
   docker = (builtins.toPath "${mixins}/docker.nix");
   thunar = (builtins.toPath "${mixins}/thunar.nix");
 
-  polkitAgent = (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") { inherit pkgs; wantedBy = "hyprland-session.target"; });
+  polkitAgent =
+    (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") {
+      inherit pkgs;
+      wantedBy = "hyprland-session.target";
+    });
 in
 {
   imports = [
     nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
+    inputs.sops-nix.nixosModules.sops
     ./hardware-configuration.nix
     ./services.nix
     ./udev.nix
     ./power.nix
     ./xdg.nix
+    ./pam.nix
 
     common
     # qemu
@@ -28,11 +34,6 @@ in
     thunar
     polkitAgent
   ];
-
-  security.pam.services = {
-    login.u2fAuth = true;
-    sudo.u2fAuth = true;
-  };
 
   nixpkgs.config.allowUnfree = true;
 
@@ -58,14 +59,10 @@ in
   users.users.orbit = with pkgs; {
     initialPassword = "toor";
     isNormalUser = true;
-    extraGroups = [
-      "wheel"
-      "video"
-      "audio"
-    ]
-    ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
-    ++ lib.optional config.virtualisation.docker.enable "docker"
-    ++ lib.optional config.networking.networkmanager.enable "networkmanager";
+    extraGroups = [ "wheel" "video" "audio" ]
+      ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
+      ++ lib.optional config.virtualisation.docker.enable "docker"
+      ++ lib.optional config.networking.networkmanager.enable "networkmanager";
     shell = zsh;
   };
 
