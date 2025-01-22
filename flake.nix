@@ -5,6 +5,10 @@
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   inputs.orbit-nvim.url = "github:ayoubedd/nvim";
   inputs.nur.url = "github:nix-community/NUR";
+  inputs.sops-nix = {
+    url = "github:Mic92/sops-nix";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
   inputs.home-manager = {
     url = "github:nix-community/home-manager";
     inputs.nixpkgs.follows = "nixpkgs";
