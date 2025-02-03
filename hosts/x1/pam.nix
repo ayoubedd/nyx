@@ -4,6 +4,8 @@
   services.udev.packages = with pkgs; [ yubikey-personalization ];
   environment.systemPackages = with pkgs; [ yubioath-flutter ];
 
+    services.fprintd.enable = true;
+
   security.pam.yubico = {
     enable = true;
     mode = "challenge-response";
@@ -14,11 +16,13 @@
     login = {
       u2fAuth = true;
       enableGnomeKeyring = true;
+      fprintAuth = false;
     };
 
     greetd = {
       u2fAuth = true;
       enableGnomeKeyring = true;
+      fprintAuth = false;
     };
 
     sudo = {
