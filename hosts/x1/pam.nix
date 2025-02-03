@@ -11,10 +11,25 @@
   };
 
   security.pam.services = {
-    login.u2fAuth = true;
-    sudo.u2fAuth = true;
-    greetd.u2fAuth = true;
-    polkit-1.u2fAuth = true;
+    login = {
+      u2fAuth = true;
+      enableGnomeKeyring = true;
+    };
+
+    greetd = {
+      u2fAuth = true;
+      enableGnomeKeyring = true;
+    };
+
+    sudo = {
+      u2fAuth = true;
+      nodelay = true;
+    };
+
+    polkit-1 = {
+      u2fAuth = true;
+      nodelay = true;
+    };
   };
 
   services.udev.extraRules = ''
