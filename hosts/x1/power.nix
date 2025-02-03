@@ -1,11 +1,11 @@
 { pkgs, ... }: {
-  services.thermald.enable = true;
-  services.thermald.ignoreCpuidCheck = true;
+  # services.thermald.enable = true;
+  # services.thermald.ignoreCpuidCheck = true;
 
-  powerManagement.powertop.enable = true;
-  environment.systemPackages = with pkgs; [
-    powertop
-  ];
+  # powerManagement.powertop.enable = true;
+  # environment.systemPackages = with pkgs; [
+  #   powertop
+  # ];
   services.acpid = {
     enable = true;
     handlers.energy_perf_bias = {
