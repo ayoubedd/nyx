@@ -380,11 +380,11 @@
         "nixpkgs": "nixpkgs_3"
       },
       "locked": {
-        "lastModified": 1738607742,
-        "narHash": "sha256-xOjhRtnQbN8xmWTiqxXTu3G01XKU8rEMICcjaIXqOkA=",
+        "lastModified": 1738608868,
+        "narHash": "sha256-kWlLd4h5LGOHertdmFzrb4Z8JjI+Va3gu4122gQCQc4=",
         "owner": "ayoubedd",
         "repo": "nvim",
-        "rev": "1cefcfe98bfeef5b4bc15f591b0dc0fc4292cf71",
+        "rev": "9d3e9a2d513dc4db51ff940f9b060597d310ecbb",
         "type": "github"
       },
       "original": {
