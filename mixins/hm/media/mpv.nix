@@ -78,8 +78,10 @@
     "," = "frame-back-step"; # go back by one frame and pause
 
     "p" = "show-progress"; # "show"; = playback progress
-    "s" = "screenshot"; # take a screenshot of the video in its original resolution with subtitles
-    "S" = "screenshot video"; # take a screenshot of the video in its original resolution without subtitles
+    "s" =
+      "screenshot"; # take a screenshot of the video in its original resolution with subtitles
+    "S" =
+      "screenshot video"; # take a screenshot of the video in its original resolution without subtitles
 
     "Alt+h" = "add video-pan-x  -0.1"; # move the video right
     "Alt+l" = "add video-pan-x   0.1"; # move the video left
@@ -87,7 +89,8 @@
     "Alt+j" = "add video-pan-y   0.1"; # move the video up
     "Alt++" = "add video-zoom    0.1"; # zoom in
     "Alt+-" = "add video-zoom   -0.1"; # zoom out
-    "Alt+r" = "set video-zoom 0; set video-pan-x 0; set video-pan-y 0 "; # reset zoom and pan settings
+    "Alt+r" =
+      "set video-zoom 0; set video-pan-x 0; set video-pan-y 0 "; # reset zoom and pan settings
 
     "Shift+j" = "cycle sub"; # switch subtitle track
     "Shift+k" = "cycle audio"; # switch audio track

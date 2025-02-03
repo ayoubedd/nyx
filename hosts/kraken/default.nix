@@ -13,39 +13,38 @@ let
 
   disko = import ./disk-config.nix { device = "/dev/xxx"; };
 
-  polkitAgent = (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") { inherit pkgs; wantedBy = "hyprland-session.target"; });
-in
-{
-  imports =
-    [
-      # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      ./nvidia.nix
-      ./services.nix
-      # ./virtualisation.nix
-      ./xdg.nix
-      ./sysctl.nix
+  polkitAgent =
+    (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") {
+      inherit pkgs;
+      wantedBy = "hyprland-session.target";
+    });
+in {
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+    ./nvidia.nix
+    ./services.nix
+    # ./virtualisation.nix
+    ./xdg.nix
+    ./sysctl.nix
 
-      inputs.disko.nixosModules.disko
-      disko
+    inputs.disko.nixosModules.disko
+    disko
 
-      common
-      # qemu
-      docker
-      thunar
-      polkitAgent
-    ];
-
-  boot.kernelParams = [
-    "amd-pstate=active"
+    common
+    # qemu
+    docker
+    thunar
+    polkitAgent
   ];
+
+  boot.kernelParams = [ "amd-pstate=active" ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
 
   # Hostname
   networking.hostName = "kraken"; # Define your hostname.
@@ -56,7 +55,8 @@ in
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
-  hardware.bluetooth.powerOnBoot = lib.mkForce true; # Overriding common nixos config
+  hardware.bluetooth.powerOnBoot =
+    lib.mkForce true; # Overriding common nixos config
 
   programs.hyprland.enable = true;
   security.polkit.enable = true;
@@ -67,14 +67,10 @@ in
   users.users.orbit = with pkgs; {
     initialPassword = "toor";
     isNormalUser = true;
-    extraGroups = [
-      "wheel"
-      "video"
-      "audio"
-    ]
-    ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
-    ++ lib.optional config.virtualisation.docker.enable "docker"
-    ++ lib.optional config.networking.networkmanager.enable "networkmanager";
+    extraGroups = [ "wheel" "video" "audio" ]
+      ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
+      ++ lib.optional config.virtualisation.docker.enable "docker"
+      ++ lib.optional config.networking.networkmanager.enable "networkmanager";
     shell = zsh;
   };
 

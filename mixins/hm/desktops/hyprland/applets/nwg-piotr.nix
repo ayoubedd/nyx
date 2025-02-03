@@ -1,12 +1,15 @@
 { ... }:
 let
-  lock-screen-icon = builtins.toString ../../../../../assets/icons/system-lock-screen.svg;
-  logout-icon = builtins.toString ../../../../../assets/icons/system-log-out.svg;
-  suspend-icon = builtins.toString ../../../../../assets/icons/system-suspend.svg;
-  shutdown-icon = builtins.toString ../../../../../assets/icons/system-shutdown.svg;
+  lock-screen-icon =
+    builtins.toString ../../../../../assets/icons/system-lock-screen.svg;
+  logout-icon =
+    builtins.toString ../../../../../assets/icons/system-log-out.svg;
+  suspend-icon =
+    builtins.toString ../../../../../assets/icons/system-suspend.svg;
+  shutdown-icon =
+    builtins.toString ../../../../../assets/icons/system-shutdown.svg;
   reboot-icon = builtins.toString ../../../../../assets/icons/system-reboot.svg;
-in
-{
+in {
   programs.nwg-piotr = {
     enable = true;
 

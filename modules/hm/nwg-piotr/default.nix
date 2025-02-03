@@ -1,8 +1,6 @@
 { lib, pkgs, config, ... }:
-let
-  cfg = config.programs.nwg-piotr;
-in
-{
+let cfg = config.programs.nwg-piotr;
+in {
   options = {
     programs.nwg-piotr = {
       enable = lib.mkEnableOption { };
@@ -22,9 +20,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [
-      nwg-bar
-    ];
+    home.packages = with pkgs; [ nwg-bar ];
 
     xdg.configFile."nwg-bar/bar.json" = {
       enable = cfg.config != null;
@@ -36,4 +32,4 @@ in
       text = lib.mkForce cfg.style;
     };
   };
-} 
+}

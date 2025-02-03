@@ -15,21 +15,10 @@
     enable = true;
     defaultFonts = {
       emoji = [ "Noto Color Emoji" ];
-      monospace = [
-        "Noto Sans Mono"
-        "Noto Naskh Arabic UI"
-        "Noto Sans Arabic"
-      ];
-      serif = [
-        "Noto Serif"
-        "Noto Naskh Arabic UI"
-        "Noto Sans Arabic"
-      ];
-      sansSerif = [
-        "Noto Sans"
-        "Noto Naskh Arabic UI"
-        "Noto Sans Arabic"
-      ];
+      monospace =
+        [ "Noto Sans Mono" "Noto Naskh Arabic UI" "Noto Sans Arabic" ];
+      serif = [ "Noto Serif" "Noto Naskh Arabic UI" "Noto Sans Arabic" ];
+      sansSerif = [ "Noto Sans" "Noto Naskh Arabic UI" "Noto Sans Arabic" ];
     };
   };
 }

@@ -1,9 +1,6 @@
 { lib, pkgs, ... }: {
   # depedent packges
-  home.packages = with pkgs; [
-    font-awesome
-    noto-fonts
-  ];
+  home.packages = with pkgs; [ font-awesome noto-fonts ];
 
   programs.waybar = {
     enable = true;
@@ -17,7 +14,16 @@
       mainBar = {
         "modules-left" = [ "hyprland/workspaces" ];
         "modules-center" = [ "clock" ];
-        "modules-right" = [ "network" "pulseaudio" "cpu" "memory" "temperature" "upower" "backlight" "tray" ];
+        "modules-right" = [
+          "network"
+          "pulseaudio"
+          "cpu"
+          "memory"
+          "temperature"
+          "upower"
+          "backlight"
+          "tray"
+        ];
 
         "network" = {
           "interface" = "wlp0s20f3";
@@ -46,7 +52,9 @@
         };
 
         "clock" = {
-          "tooltip-format" = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+          "tooltip-format" = ''
+            <big>{:%Y %B}</big>
+            <tt><small>{calendar}</small></tt>'';
           "format" = "{:%a, %d %b, %H:%M}";
         };
 
@@ -76,9 +84,7 @@
           "format" = "{temperatureC}°C {icon}";
           "format-icons" = [ "" "" "" "" "" ];
           "tooltip" = false;
-          "hwmon-path" = [
-            "/sys/class/hwmon/hwmon5/temp1_input"
-          ];
+          "hwmon-path" = [ "/sys/class/hwmon/hwmon5/temp1_input" ];
         };
 
         "backlight" = {

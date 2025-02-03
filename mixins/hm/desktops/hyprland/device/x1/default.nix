@@ -1,5 +1,1 @@
-{ ... }: {
-  imports = [
-    ./kanshi.nix
-  ];
-}
+{ ... }: { imports = [ ./kanshi.nix ]; }

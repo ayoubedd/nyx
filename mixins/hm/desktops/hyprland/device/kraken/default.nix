@@ -1,7 +1,1 @@
-{ ... }: {
-  imports = [
-    ./kanshi.nix
-    ./waybar.nix
-    ./hypridle.nix
-  ];
-}
+{ ... }: { imports = [ ./kanshi.nix ./waybar.nix ./hypridle.nix ]; }

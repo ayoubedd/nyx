@@ -8,10 +8,7 @@
       "--disable-sync-preferences"
     ];
 
-    dictionaries = with pkgs.hunspellDictsChromium; [
-      en_US
-      fr_FR
-    ];
+    dictionaries = with pkgs.hunspellDictsChromium; [ en_US fr_FR ];
 
     extensions = [
       { id = "cjpalhdlnbpafiamejdnhcphjbkeiagm"; } # uBlock Origin

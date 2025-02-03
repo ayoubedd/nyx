@@ -12,17 +12,12 @@
     ./documentation.nix
   ];
 
-
   # System packages
-  environment.systemPackages = with pkgs; [
-    neovim
-    git
-    curl
-    qt5.qtwayland
-  ];
+  environment.systemPackages = with pkgs; [ neovim git curl qt5.qtwayland ];
 
   programs.nix-ld.enable = true;
-  security.rtkit.enable = true; # For processs niceness and priority adjusment through dbus, used by browsers.
+  security.rtkit.enable =
+    true; # For processs niceness and priority adjusment through dbus, used by browsers.
 
   time.hardwareClockInLocalTime = false;
 

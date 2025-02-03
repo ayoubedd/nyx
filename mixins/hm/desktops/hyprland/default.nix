@@ -1,5 +1,4 @@
-{ pkgs, lo-pkgs, host, ... }:
-{
+{ pkgs, lo-pkgs, host, ... }: {
 
   imports = [
     # import home manager custom modules
@@ -21,16 +20,15 @@
     ./device/${host}
   ];
 
-  home.packages = with pkgs;
-    [
-      lo-pkgs.realod-failed-services
-      wl-clipboard
-      wl-color-picker
-      slurp
-      grim
-      # wtype
-      wofi-emoji
-      jq
-      wl-clip-persist # should write a module for this
-    ];
+  home.packages = with pkgs; [
+    lo-pkgs.realod-failed-services
+    wl-clipboard
+    wl-color-picker
+    slurp
+    grim
+    # wtype
+    wofi-emoji
+    jq
+    wl-clip-persist # should write a module for this
+  ];
 }

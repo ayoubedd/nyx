@@ -16,8 +16,7 @@ let
       inherit pkgs;
       wantedBy = "hyprland-session.target";
     });
-in
-{
+in {
   imports = [
     nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
     inputs.sops-nix.nixosModules.sops

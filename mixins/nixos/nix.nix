@@ -11,15 +11,10 @@
     settings = {
       sandbox = true;
 
-      experimental-features = [
-        "nix-command"
-        "flakes"
-        "read-only-local-store"
-      ];
+      experimental-features =
+        [ "nix-command" "flakes" "read-only-local-store" ];
 
-      trusted-users = [
-        "@wheel"
-      ];
+      trusted-users = [ "@wheel" ];
 
       warn-dirty = false;
     };
