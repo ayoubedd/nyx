@@ -20,12 +20,15 @@ in {
   imports = [
     nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
     inputs.sops-nix.nixosModules.sops
+
     ./hardware-configuration.nix
     ./services.nix
     ./udev.nix
     ./power.nix
     ./xdg.nix
     ./pam.nix
+    ./wireguard.nix
+    ./sops.nix
 
     common
     # qemu
@@ -47,7 +50,7 @@ in {
   # Set your time zone.
   time.timeZone = "Africa/Casablanca";
 
-  # Select internationalisation properties.
+  # Select internationalization properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
   programs.hyprland.enable = true;
@@ -55,13 +58,19 @@ in {
   security.polkit.enable = true;
 
   # Users
+  users.mutableUsers = false;
+
+  users.users.root = {
+    hashedPasswordFile = config.sops.secrets.root_password.path;
+  };
+
   users.users.orbit = with pkgs; {
-    initialPassword = "toor";
     isNormalUser = true;
     extraGroups = [ "wheel" "video" "audio" ]
       ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
       ++ lib.optional config.virtualisation.docker.enable "docker"
       ++ lib.optional config.networking.networkmanager.enable "networkmanager";
+    hashedPasswordFile = config.sops.secrets.user_password.path;
     shell = zsh;
   };
 

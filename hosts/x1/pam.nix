@@ -4,7 +4,7 @@
   services.udev.packages = with pkgs; [ yubikey-personalization ];
   environment.systemPackages = with pkgs; [ yubioath-flutter ];
 
-    services.fprintd.enable = true;
+  services.fprintd.enable = true;
 
   security.pam.yubico = {
     enable = true;
@@ -22,6 +22,10 @@
     greetd = {
       u2fAuth = true;
       enableGnomeKeyring = true;
+      fprintAuth = false;
+    };
+
+    hyprlock = {
       fprintAuth = false;
     };
 

@@ -3,6 +3,7 @@
     enable = true;
     userEmail = "me@ayoubedd.me";
     userName = "Ayoub Eddaoudi";
+
     includes = [{
       condition = "gitdir:~/Code/42/";
       contents = {
@@ -12,6 +13,7 @@
         };
       };
     }];
+
     extraConfig = {
       core.excludesfile = "gitignore";
       core.editor = "nvim";

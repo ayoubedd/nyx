@@ -1,11 +1,12 @@
 { pkgs, ... }: {
-  # services.thermald.enable = true;
-  # services.thermald.ignoreCpuidCheck = true;
+  services.thermald.enable = true;
+  services.thermald.ignoreCpuidCheck = true;
 
   # powerManagement.powertop.enable = true;
   # environment.systemPackages = with pkgs; [
   #   powertop
   # ];
+
   services.acpid = {
     enable = true;
     handlers.energy_perf_bias = {
@@ -506,13 +507,13 @@
       # Separate multiple devices with spaces.
       # Default: <none>
 
-      DEVICES_TO_DISABLE_ON_STARTUP = "bluetooth nfc";
+      DEVICES_TO_DISABLE_ON_STARTUP = "nfc";
 
       # Radio devices to enable on startup: bluetooth, nfc, wifi, wwan.
       # Separate multiple devices with spaces.
       # Default: <none>
 
-      DEVICES_TO_ENABLE_ON_STARTUP = "wifi";
+      DEVICES_TO_ENABLE_ON_STARTUP = "wifi bluetooth";
 
       # Radio devices to disable on shutdown: bluetooth, nfc, wifi, wwan.
       # Note: use as a workaround for devices that are blocking shutdown.

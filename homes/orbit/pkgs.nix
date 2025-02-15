@@ -1,4 +1,4 @@
-{ pkgs, ... }@args: {
+{ pkgs, ... }: {
   home.packages = with pkgs; [
     # Nix stuff
     nix-index
@@ -51,6 +51,4 @@
     sof-firmware
     bind # for dig
   ];
-
-  programs.direnv = { enable = true; };
 }
