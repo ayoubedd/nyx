@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, inputs, ... }: {
   home.packages = with pkgs; [
     # Nix stuff
     nix-index
@@ -16,7 +16,8 @@
     seahorse
     gnome-software
 
-    devenv
+    inputs.devenv.outputs.packages.x86_64-linux.default
+
     httplz
     tokei
     whois

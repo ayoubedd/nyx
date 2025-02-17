@@ -21,11 +21,11 @@
 
   time.hardwareClockInLocalTime = false;
 
-  # services.ananicy = {
-  #   enable = true;
-  #   package = pkgs.ananicy-cpp;
-  #   rulesProvider = pkgs.ananicy-rules-cachyos;
-  # };
+  services.ananicy = {
+    enable = true;
+    package = pkgs.ananicy-cpp;
+    rulesProvider = pkgs.ananicy-rules-cachyos;
+  };
 
   environment.homeBinInPath = true;
   fonts.enableDefaultPackages = true;
@@ -34,4 +34,3 @@
   hardware.enableAllFirmware = true;
   programs.gnupg.agent.enable = true;
 }
-

@@ -31,3 +31,7 @@ up *targets:
 # Garbage collect
 gc:
   sudo nix-collect-garbage --delete-old
+
+# Garbage collect
+fmt:
+  nix fmt

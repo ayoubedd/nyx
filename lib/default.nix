@@ -1,6 +1,6 @@
 { lib, nixpkgs, ... }:
 let
-  mkHome = { specialArgs, modules ? [ ] }:
+  mkHome = { specialArgs, modules ? [ ], }:
     lib.homeManagerConfiguration rec {
       pkgs = nixpkgs.legacyPackages.${specialArgs.system};
       extraSpecialArgs = specialArgs // {

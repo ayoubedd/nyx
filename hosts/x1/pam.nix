@@ -25,9 +25,7 @@
       fprintAuth = false;
     };
 
-    hyprlock = {
-      fprintAuth = false;
-    };
+    hyprlock = { fprintAuth = false; };
 
     sudo = {
       u2fAuth = true;

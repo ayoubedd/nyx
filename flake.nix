@@ -46,7 +46,7 @@
       imports = [ inputs.devenv.flakeModule ];
       systems = lib.lo.systems;
       perSystem = { config, inputs', pkgs, system, ... }: {
-        formatter = pkgs.nixfmt-classic;
+        formatter = pkgs.treefmt;
         devenv.shells.default = {
           devenv.root =
             let devenvRootFileContent = builtins.readFile devenv-root.outPath;
