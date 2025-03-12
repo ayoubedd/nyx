@@ -6,6 +6,7 @@
     comma
     vlc
     rclone
+    atuin
 
     # GUI
     qbittorrent
@@ -17,6 +18,8 @@
     gnome-software
 
     inputs.devenv.outputs.packages.x86_64-linux.default
+
+    lsof
 
     httplz
     tokei
