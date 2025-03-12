@@ -6,7 +6,7 @@
     isDefault = true;
     id = 0;
 
-    extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+    extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
       bitwarden
       darkreader
       ublock-origin
@@ -14,6 +14,59 @@
     ];
 
     settings = {
+      "network.http.max-connections" = 1800;
+      "network.http.max-persistent-connections-per-server" = 10;
+      "network.http.max-urgent-start-excessive-connections-per-host" = 5;
+      "network.http.pacing.requests.enabled" = false;
+      "network.dnsCacheExpiration" = 3600;
+      "network.ssl_tokens_cache_capacity" = 10240;
+
+      "gfx.canvas.accelerated.cache-items" = 8192;
+      "gfx.canvas.accelerated.cache-size" = 512;
+      "gfx.content.skia-font-cache-size" = 20;
+
+      "browser.cache.disk.enable" = true;
+
+      "browser.aboutwelcome.enabled" = false;
+      "browser.shell.checkDefaultBrowser" = false;
+
+      "datareporting.policy.dataSubmissionEnabled" = false;
+      "datareporting.healthreport.uploadEnabled" = false;
+      "toolkit.telemetry.unified" = false;
+      "toolkit.telemetry.enabled" = false;
+      "toolkit.telemetry.server" = "data:,";
+      "toolkit.telemetry.archive.enabled" = false;
+      "toolkit.telemetry.newProfilePing.enabled" = false;
+      "toolkit.telemetry.shutdownPingSender.enabled" = false;
+      "toolkit.telemetry.updatePing.enabled" = false;
+      "toolkit.telemetry.bhrPing.enabled" = false;
+      "toolkit.telemetry.firstShutdownPing.enabled" = false;
+      "toolkit.telemetry.coverage.opt-out" = true;
+      "toolkit.coverage.opt-out" = true;
+      "toolkit.coverage.endpoint.base" = "";
+      "browser.newtabpage.activity-stream.feeds.telemetry" = false;
+      "browser.newtabpage.activity-stream.telemetry" = false;
+
+      "browser.urlbar.trimHttps" = true;
+      "browser.urlbar.untrimOnUserInteraction.featureGate" = true;
+      "browser.search.separatePrivateDefault.ui.enabled" = true;
+      "browser.urlbar.update2.engineAliasRefresh" = true;
+      "browser.search.suggest.enabled" = false;
+      "browser.urlbar.quicksuggest.enabled" = false;
+      "browser.urlbar.groupLabels.enabled" = false;
+      "browser.formfill.enable" = false;
+      "security.insecure_connection_text.enabled" = true;
+      "security.insecure_connection_text.pbmode.enabled" = true;
+      "network.IDN_show_punycode" = true;
+
+      "browser.privatebrowsing.forceMediaMemoryCache" = true;
+      "browser.sessionstore.interval" = 60000;
+
+      "media.memory_cache_max_size" = 65536;
+      "media.cache_readahead_limit" = 7200;
+      "media.cache_resume_threshold" = 3600;
+      "image.mem.decode_bytes_at_a_time" = 32768;
+
       "browser.startup.blankWindow" = true;
       "browser.toolbars.bookmarks.visibility" = "never";
       "browser.search.isUS" = false;
@@ -21,7 +74,6 @@
       "general.useragent.locale" = "en-US";
       "browser.bookmarks.showMobileBookmarks" = false;
       # "extensions.activeThemeID" = "firefox-compact-dark@mozilla.org";
-      "browser.search.suggest.enabled" = false;
       "browser.urlbar.suggest.searches" = false;
       "view_source.wrap_long_lines" = true;
       "extensions.autoDisableScopes" = 0;
