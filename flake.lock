@@ -671,11 +671,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1741740040,
-        "narHash": "sha256-jzrvqGN+0ddGwrzPda8BWgSzJ+cxqC8DvdN4Hj5TRv8=",
+        "lastModified": 1741742175,
+        "narHash": "sha256-HTlPBW0nzArIwdupHvXBrw7UVmSt7UhHCi+2axsZ/Kc=",
         "owner": "ayoubedd",
         "repo": "nvim",
-        "rev": "e4642618562c14c87f52c493b72fc9fe381af6a0",
+        "rev": "6837850d46e84a4b6d29cfd96e044dda5705be39",
         "type": "github"
       },
       "original": {
