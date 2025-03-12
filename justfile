@@ -30,6 +30,7 @@ up *targets:
 
 # Garbage collect
 gc:
+  nix-collect-garbage --delete-old
   sudo nix-collect-garbage --delete-old
 
 # Garbage collect
