@@ -1,4 +1,4 @@
-{ config, ... }: {
+{ config, lib, ... }: {
   programs.mpv.enable = true;
 
   programs.mpv.config = {
@@ -49,7 +49,7 @@
     # Subtitle
     sub-visibility = "no";
     sub-auto = "fuzzy";
-    sub-font = "Noto Sans";
+    sub-font = lib.mkForce "Noto Sans";
     slang = "ar,en,eng";
 
     # Screenshots
