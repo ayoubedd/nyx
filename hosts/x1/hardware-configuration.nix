@@ -61,7 +61,7 @@
   };
 
   fileSystems."/run/media/casa/hdd-1" = {
-    device = "truenas-1.casa.ayoubedd.me:/mnt-hdd-1";
+    device = "truenas-1.casa.ayoubedd.me:/mnt/hdd-1";
     fsType = "nfs";
     options = [ "nofail" "noatime" "nodiratime" ];
   };
