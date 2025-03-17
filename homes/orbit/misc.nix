@@ -26,5 +26,14 @@
     components = [ "secrets" "ssh" ];
   };
 
+  home.file.".config/atuin/config.toml" = {
+    enable = true;
+    force = true;
+    text = ''
+      keymap_mode="vim-insert"
+      enter_accept=false
+    '';
+  };
+
   home.packages = with pkgs; [ nerd-fonts.jetbrains-mono ];
 }
