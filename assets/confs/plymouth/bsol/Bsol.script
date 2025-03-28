@@ -1,0 +1,146 @@
+# ▒█▀▀█ ▒█▀▀▀█ ▒█▀▀▀█ ▒█░░░ 　 ░░ 　 ▒█▀▀█ ▒█░░░ ▒█░░▒█ ▒█▀▄▀█ ▒█▀▀▀█ ▒█░▒█ ▀▀█▀▀ ▒█░▒█ 
+# ▒█▀▀▄ ░▀▀▀▄▄ ▒█░░▒█ ▒█░░░ 　 ▀▀ 　 ▒█▄▄█ ▒█░░░ ▒█▄▄▄█ ▒█▒█▒█ ▒█░░▒█ ▒█░▒█ ░▒█░░ ▒█▀▀█ 
+# ▒█▄▄█ ▒█▄▄▄█ ▒█▄▄▄█ ▒█▄▄█ 　 ░░ 　 ▒█░░░ ▒█▄▄█ ░░▒█░░ ▒█░░▒█ ▒█▄▄▄█ ░▀▄▄▀ ░▒█░░ ▒█░▒█
+# Made By:- Vivek Rajan
+# Don't forget to follow on github:- https://github.com/MrVivekRajan
+ 
+background_image = Image("background.png");
+background_sprite = Sprite(background_image);
+screen_width = Window.GetWidth();
+screen_height = Window.GetHeight();
+resized_background_image = background_image.Scale(screen_width, screen_height);
+background_sprite.SetImage(resized_background_image);
+
+CURVE_FUNCTION_LINEAR = 0;
+CURVE_FUNCTION_EASE_IN = 1;
+CURVE_FUNCTION_EASE_OUT = 2;
+CURVE_FUNCTION_EASE_IN_OUT = 3;
+DEG2RAD_FACTOR = Math.Pi / 180;
+M_PI_2 = Math.Pi / 2;
+
+DOTS = 5;
+FADE_OUT_DOTS = 0;
+
+fps = 13;
+anim_duration = 17000;
+anim_frames = anim_duration / 1200 * fps;   
+
+percent_00 = 0;
+percent_07 = Math.Int( 7 / 100 * anim_frames);
+percent_30 = Math.Int(30 / 100 * anim_frames);
+percent_39 = Math.Int(39 / 100 * anim_frames);
+percent_70 = Math.Int(70 / 100 * anim_frames);
+percent_75 = Math.Int(75 / 100 * anim_frames);
+percent_76 = Math.Int(76 / 100 * anim_frames);
+percent_100 = anim_frames;
+
+angle_225 = 225 * DEG2RAD_FACTOR - M_PI_2;
+angle_345 = 345 * DEG2RAD_FACTOR - M_PI_2;
+angle_455 = 455 * DEG2RAD_FACTOR - M_PI_2;
+angle_690 = 690 * DEG2RAD_FACTOR - M_PI_2;
+angle_815 = 815 * DEG2RAD_FACTOR - M_PI_2;
+angle_945 = 945 * DEG2RAD_FACTOR - M_PI_2;
+
+
+fun curve (value, functype, input_from, input_to, output_from, output_to) {
+    input_range = input_to - input_from;
+    output_range = output_to - output_from;
+    linear_value = (value - input_from) / input_range;
+    if (functype == CURVE_FUNCTION_LINEAR) {
+        return output_from + linear_value * output_range;
+    } else if (functype == CURVE_FUNCTION_EASE_OUT) {
+        return output_from + Math.Sin(linear_value * M_PI_2) * output_range;
+    } else if (functype == CURVE_FUNCTION_EASE_IN) {
+        return output_from + (1 - Math.Sin(M_PI_2 + linear_value * M_PI_2)) * output_range;
+    } else if (functype == CURVE_FUNCTION_EASE_IN_OUT) {
+        return output_from + (1 - Math.Sin(M_PI_2 + linear_value * Math.Pi)) / 2 * output_range;
+    } else {
+        return 0;
+    }
+}
+
+dot_image = Image("circle.png");
+for (i = 0; i < DOTS; i++){
+    dot[i].sprite = Sprite(dot_image);
+    dot[i].sprite.SetOpacity(0);
+    dot[i].sprite.SetZ(0);
+}
+
+dot_gap = Math.Int(fps - 1);
+progress = 0.0;
+center_x = Window.GetWidth() / 2;
+center_y = Window.GetHeight() / 1.11;
+// radius = Math.Max(15, Math.Int(Window.GetWidth()  * 25 / 1920));   // adapt according to screen width
+radius = Math.Max(15, Math.Int(Window.GetHeight() * 25 / 1080));   // adapt to according screen height (better than width)
+opacity = 0;
+angle = 0;
+frame = 0;
+loop_count = 0;
+
+computed_x[0] = 0;
+computed_y[0] = 0;
+computed_o[0] = 0;
+for (f = 0; f < anim_frames; f++) {
+    if (f < percent_07) {
+        angle = curve(f, CURVE_FUNCTION_EASE_OUT, percent_00, percent_07, angle_225, angle_345);
+        if (FADE_OUT_DOTS) {
+            opacity = curve(f, CURVE_FUNCTION_EASE_OUT, percent_00, percent_07, 0, 1);
+        } else {
+            opacity = 1;
+        }
+    } else if (f < percent_30) {
+        angle = curve(f, CURVE_FUNCTION_LINEAR, percent_07, percent_30, angle_345, angle_455);
+        opacity = 1;    
+    } else if (f < percent_39) {
+        angle = curve(f, CURVE_FUNCTION_EASE_IN_OUT, percent_30, percent_39, angle_455, angle_690);
+        opacity = 1;    
+    } else if (f <= percent_70) {
+        angle = curve(f, CURVE_FUNCTION_LINEAR, percent_39, percent_70, angle_690, angle_815);
+        opacity = 1;    
+    } else if (f <= percent_75) {
+        angle = curve(f, CURVE_FUNCTION_EASE_OUT, percent_70, percent_75, angle_815, angle_945);
+        if (FADE_OUT_DOTS) {
+            opacity = curve(f, CURVE_FUNCTION_EASE_OUT, percent_70, percent_75, 1, 0);
+        } else {
+            opacity = 1;
+        }
+    } else if (f <= percent_76) {
+        angle = angle_945;
+        opacity = 0;
+    } else if (f <= percent_100) {
+        angle = angle_945;
+        opacity = 0;
+    }
+    computed_x[f] = center_x + radius * Math.Sin(angle);
+    computed_y[f] = center_y - radius * Math.Cos(angle);
+    computed_o[f] = opacity;
+}
+
+fun refresh () {
+    inc = progress;
+
+    if (inc < 0.80){
+        for (i = 0; i < DOTS; i++){
+            f = Math.Min(Math.Max(0, frame - i * dot_gap), anim_frames); 
+            dot[i].sprite.SetX(computed_x[f]);
+            dot[i].sprite.SetY(computed_y[f]);
+            dot[i].sprite.SetOpacity(computed_o[f]);
+        }
+    } else {
+        opacity = curve(inc, CURVE_FUNCTION_LINEAR, 0.8, 1.0, 1.0, 0.0);
+        for (i = 0; i < DOTS; i++){
+            f = Math.Min(Math.Max(0, frame - i * dot_gap), anim_frames);
+            dot[i].sprite.SetX(computed_x[f]);
+            dot[i].sprite.SetY(computed_y[f]);
+            dot[i].sprite.SetOpacity(computed_o[f] * opacity);
+        }
+    }
+    if (frame >= anim_frames) {
+        loop_count++;
+        frame = 0;
+    } else {
+        frame++;
+    }
+}
+
+Plymouth.SetRefreshFunction(refresh);

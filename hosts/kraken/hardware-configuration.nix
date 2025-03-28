@@ -23,6 +23,17 @@
   networking.useDHCP = lib.mkDefault true;
   # networking.interfaces.enp39s0.useDHCP = lib.mkDefault true;
 
+  boot.binfmt.registrations.appimage = {
+    wrapInterpreterInShell = false;
+    interpreter = "${pkgs.appimage-run}/bin/appimage-run";
+    recognitionType = "magic";
+    offset = 0;
+    mask = "\\xff\\xff\\xff\\xff\\x00\\x00\\x00\\x00\\xff\\xff\\xff";
+    magicOrExtension = "\\x7fELF....AI\\x02";
+  };
+
+  boot.plymouth.enable = true;
+
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode =
     lib.mkDefault config.hardware.enableRedistributableFirmware;

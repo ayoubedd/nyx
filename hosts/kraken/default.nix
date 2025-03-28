@@ -6,15 +6,15 @@
 let
   mixins = ../../mixins/nixos;
 
-  common = (builtins.toPath "${mixins}/common.nix");
+  common = (builtins.toPath "${mixins}/apps/common.nix");
   # qemu = (builtins.toPath "${mixins}/qemu.nix");
-  docker = (builtins.toPath "${mixins}/docker.nix");
-  thunar = (builtins.toPath "${mixins}/thunar.nix");
+  docker = (builtins.toPath "${mixins}/apps/docker.nix");
+  thunar = (builtins.toPath "${mixins}/apps/thunar.nix");
 
   disko = import ./disk-config.nix { device = "/dev/xxx"; };
 
   polkitAgent =
-    (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") {
+    (import (builtins.toPath "${mixins}/apps/polkit_pantheon_agent.nix") {
       inherit pkgs;
       wantedBy = "hyprland-session.target";
     });

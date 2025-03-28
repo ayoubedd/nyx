@@ -4,15 +4,14 @@
 
 { lib, pkgs, nixos-hardware, config, inputs, ... }:
 let
-  mixins = ../../mixins/nixos;
+  misc = ../../misc/nixos;
 
-  common = (builtins.toPath "${mixins}/common.nix");
-  qemu = (builtins.toPath "${mixins}/qemu.nix");
-  docker = (builtins.toPath "${mixins}/docker.nix");
-  thunar = (builtins.toPath "${mixins}/thunar.nix");
-
+  common = (builtins.toPath "${misc}/common");
+  qemu = (builtins.toPath "${misc}/apps/qemu.nix");
+  docker = (builtins.toPath "${misc}/apps/docker.nix");
+  thunar = (builtins.toPath "${misc}/apps/thunar.nix");
   polkitAgent =
-    (import (builtins.toPath "${mixins}/polkit_pantheon_agent.nix") {
+    (import (builtins.toPath "${misc}/apps/polkit_pantheon_agent.nix") {
       inherit pkgs;
       wantedBy = "hyprland-session.target";
     });
@@ -21,20 +20,18 @@ in {
     nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
     inputs.sops-nix.nixosModules.sops
 
-    ./hardware-configuration.nix
-    ./services.nix
-    ./udev.nix
-    ./power.nix
-    ./xdg.nix
-    ./pam.nix
-    ./wireguard.nix
-    ./sops.nix
-
     common
-    # qemu
+    qemu
     docker
     thunar
     polkitAgent
+
+    ./hardware-configuration.nix
+    ./misc.nix
+    ./power.nix
+    ./security.nix
+    ./vpn.nix
+    ./sops.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
@@ -46,19 +43,26 @@ in {
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "x1";
+  networking.useDHCP = lib.mkDefault true;
 
-  # Set your time zone.
+  # Local
   time.timeZone = "Africa/Casablanca";
 
-  # Select internationalization properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "en_US.UTF-8";
+    LC_IDENTIFICATION = "en_US.UTF-8";
+    LC_MEASUREMENT = "en_US.UTF-8";
+    LC_MONETARY = "en_US.UTF-8";
+    LC_NAME = "en_US.UTF-8";
+    LC_NUMERIC = "en_US.UTF-8";
+    LC_PAPER = "en_US.UTF-8";
+    LC_TELEPHONE = "en_US.UTF-8";
+    LC_TIME = "en_US.UTF-8";
+  };
+
   programs.hyprland.enable = true;
-
-  security.polkit.enable = true;
-
-  # Users
-  users.mutableUsers = false;
 
   users.users.root = {
     hashedPasswordFile = config.sops.secrets.root_password.path;

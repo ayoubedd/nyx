@@ -9,13 +9,13 @@
     ./misc.nix
     ./git.nix
 
-    ../../mixins/hm/desktops/hyprland
-    ../../mixins/hm/browsers/firefox.nix
-    ../../mixins/hm/terminals/alacritty
-    ../../mixins/hm/shells/zsh
-    ../../mixins/hm/mux/zellij
-    ../../mixins/hm/media/mpv.nix
-    ../../mixins/hm/media/zathura.nix
+    ../../misc/hm/desktops/hyprland
+    ../../misc/hm/browsers/firefox.nix
+    ../../misc/hm/terminals/alacritty
+    ../../misc/hm/shells/zsh
+    ../../misc/hm/mux/zellij
+    ../../misc/hm/media/mpv.nix
+    ../../misc/hm/media/zathura.nix
   ];
 
   orbit-nvim.enable = true;

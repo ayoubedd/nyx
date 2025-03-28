@@ -4,17 +4,17 @@
 { config, lib, pkgs, modulesPath, ... }:
 
 {
-  imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
+  imports = [
+    (modulesPath + "/installer/scan/not-detected.nix")
+    ../../misc/nixos/hardware/intel.nix
+  ];
 
   boot.initrd.availableKernelModules =
     [ "xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
-  boot.blacklistedKernelModules = [
-    "iTCO_wdt"
-    # "i915"
-  ];
+  boot.blacklistedKernelModules = [ "iTCO_wdt" ];
 
   boot.kernelParams = [
     "quiet"
@@ -22,30 +22,7 @@
     "systemd.show_status=auto"
     "rd.udev.log_level=3"
     "nmi_watchdog=0"
-    "intel_pstate=enable"
-
-    "i915.fastboot=1"
-    "i915.enable_psr=2"
-    "i915.enable_psr2_sel_fetch=1"
-    "i915.enable_guc=2"
-    "i915.enable_fbc=1"
-
-    # "i915.force_probe=!9a49" # 9a49
-    # "xe.force_probe=9a49"
-    # "xe.enable_psr=2"
-    # "xe.enable_psr2_sel_fetch=1"
-    # "xe.enable_fbc=1"
   ];
-
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-    extraPackages = with pkgs; [
-      intel-media-driver # LIBVA_DRIVER_NAME=iHD
-      # intel-vaapi-driver # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
-      libvdpau-va-gl
-    ];
-  };
 
   environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; };
 
@@ -60,22 +37,24 @@
     options = [ "fmask=0022" "dmask=0022" ];
   };
 
-  fileSystems."/run/media/casa/hdd-1" = {
-    device = "truenas-1.casa.ayoubedd.me:/mnt/hdd-1";
-    fsType = "nfs";
-    options = [ "nofail" "noatime" "nodiratime" ];
-  };
-
+  # fileSystems."/run/media/casa/hdd-1" = {
+  #   device = "truenas-1.casa.ayoubedd.me:/mnt/hdd-1";
+  #   fsType = "nfs";
+  #   options = [ "nofail" "noatime" "nodiratime" ];
+  # };
+  #
   swapDevices = [ ];
 
-  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
-  # (the default) this is the recommended approach. When using systemd-networkd it's
-  # still possible to use this option, but it's recommended to use it in conjunction
-  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-  networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.wlp0s20f3.useDHCP = lib.mkDefault true;
+  boot.binfmt.registrations.appimage = {
+    wrapInterpreterInShell = false;
+    interpreter = "${pkgs.appimage-run}/bin/appimage-run";
+    recognitionType = "magic";
+    offset = 0;
+    mask = "\\xff\\xff\\xff\\xff\\x00\\x00\\x00\\x00\\xff\\xff\\xff";
+    magicOrExtension = "\\x7fELF....AI\\x02";
+  };
+
+  boot.plymouth.enable = true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware.cpu.intel.updateMicrocode =
-    lib.mkDefault config.hardware.enableRedistributableFirmware;
 }

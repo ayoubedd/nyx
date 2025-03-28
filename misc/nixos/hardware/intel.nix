@@ -1,0 +1,26 @@
+{ pkgs, lib, config, ... }: {
+  boot.kernelParams = [
+    "intel_pstate=enable"
+    "i915.fastboot=1"
+    "i915.enable_psr=2"
+    "i915.enable_psr2_sel_fetch=1"
+    "i915.enable_guc=2"
+    "i915.enable_fbc=1"
+  ];
+
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;
+    extraPackages = with pkgs; [
+      intel-media-driver
+      vaapiIntel
+      vaapiVdpau
+      libvdpau-va-gl
+    ];
+  };
+
+  environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; };
+
+  hardware.cpu.intel.updateMicrocode =
+    lib.mkDefault config.hardware.enableRedistributableFirmware;
+}

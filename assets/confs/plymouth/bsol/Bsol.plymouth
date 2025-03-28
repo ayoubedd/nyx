@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Bsol
+Description=Windows blue screen of death inspired plymouth splash theme made by Vivek Rajan
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/Bsol
+ScriptFile=/usr/share/plymouth/themes/Bsol/Bsol.script
