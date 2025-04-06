@@ -7,12 +7,17 @@
     vlc
     rclone
     atuin
+    inputs.sherlock.packages.x86_64-linux.default
+
+    lazydocker
 
     # GUI
     qbittorrent
+
+    bandwhich
+
     mpv
     ripdrag
-    # zathura
     pavucontrol
     seahorse
     gnome-software

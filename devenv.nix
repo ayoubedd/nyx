@@ -1,5 +1,5 @@
 { pkgs, devenv-root, ... }:
 
 {
-  packages = with pkgs; [ just sops age just nixfmt ];
+  packages = with pkgs; [ just sops age just nixfmt disko ];
 }

@@ -5,11 +5,6 @@
   programs.waybar = {
     enable = true;
 
-    # systemd = {
-    #     enable = true;
-    #     target = "hyprland-session.target";
-    # };
-
     settings = {
       mainBar = {
         "modules-left" = [ "hyprland/workspaces" ];
@@ -23,6 +18,7 @@
           "upower"
           "backlight"
           "tray"
+          "custom/notification"
         ];
 
         "network" = {
@@ -79,6 +75,28 @@
           "min-length" = 13;
         };
 
+        "custom/notification" = {
+          "tooltip" = false;
+          "format" = "{icon}";
+          "format-icons" = {
+            "notification" = "<span foreground='red'><sup></sup></span>";
+            "none" = "";
+            "dnd-notification" = "<span foreground='red'><sup></sup></span>";
+            "dnd-none" = "";
+            "inhibited-notification" =
+              "<span foreground='red'><sup></sup></span>";
+            "inhibited-none" = "";
+            "dnd-inhibited-notification" =
+              "<span foreground='red'><sup></sup></span>";
+            "dnd-inhibited-none" = "";
+          };
+          "return-type" = "json";
+          "exec-if" = "which swaync-client";
+          "exec" = "swaync-client -swb";
+          "on-click" = "swaync-client -t -sw";
+          "on-click-right" = "swaync-client -d -sw";
+          "escape" = true;
+        };
         "temperature" = {
           "critical-threshold" = 80;
           "format" = "{temperatureC}°C {icon}";
@@ -122,6 +140,10 @@
           font-size: 14px;
           min-height: 24px;
       }
+        #custom-notification {
+          margin-right: 8px;
+          font-family: "Noto Sans";
+        }
 
       window#waybar {
           background: #161616;

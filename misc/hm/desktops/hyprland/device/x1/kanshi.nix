@@ -20,7 +20,7 @@
             status = "disable";
           }
           {
-            criteria = "HDMI-A-1";
+            criteria = "DP-2";
             status = "enable";
           }
         ];

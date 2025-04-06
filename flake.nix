@@ -10,6 +10,12 @@
   inputs.orbit-nvim.url = "github:ayoubedd/nvim";
   inputs.nur.url = "github:nix-community/NUR";
   inputs.devenv.url = "github:cachix/devenv";
+
+  inputs.sherlock = {
+    url = "github:Skxxtz/sherlock";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
   inputs.sops-nix = {
     url = "github:Mic92/sops-nix";
     inputs.nixpkgs.follows = "nixpkgs";

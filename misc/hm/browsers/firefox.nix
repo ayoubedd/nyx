@@ -6,88 +6,140 @@
     isDefault = true;
     id = 0;
 
+    containersForce = true;
+
+    containers = {
+      dangerous = {
+        color = "red";
+        icon = "fruit";
+        id = 2;
+      };
+
+      shopping = {
+        color = "blue";
+        icon = "cart";
+        id = 1;
+      };
+    };
+
     extensions.packages = with pkgs.nur.repos.rycee.firefox-addons; [
       bitwarden
       darkreader
       ublock-origin
       sponsorblock
+      clearurls
+      multi-account-containers
     ];
 
     settings = {
+      "browser.aboutConfig.showWarning" = false;
+      "browser.aboutwelcome.enabled" = false;
+      "browser.bookmarks.showmobilebookmarks" = false;
+      "browser.cache.disk.enable" = true;
+      "browser.compactmode.show" = true;
+      "browser.discovery.enabled" = false;
+      "browser.download.always_ask_before_handling_new_types" = true;
+      "browser.download.open_pdf_attachments_inline" = true;
+      "browser.formfill.enable" = false;
+      "browser.newtabpage.activity-stream.feeds.telemetry" = false;
+      "browser.newtabpage.activity-stream.telemetry" = false;
+      "browser.preferences.moreFromMozilla" = false;
+      "browser.privatebrowsing.forceMediaMemoryCache" = true;
+      "browser.profiles.enabled" = true;
+      "browser.search.isUS" = false;
+      "browser.search.separatePrivateDefault.ui.enabled" = true;
+      "browser.search.suggest.enabled" = false;
+      "browser.sessionstore.interval" = 60000;
+      "browser.shell.checkDefaultBrowser" = false;
+      "browser.startup.blankWindow" = true;
+      "browser.startup.homepage" = "about:blank";
+      "browser.startup.page" = 3;
+      "browser.tabs.loadInBackground" = true;
+      "browser.tabs.tabMinWidth" = 120;
+      "browser.toolbars.bookmarks.visibility" = "never";
+      "browser.urlbar.addons.featureGate" = false;
+      "browser.urlbar.clipboard.featureGate" = false;
+      "browser.urlbar.fakespot.featureGate" = false;
+      "browser.urlbar.groupLabels.enabled" = false;
+      "browser.urlbar.mdn.featureGate" = false;
+      "browser.urlbar.pocket.featureGate" = false;
+      "browser.urlbar.quickactions.enabled" = false;
+      "browser.urlbar.quicksuggest.enabled" = false;
+      "browser.urlbar.shortcuts.quickactions" = false;
+      "browser.urlbar.suggest.bookmark" = true;
+      "browser.urlbar.suggest.history" = true;
+      "browser.urlbar.suggest.calculator" = true;
+      "browser.urlbar.suggest.clipboard" = false;
+      "browser.urlbar.suggest.engines" = false;
+      "browser.urlbar.suggest.openpage" = false;
+      "browser.urlbar.suggest.searches" = false;
+      "browser.urlbar.suggest.trending" = false;
+      "browser.urlbar.suggest.weather" = false;
+      "browser.urlbar.suggest.yelp" = false;
+      "browser.urlbar.trending.featureGate" = false;
+      "browser.urlbar.trimHttps" = true;
+      "browser.urlbar.unitConversion.enabled" = true;
+      "browser.urlbar.untrimOnUserInteraction.featureGate" = true;
+      "browser.urlbar.update2.engineAliasRefresh" = true;
+      "browser.urlbar.weather.featureGate" = false;
+      "browser.urlbar.weather.ignoreVPN" = false;
+      "browser.urlbar.yelp.featureGate" = false;
+      "browser.vpn_promo.enabled" = false;
+      "datareporting.healthreport.uploadEnabled" = false;
+      "datareporting.policy.dataSubmissionEnabled" = false;
+      "distribution.searchplugins.defaultLocale" = "en-US";
+      "extensions.autoDisableScopes" = 0;
+      "extensions.getAddons.showPane" = false;
+      "extensions.htmlaboutaddons.recommendations.enabled" = false;
+      "general.useragent.locale" = "en-US";
+      "gfx.canvas.accelerated.cache-items" = 8192;
+      "gfx.canvas.accelerated.cache-size" = 512;
+      "gfx.content.skia-font-cache-size" = 20;
+      "gfx.webrender.quality.force-subpixel-aa-where-possible" = true;
+      "image.mem.decode_bytes_at_a_time" = 32768;
+      "media.autoplay.default" = 1;
+      "media.block-autoplay-until-in-foreground" = true;
+      "media.cache_readahead_limit" = 7200;
+      "media.cache_resume_threshold" = 3600;
+      "media.memory_cache_max_size" = 65536;
+
+      "network.dnsCacheExpiration" = 3600;
+      "network.http.connection-timeout" = 20;
       "network.http.max-connections" = 1800;
       "network.http.max-persistent-connections-per-server" = 10;
       "network.http.max-urgent-start-excessive-connections-per-host" = 5;
       "network.http.pacing.requests.enabled" = false;
-      "network.dnsCacheExpiration" = 3600;
+      "network.IDN_show_punycode" = true;
       "network.ssl_tokens_cache_capacity" = 10240;
 
-      "gfx.canvas.accelerated.cache-items" = 8192;
-      "gfx.canvas.accelerated.cache-size" = 512;
-      "gfx.content.skia-font-cache-size" = 20;
-
-      "browser.cache.disk.enable" = true;
-
-      "browser.aboutwelcome.enabled" = false;
-      "browser.shell.checkDefaultBrowser" = false;
-
-      "datareporting.policy.dataSubmissionEnabled" = false;
-      "datareporting.healthreport.uploadEnabled" = false;
-      "toolkit.telemetry.unified" = false;
-      "toolkit.telemetry.enabled" = false;
-      "toolkit.telemetry.server" = "data:,";
-      "toolkit.telemetry.archive.enabled" = false;
-      "toolkit.telemetry.newProfilePing.enabled" = false;
-      "toolkit.telemetry.shutdownPingSender.enabled" = false;
-      "toolkit.telemetry.updatePing.enabled" = false;
-      "toolkit.telemetry.bhrPing.enabled" = false;
-      "toolkit.telemetry.firstShutdownPing.enabled" = false;
-      "toolkit.telemetry.coverage.opt-out" = true;
-      "toolkit.coverage.opt-out" = true;
-      "toolkit.coverage.endpoint.base" = "";
-      "browser.newtabpage.activity-stream.feeds.telemetry" = false;
-      "browser.newtabpage.activity-stream.telemetry" = false;
-
-      "browser.urlbar.trimHttps" = true;
-      "browser.urlbar.untrimOnUserInteraction.featureGate" = true;
-      "browser.search.separatePrivateDefault.ui.enabled" = true;
-      "browser.urlbar.update2.engineAliasRefresh" = true;
-      "browser.search.suggest.enabled" = false;
-      "browser.urlbar.quicksuggest.enabled" = false;
-      "browser.urlbar.groupLabels.enabled" = false;
-      "browser.formfill.enable" = false;
       "security.insecure_connection_text.enabled" = true;
       "security.insecure_connection_text.pbmode.enabled" = true;
-      "network.IDN_show_punycode" = true;
 
-      "browser.privatebrowsing.forceMediaMemoryCache" = true;
-      "browser.sessionstore.interval" = 60000;
+      "toolkit.coverage.endpoint.base" = "";
+      "toolkit.coverage.opt-out" = true;
+      "toolkit.telemetry.archive.enabled" = false;
+      "toolkit.telemetry.bhrPing.enabled" = false;
+      "toolkit.telemetry.coverage.opt-out" = true;
+      "toolkit.telemetry.enabled" = false;
+      "toolkit.telemetry.firstShutdownPing.enabled" = false;
+      "toolkit.telemetry.newProfilePing.enabled" = false;
+      "toolkit.telemetry.server" = "data:,";
+      "toolkit.telemetry.shutdownPingSender.enabled" = false;
+      "toolkit.telemetry.unified" = false;
+      "toolkit.telemetry.updatePing.enabled" = false;
 
-      "media.memory_cache_max_size" = 65536;
-      "media.cache_readahead_limit" = 7200;
-      "media.cache_resume_threshold" = 3600;
-      "image.mem.decode_bytes_at_a_time" = 32768;
-
-      "browser.startup.blankWindow" = true;
-      "browser.toolbars.bookmarks.visibility" = "never";
-      "browser.search.isUS" = false;
-      "distribution.searchplugins.defaultLocale" = "en-US";
-      "general.useragent.locale" = "en-US";
-      "browser.bookmarks.showMobileBookmarks" = false;
-      # "extensions.activeThemeID" = "firefox-compact-dark@mozilla.org";
-      "browser.urlbar.suggest.searches" = false;
       "view_source.wrap_long_lines" = true;
-      "extensions.autoDisableScopes" = 0;
-      "browser.startup.page" = 3;
     };
 
     search.force = true;
-    search.default = "Google";
+    search.default = "google";
 
     search.engines = {
-      "Google".metaData.alias =
+      google.metaData.alias =
         "@g"; # builtin engines only support specifying one additional alias
 
-      "Nix Packages" = {
+      nix-packages = {
+        name = "Nix Packages";
         urls = [{
           template = "https://search.nixos.org/packages";
           params = [
@@ -102,11 +154,12 @@
           ];
         }];
         definedAliases = [ "@np" ];
-        iconUpdateURL = "https://search.nixos.org/favicon.png";
+        icon = "https://search.nixos.org/favicon.png";
         updateInterval = 24 * 60 * 60 * 1000; # every day
       };
 
-      "Nix Options" = {
+      nix-options = {
+        name = "Nix Options";
         urls = [{
           template = "https://search.nixos.org/options";
           params = [
@@ -121,11 +174,12 @@
           ];
         }];
         definedAliases = [ "@no" ];
-        iconUpdateURL = "https://search.nixos.org/favicon.png";
+        icon = "https://search.nixos.org/favicon.png";
         updateInterval = 24 * 60 * 60 * 1000; # every day
       };
 
-      "My Nixos" = {
+      my-nixos = {
+        name = "My NixOS";
         urls = [{
           template = "https://mynixos.com/search";
           params = [{
@@ -134,27 +188,30 @@
           }];
         }];
         definedAliases = [ "@mn" ];
-        iconUpdateURL = "https://mynixos.com/favicon.ico";
+        icon = "https://mynixos.com/favicon.ico";
         updateInterval = 24 * 60 * 60 * 1000; # every day
       };
 
-      "NixOS Wiki" = {
+      nix-wiki = {
+        name = "Nix Wiki";
         urls = [{
           template = "https://wiki.nixos.org/index.php?search={searchTerms}";
         }];
-        iconUpdateURL = "https://wiki.nixos.org/favicon.ico";
+        icon = "https://wiki.nixos.org/favicon.ico";
         updateInterval = 24 * 60 * 60 * 1000; # every day
         definedAliases = [ "@nw" ];
       };
 
-      "Github" = {
+      github = {
+        name = "Github";
         urls = [{ template = "https://github.com/search?q={searchTerms}"; }];
-        iconUpdateURL = "https://github.com/favicon.ico";
+        icon = "https://github.com/favicon.ico";
         updateInterval = 24 * 60 * 60 * 1000; # every day
         definedAliases = [ "@gh" ];
       };
 
-      "Docker hub" = {
+      docker-hub = {
+        name = "Docker Hub";
         urls = [{
           template = "https://hub.docker.com/search";
           params = [{
@@ -163,25 +220,26 @@
           }];
         }];
         definedAliases = [ "@dh" ];
-        iconUpdateURL = "https://hub.docker.com/favicon.ico";
+        icon = "https://hub.docker.com/favicon.ico";
         updateInterval = 24 * 60 * 60 * 1000; # every day
       };
 
-      "YouTube" = {
+      youtube = {
+        name = "YouTube";
         urls = [{
           template =
             "https://www.youtube.com/results?search_query={searchTerms}";
         }];
-        iconUpdateURL = "https://www.youtube.com/favicon.ico";
+        icon = "https://www.youtube.com/favicon.ico";
         updateInterval = 24 * 60 * 60 * 1000; # every day
         definedAliases = [ "@yt" ];
       };
 
       # Disable these
-      "Bing".metaData.hidden = true;
-      "Ebay".metaData.hidden = true;
-      "Amazon.com".metaData.hidden = true;
-      "Wikipedia (en)".metaData.hidden = true;
+      "bing".metaData.hidden = true;
+      "ebay".metaData.hidden = true;
+      "amazon.com".metaData.hidden = true;
+      "wikipedia (en)".metaData.hidden = true;
     };
   };
 
@@ -228,7 +286,7 @@
         Enabled = true;
         ProviderURL = "https://cloudflare-dns.com/dns-query";
         Locked = true;
-        ExcludedDomains = [ "example.com" ];
+        ExcludedDomains = [ "casa.ayoubedd.me" ];
         Fallback = true;
       };
       Permissions = {

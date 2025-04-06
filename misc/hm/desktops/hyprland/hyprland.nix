@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, inputs, ... }:
 let
   alacritty = "${pkgs.alacritty}/bin/alacritty";
   pactl = "${pkgs.pulseaudio}/bin/pactl";
@@ -34,6 +34,7 @@ let
     "${grim} -g \"$(${slurp} -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | ${wl-copy} -t 'image/png'";
 
   wofi = "${pkgs.wofi}/bin/wofi";
+  sherlock = "${inputs.sherlock.packages.x86_64-linux.default}/bin/sherlock";
   nwg-bar = "${pkgs.nwg-bar}/bin/nwg-bar";
   firefox = "${pkgs.firefox}/bin/firefox";
   thunar = "${pkgs.xfce.thunar}/bin/thunar";
@@ -46,6 +47,9 @@ let
   lockscreen_img = ../../../../assets/images/lockscreen.png;
   cliphist = "${pkgs.cliphist}/bin/cliphist";
   hyprpicker = "${pkgs.hyprpicker}/bin/hyprpicker";
+
+  swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
+  swaync-client = "${pkgs.swaynotificationcenter}/bin/swaync-client";
 in {
   wayland.windowManager.hyprland.enable = true;
 
@@ -101,6 +105,7 @@ in {
       "${waybar}"
       "sleep 3; ${cliphist} wipe" # wipe clipboard history from last session
       "${wl-clip-persist} --clipboard both"
+      "${swaync}"
     ];
 
     exec = [
@@ -118,11 +123,13 @@ in {
       "$mod, d, exec, $menu"
 
       "$mod, x, exec, ${nwg-bar}"
-      "$mod_SHIFT, v, exec, ${cliphist} list | sort -r | ${wofi} --dmenu | ${cliphist} decode | ${wl-copy}"
-      "$mod_SHIFT, c, exec, ${hyprpicker} | wl-copy"
+      "$mod SHIFT, v, exec, ${cliphist} list | sort -r | ${wofi} --dmenu | ${cliphist} decode | ${wl-copy}"
+      "$mod SHIFT, c, exec, ${hyprpicker} | wl-copy"
 
-      "$mod_SHIFT, f, exec, $file_manager"
-      "$mod_SHIFT, b, exec, $browser"
+      "$mod_SHIFT, n, exec, ${swaync-client} -t -sw"
+
+      "$mod SHIFT, f, exec, $file_manager"
+      "$mod SHIFT, b, exec, $browser"
 
       "$mod, l, movefocus, r"
       "$mod, h, movefocus, l"
@@ -145,8 +152,8 @@ in {
       "$mod, 9, workspace, 9"
       "$mod, 0, workspace, 10"
 
-      "$mod_ALT, l, exec, ${loginctl} lock-session"
-      "$mod, d, exec, ${wofi}"
+      "$mod ALT, l, exec, ${loginctl} lock-session"
+      "$mod, d, exec, ${sherlock}"
 
       "$mod SHIFT, 1, movetoworkspace, 1"
       "$mod SHIFT, 2, movetoworkspace, 2"

@@ -1,7 +1,7 @@
 { ... }: {
   imports = [
     ./waybar.nix
-    ./mako.nix
+    ./sway-notification-center.nix
     ./wofi.nix
     ./nwg-piotr.nix
     ../../../../../misc/hm/media/imv.nix

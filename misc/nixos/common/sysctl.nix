@@ -1,6 +1,14 @@
 { ... }: {
   # source https://github.com/CachyOS/CachyOS-Settings/blob/master/usr/lib/sysctl.d/99-cachyos-settings.conf
   # source https://github.com/LudovicoPiero/dotfiles/blob/main/cells/workstations/nixosProfiles/security/default.nix
+
+  # systemd.tmpfiles.rules = [
+  #   "d /var/lib/systemd/coredump 0755 root root 3d"
+  #   "w! /sys/kernel/mm/transparent_hugepage/defrag - - - - defer+madvise"
+  #   "w! /sys/class/rtc/rtc0/max_user_freq - - - - 3072"
+  #   "w! /proc/sys/dev/hpet/max-user-freq  - - - - 3072"
+  # ];
+
   boot.kernel.sysctl = {
     # The sysctl swappiness parameter determines the kernel's preference for pushing anonymous pages or page cache to disk in memory-starved situations.
     # A low value causes the kernel to prefer freeing up open files (page cache), a high value causes the kernel to try to use swap space,
@@ -9,7 +17,7 @@
 
     # The value controls the tendency of the kernel to reclaim the memory which is used for caching of directory and inode objects (VFS cache).
     # Lowering it from the default value of 100 makes the kernel less inclined to reclaim VFS cache (do not set it to 0, this may produce out-of-memory conditions)
-    #vm.vfs_cache_pressure=50
+    "vm.vfs_cache_pressure" = 50;
 
     # Contains, as a bytes of total available memory that contains free pages and reclaimable
     # pages, the number of pages at which a process which is generating disk writes will itself start
@@ -42,7 +50,7 @@
     "kernel.nmi_watchdog" = 0;
 
     # Enable the sysctl setting kernel.unprivileged_userns_clone to allow normal users to run unprivileged containers.
-    # "kernel.unprivileged_userns_clone" = 1;
+    "kernel.unprivileged_userns_clone" = 1;
 
     # To hide any kernel messages from the console
     "kernel.printk" = "3 3 3 3";
@@ -131,6 +139,7 @@
     # Bufferbloat mitigations + slight improvement in throughput & latency
     # "net.ipv4.tcp_congestion_control" = "bbr";
     "net.core.default_qdisc" = "cake";
+    "net.ipv4.tcp_retries2" = 5;
   };
 
   boot.kernelModules = [ "tcp_bbr" ];

@@ -6,6 +6,8 @@
 let
   misc = ../../misc/nixos;
 
+  disko = import ./disk-config.nix { device = "/dev/xxx"; };
+
   common = (builtins.toPath "${misc}/common");
   qemu = (builtins.toPath "${misc}/apps/qemu.nix");
   docker = (builtins.toPath "${misc}/apps/docker.nix");
@@ -19,6 +21,7 @@ in {
   imports = [
     nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
     inputs.sops-nix.nixosModules.sops
+    inputs.disko.nixosModules.disko
 
     common
     qemu
