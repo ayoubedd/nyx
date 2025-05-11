@@ -25,6 +25,19 @@
           }
         ];
       }
+      {
+        profile.name = "hdmi-direct";
+        profile.outputs = [
+          {
+            criteria = "eDP-1";
+            status = "disable";
+          }
+          {
+            criteria = "HDMI-A-1";
+            status = "enable";
+          }
+        ];
+      }
     ];
   };
 
