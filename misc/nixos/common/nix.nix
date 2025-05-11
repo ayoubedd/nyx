@@ -9,6 +9,7 @@
     };
 
     settings = {
+      download-buffer-size = 524288000;
       sandbox = true;
 
       auto-optimise-store = true;
