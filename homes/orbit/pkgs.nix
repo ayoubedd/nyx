@@ -9,7 +9,13 @@
     atuin
     inputs.sherlock.packages.x86_64-linux.default
 
+    # docker-buildx
     lazydocker
+
+    poppler
+    ueberzugpp
+    resvg
+    imagemagick
 
     # GUI
     qbittorrent
