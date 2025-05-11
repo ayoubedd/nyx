@@ -1,4 +1,4 @@
-{ pkgs, inputs, system, options, ... }: {
+{ pkgs, ... }: {
   programs.firefox = { enable = true; };
 
   programs.firefox.profiles."orbit" = {
@@ -9,16 +9,28 @@
     containersForce = true;
 
     containers = {
-      dangerous = {
-        color = "red";
+      Personal = {
+        color = "blue";
         icon = "fruit";
+        id = 1;
+      };
+
+      Work = {
+        color = "orange";
+        icon = "briefcase";
         id = 2;
       };
 
-      shopping = {
+      Finance = {
+        color = "green";
+        icon = "dollar";
+        id = 3;
+      };
+
+      Shopping = {
         color = "blue";
         icon = "cart";
-        id = 1;
+        id = 4;
       };
     };
 
