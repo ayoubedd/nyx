@@ -65,11 +65,11 @@
         nixosConfigurations = {
           x1 = lib.nixosSystem {
             specialArgs = { inherit inputs nixos-hardware; };
-            modules = [ ./hosts/x1 ];
+            modules = [ ./machines/x1 ];
           };
           kraken = lib.nixosSystem {
             specialArgs = { inherit inputs; };
-            modules = [ ./hosts/kraken ];
+            modules = [ ./machines/kraken ];
           };
         };
 
