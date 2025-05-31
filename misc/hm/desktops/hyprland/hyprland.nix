@@ -108,10 +108,6 @@ in {
       "${swaync}"
     ];
 
-    exec = [
-      # "${pkgs.callPackage ./scripts/restart_failed_services.nix {}}/bin/ayoub"
-    ];
-
     bindm = [ "ALT,mouse:272,movewindow" "ALT_SHIFT,mouse:272,resizewindow" ];
 
     bind = [
@@ -250,13 +246,18 @@ in {
 
       "float,class:.blueman-manager-wrapped"
 
-      "float,class:seahorse"
-      "size 900 700,class:seahorse"
+      "float,class:org.gnome.seahorse.Application"
+      "size 900 700,class:org.gnome.seahorse.Application"
 
       "float,class:[tT]hunar"
       "size 900 600,class:[tT]hunar"
 
-      "float,title:^(.*)(Bitwarden)(.*)$"
+      "float,class:nm-connection-editor"
+      "size 900 600,class:nm-connection-editor"
+
+      "float,class:org.pulseaudio.pavucontrol"
+      "size 900 600,class:org.pulseaudio.pavucontrol"
+
 
       "float,class:pavucontrol"
       "center,class:pavucontrol"
