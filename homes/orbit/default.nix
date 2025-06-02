@@ -4,6 +4,8 @@
     inputs.nur.modules.homeManager.default
     inputs.stylix.homeManagerModules.stylix
     inputs.orbit-nvim.homeManagerModules.orbit-nvim
+    inputs.nix-flatpak.homeManagerModules.nix-flatpak
+    inputs.sherlock.homeModules.default
 
     ./pkgs.nix
     ./misc.nix
@@ -29,5 +31,24 @@
   programs.home-manager.enable = true;
 
   home.stateVersion = "24.11";
+
+  services.flatpak.remotes = [
+    {
+      name = "flathub-beta";
+      location = "https://flathub.org/beta-repo/flathub-beta.flatpakrepo";
+    }
+    {
+      name = "flathub";
+      location = "https://flathub.org/repo/flathub.flatpakrepo";
+    }
+  ];
+
+  services.flatpak.update.auto.enable = false;
+  services.flatpak.uninstallUnmanaged = true;
+
+  services.flatpak.packages = [{
+    appId = "io.github.fizzyizzy05.binary";
+    origin = "flathub";
+  }];
 }
 

@@ -1,13 +1,15 @@
 { pkgs, inputs, ... }: {
   home.packages = with pkgs; [
+    inputs.devenv.outputs.packages.x86_64-linux.default
+
     # Nix stuff
     nix-index
     nix-tree
     comma
-    vlc
     rclone
     atuin
-    inputs.sherlock.packages.x86_64-linux.default
+
+    f2
 
     # docker-buildx
     lazydocker
@@ -27,8 +29,6 @@
     pavucontrol
     seahorse
     gnome-software
-
-    inputs.devenv.outputs.packages.x86_64-linux.default
 
     lsof
 

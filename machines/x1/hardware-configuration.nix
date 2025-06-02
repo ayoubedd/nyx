@@ -24,6 +24,13 @@
     "nmi_watchdog=0"
   ];
 
+  boot.loader = {
+    systemd-boot.enable = true;
+    efi.canTouchEfiVariables = true;
+  };
+
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
   environment.sessionVariables = { LIBVA_DRIVER_NAME = "iHD"; };
 
   fileSystems."/" = {

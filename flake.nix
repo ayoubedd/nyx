@@ -10,6 +10,7 @@
   inputs.orbit-nvim.url = "github:ayoubedd/nvim";
   inputs.nur.url = "github:nix-community/NUR";
   inputs.devenv.url = "github:cachix/devenv";
+  inputs.nix-flatpak.url = "github:gmodena/nix-flatpak";
 
   inputs.sherlock = {
     url = "github:Skxxtz/sherlock";

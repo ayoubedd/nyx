@@ -1,5 +1,6 @@
 { config, ... }: {
   networking.wireguard.enable = true;
+
   networking.wireguard.interfaces = {
     #"wg0" is the network interface name. You can name the interface arbitrarily.
     homelab = {

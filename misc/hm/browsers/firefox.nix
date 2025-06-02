@@ -44,6 +44,23 @@
     ];
 
     settings = {
+      "security.OCSP.enabled" = 0;
+      "security.cert_pinning.enforcement_level" = 2;
+      "security.enterprise_roots.enabled" = false;
+      "security.certerrors.mitm.auto_enable_enterprise_roots" = false;
+      "privacy.globalprivacycontrol.enable" = true;
+      "dom.battery.enabled" = false;
+
+      "network.cookie.sameSite.laxByDefault" = true;
+      "network.cookie.sameSite.noneRequiresSecure" = true;
+      "network.cookie.sameSite.schemeful" = true;
+      "privacy.purge_trackers.enabled" = true;
+      "security.sandbox.gpu.level" = 1;
+      "privacy.trackingprotection.lower_network_priority" = true;
+
+      "browser.download.start_downloads_in_tmp_dir" = true;
+      "browser.helperApps.deleteTempFileOnExit" = true;
+
       "browser.aboutConfig.showWarning" = false;
       "browser.aboutwelcome.enabled" = false;
       "browser.bookmarks.showmobilebookmarks" = false;

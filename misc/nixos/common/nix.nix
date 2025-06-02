@@ -1,4 +1,6 @@
 { ... }: {
+  nixpkgs.config.allowUnfree = true;
+
   nix = {
     optimise.automatic = true;
 

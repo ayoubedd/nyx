@@ -258,7 +258,6 @@ in {
       "float,class:org.pulseaudio.pavucontrol"
       "size 900 600,class:org.pulseaudio.pavucontrol"
 
-
       "float,class:pavucontrol"
       "center,class:pavucontrol"
       "size 700 500,class:pavucontrol"

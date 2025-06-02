@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, lib, ... }: {
   imports = [
     ./nix.nix
     ./networking.nix
@@ -10,14 +10,14 @@
     ./sysctl.nix
     ./fs.nix
     ./documentation.nix
+    ./quietboot.nix
+    ./local.nix
   ];
 
   # System packages
   environment.systemPackages = with pkgs; [ neovim git curl qt5.qtwayland ];
 
   programs.nix-ld.enable = true;
-
-  time.hardwareClockInLocalTime = false;
 
   security.rtkit.enable = true;
   services.ananicy = {
