@@ -1,4 +1,4 @@
-{ config, pkgs, lib, inputs, ... }: {
+{ inputs, ... }: {
 
   imports = [
     inputs.nur.modules.homeManager.default
@@ -11,17 +11,12 @@
     ./misc.nix
     ./git.nix
 
+    ./flatpak.nix
+
+    ../../misc/hm/common
     ../../misc/hm/desktops/hyprland
-    ../../misc/hm/browsers/firefox.nix
-    ../../misc/hm/terminals/alacritty
-    ../../misc/hm/shells/zsh
-    ../../misc/hm/mux/zellij
-    ../../misc/hm/media/mpv.nix
-    ../../misc/hm/media/zathura.nix
   ];
 
-  orbit-nvim.enable = true;
-  orbit-nvim.neovide = true;
 
   nixpkgs.config.allowUnfree = true;
 
@@ -31,24 +26,5 @@
   programs.home-manager.enable = true;
 
   home.stateVersion = "24.11";
-
-  services.flatpak.remotes = [
-    {
-      name = "flathub-beta";
-      location = "https://flathub.org/beta-repo/flathub-beta.flatpakrepo";
-    }
-    {
-      name = "flathub";
-      location = "https://flathub.org/repo/flathub.flatpakrepo";
-    }
-  ];
-
-  services.flatpak.update.auto.enable = false;
-  services.flatpak.uninstallUnmanaged = true;
-
-  services.flatpak.packages = [{
-    appId = "io.github.fizzyizzy05.binary";
-    origin = "flathub";
-  }];
 }
 

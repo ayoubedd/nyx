@@ -17,6 +17,12 @@
     # Applets
     ./applets
 
+    ../../browsers/firefox.nix
+    ../../terminals/alacritty
+    ../../shells/zsh
+    ../../media/mpv.nix
+    ../../media/zathura.nix
+
     ./device/${host}
   ];
 
@@ -26,7 +32,6 @@
     wl-color-picker
     slurp
     grim
-    # wtype
     wofi-emoji
     jq
     wl-clip-persist # should write a module for this

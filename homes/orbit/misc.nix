@@ -1,4 +1,7 @@
 { pkgs, ... }: {
+  orbit-nvim.enable = true;
+  orbit-nvim.neovide = true;
+
   programs.direnv.enable = true;
 
   programs.ssh = {
@@ -12,6 +15,21 @@
           Port 443
           User git
     '';
+  };
+
+  programs.gh = {
+    enable = true;
+    extensions = with pkgs; [ gh-markdown-preview ];
+    settings = {
+      git_protocol = "ssh";
+      version = 1;
+      editor = "";
+      prompt = "enabled";
+      pager = "";
+      aliases = { co = "pr checkout"; };
+      http_unix_socket = "";
+      browser = "";
+    };
   };
 
   services.blueman-applet.enable = true;
