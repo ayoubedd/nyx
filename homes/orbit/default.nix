@@ -17,7 +17,6 @@
     ../../misc/hm/desktops/hyprland
   ];
 
-
   nixpkgs.config.allowUnfree = true;
 
   home.username = "orbit";
