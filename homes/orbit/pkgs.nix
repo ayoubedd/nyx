@@ -7,24 +7,17 @@
     nix-tree
     comma
     rclone
-    atuin
 
     f2
 
     # docker-buildx
     lazydocker
 
-    poppler
-    ueberzugpp
-    resvg
-    imagemagick
-
     # GUI
     qbittorrent
 
     bandwhich
 
-    mpv
     ripdrag
     pavucontrol
     seahorse
@@ -37,8 +30,6 @@
     whois
 
     # CMD
-    yazi
-    # ueberzugpp
     file
     killall
     btop

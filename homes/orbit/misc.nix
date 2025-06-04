@@ -1,8 +1,8 @@
 { pkgs, ... }: {
+  programs.direnv.enable = true;
+
   orbit-nvim.enable = true;
   orbit-nvim.neovide = true;
-
-  programs.direnv.enable = true;
 
   programs.ssh = {
     enable = true;
@@ -33,11 +33,6 @@
   };
 
   services.blueman-applet.enable = true;
-
-  services.cliphist = {
-    enable = true;
-    allowImages = true;
-  };
 
   services.gnome-keyring = {
     enable = true;

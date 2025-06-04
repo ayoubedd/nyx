@@ -13,7 +13,6 @@
 
     ./flatpak.nix
 
-    ../../misc/hm/common
     ../../misc/hm/desktops/hyprland
   ];
 

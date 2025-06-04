@@ -1,13 +1,6 @@
 { lib, pkgs, nixos-hardware, config, inputs, ... }:
 let
   misc = ../../misc/nixos;
-
-  # disko = import ./disk-config.nix { device = "/dev/xxx"; };
-
-  common = (builtins.toPath "${misc}/common");
-  qemu = (builtins.toPath "${misc}/apps/qemu.nix");
-  docker = (builtins.toPath "${misc}/apps/docker.nix");
-  thunar = (builtins.toPath "${misc}/apps/thunar.nix");
   polkitAgent =
     (import (builtins.toPath "${misc}/apps/polkit_pantheon_agent.nix") {
       inherit pkgs;
@@ -19,10 +12,11 @@ in {
     inputs.sops-nix.nixosModules.sops
     inputs.disko.nixosModules.disko
 
-    common
-    qemu
-    docker
-    thunar
+
+    ../../misc/nixos/common
+    ../../misc/nixos/apps/qemu.nix
+    ../../misc/nixos/apps/docker.nix
+    ../../misc/nixos/apps/thunar.nix
     polkitAgent
 
     ./hardware-configuration.nix
@@ -35,6 +29,8 @@ in {
 
   networking.hostName = "x1";
   networking.useDHCP = lib.mkDefault true;
+
+  virtualisation.waydroid.enable = true;
 
   services.devmon.enable = lib.mkForce false;
 

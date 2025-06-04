@@ -5,6 +5,5 @@
     ./wofi.nix
     ./nwg-piotr.nix
     ./sherlock.nix
-    ../../../../../misc/hm/media/imv.nix
   ];
 }

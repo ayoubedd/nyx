@@ -2,13 +2,6 @@
   # source https://github.com/CachyOS/CachyOS-Settings/blob/master/usr/lib/sysctl.d/99-cachyos-settings.conf
   # source https://github.com/LudovicoPiero/dotfiles/blob/main/cells/workstations/nixosProfiles/security/default.nix
 
-  # systemd.tmpfiles.rules = [
-  #   "d /var/lib/systemd/coredump 0755 root root 3d"
-  #   "w! /sys/kernel/mm/transparent_hugepage/defrag - - - - defer+madvise"
-  #   "w! /sys/class/rtc/rtc0/max_user_freq - - - - 3072"
-  #   "w! /proc/sys/dev/hpet/max-user-freq  - - - - 3072"
-  # ];
-
   boot.kernel.sysctl = {
     # The sysctl swappiness parameter determines the kernel's preference for pushing anonymous pages or page cache to disk in memory-starved situations.
     # A low value causes the kernel to prefer freeing up open files (page cache), a high value causes the kernel to try to use swap space,

@@ -4,6 +4,8 @@
     # import home manager custom modules
     ../../../../modules/hm
 
+    ../../misc/hm/common
+
     # Hyprland config
     ./hyprland.nix
 
@@ -21,6 +23,7 @@
     ../../terminals/alacritty
     ../../shells/zsh
     ../../media/mpv.nix
+    ../../media/imv.nix
     ../../media/zathura.nix
 
     ./device/${host}

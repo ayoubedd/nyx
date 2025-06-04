@@ -8,6 +8,7 @@
   };
 
   services.flatpak.enable = true; # Enable Flatpak
+
   systemd.services.flatpak-repo = {
     wantedBy = [ "multi-user.target" ];
     path = [ pkgs.flatpak ];

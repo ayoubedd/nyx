@@ -1,8 +1,5 @@
 { pkgs, lib, ... }: {
   home.pointerCursor = {
-    # size = 24;
-    # name = "volantes_cursors";
-    # package = pkgs.volantes-cursors;
     x11 = {
       enable = true;
       defaultCursor = "volantes_cursors";
@@ -22,11 +19,6 @@
         (pkgs.colloid-icon-theme.override { colorVariants = [ "grey" ]; });
       name = "Colloid-Grey-Dark";
     };
-
-    # theme = {
-    #   package = (pkgs.colloid-gtk-theme.override { tweaks = [ "nord" ]; colorVariants = [ "dark" ]; });
-    #   name = "Colloid-Dark-Nord";
-    # };
 
     gtk3.extraConfig = { gtk-application-prefer-dark-theme = true; };
 

@@ -9,6 +9,20 @@
     bzip2
     zoxide
     macchina
+
+    atuin
+
+    ueberzugpp
+
+    yazi
+    poppler
+    fd
+    ripgrep
+    resvg
+    imagemagick
+    fzf
+    jq
+    zoxide
   ];
 
   programs.zsh = {

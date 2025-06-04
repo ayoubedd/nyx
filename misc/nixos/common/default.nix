@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }: {
+{ pkgs, ... }: {
   imports = [
     ./nix.nix
     ./networking.nix
@@ -20,6 +20,7 @@
   programs.nix-ld.enable = true;
 
   security.rtkit.enable = true;
+
   services.ananicy = {
     enable = true;
     package = pkgs.ananicy-cpp;
