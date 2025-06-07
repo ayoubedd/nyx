@@ -12,7 +12,7 @@
           mkdir -p ~/.cache/nix-index
           cd ~/.cache/nix-index
           name="index-${pkgs.stdenv.system}"
-          wget -N "https://github.com/nix-community/nix-index-database/releases/download/2025-05-04-033656/$name"
+          wget -N "https://github.com/nix-community/nix-index-database/releases/latest/download/$name"
           ln -sf "$name" "files"
         '';
       });
