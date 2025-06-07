@@ -4,7 +4,7 @@
     # import home manager custom modules
     ../../../../modules/hm
 
-    ../../misc/hm/common
+    ../../common
 
     # Hyprland config
     ./hyprland.nix
