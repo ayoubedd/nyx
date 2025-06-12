@@ -12,7 +12,6 @@ in {
     inputs.sops-nix.nixosModules.sops
     inputs.disko.nixosModules.disko
 
-
     ../../misc/nixos/common
     ../../misc/nixos/apps/qemu.nix
     ../../misc/nixos/apps/docker.nix
