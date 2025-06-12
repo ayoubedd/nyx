@@ -10,6 +10,8 @@
 
     f2
 
+    obs-studio
+
     # docker-buildx
     lazydocker
 
