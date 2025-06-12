@@ -1,6 +1,6 @@
 { ... }: {
   programs.sherlock = {
-    enable = false;
+    enable = true;
 
     settings = {
       config = {
@@ -22,7 +22,6 @@
           cache = "~/.cache/sherlock_desktop_cache.json";
           daemonize = false;
           animation = false;
-
         };
 
         binds = {
