@@ -15,6 +15,8 @@
     # docker-buildx
     lazydocker
 
+    vesktop
+
     # GUI
     qbittorrent
 
