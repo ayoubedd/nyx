@@ -1,4 +1,6 @@
-{ pkgs, ... }: {
+{ pkgs, inputs, ... }: {
+  imports = [ inputs.nur.modules.homeManager.default ];
+
   programs.firefox = { enable = true; };
 
   programs.firefox.profiles."orbit" = {

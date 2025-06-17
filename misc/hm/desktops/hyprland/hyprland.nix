@@ -27,6 +27,7 @@ let
   grim = "${pkgs.grim}/bin/grim";
   slurp = "${pkgs.slurp}/bin/slurp";
   wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
+  wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
 
   snaparea =
     "${grim} -g \"$(${slurp})\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | ${wl-copy} -t 'image/png'";
@@ -35,7 +36,6 @@ let
 
   wofi = "${pkgs.wofi}/bin/wofi";
   sherlock = "${inputs.sherlock.packages.x86_64-linux.default}/bin/sherlock";
-  nwg-bar = "${pkgs.nwg-bar}/bin/nwg-bar";
   firefox = "${pkgs.firefox}/bin/firefox";
   thunar = "${pkgs.xfce.thunar}/bin/thunar";
 
@@ -103,7 +103,8 @@ in {
       "systemctl --user restart xdg-desktop-portal.service"
       "$browser"
       "${waybar}"
-      "sleep 3; ${cliphist} wipe" # wipe clipboard history from last session
+      "sleep 3; ${cliphist} wipe"
+      "${wl-paste} --watch ${cliphist} store"
       "${wl-clip-persist} --clipboard both"
       "${swaync}"
     ];
@@ -118,9 +119,9 @@ in {
       "$mod_SHIFT, space, togglefloating,"
       "$mod, d, exec, $menu"
 
-      "$mod, x, exec, ${nwg-bar}"
+      "$mod, x, exec, ${sherlock} --sub-menu pm"
       "$mod SHIFT, v, exec, ${cliphist} list | sort -r | ${wofi} --dmenu | ${cliphist} decode | ${wl-copy}"
-      "$mod SHIFT, c, exec, ${hyprpicker} | wl-copy"
+      "$mod SHIFT, c, exec, ${hyprpicker} | ${wl-copy}"
 
       "$mod_SHIFT, n, exec, ${swaync-client} -t -sw"
 

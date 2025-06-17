@@ -1,11 +1,8 @@
 { inputs, ... }: {
 
   imports = [
-    inputs.nur.modules.homeManager.default
-    inputs.stylix.homeManagerModules.stylix
     inputs.orbit-nvim.homeManagerModules.orbit-nvim
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
-    inputs.sherlock.homeModules.default
 
     ./pkgs.nix
     ./misc.nix

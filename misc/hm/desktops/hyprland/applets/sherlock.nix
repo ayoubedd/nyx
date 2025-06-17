@@ -1,4 +1,6 @@
-{ ... }: {
+{ inputs, ... }: {
+
+
   programs.sherlock = {
     enable = true;
 

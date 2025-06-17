@@ -1,6 +1,9 @@
-{ pkgs, lo-pkgs, host, ... }: {
+{ pkgs, lo-pkgs, inputs, host, ... }: {
 
   imports = [
+    inputs.sherlock.homeModules.default
+    inputs.stylix.homeManagerModules.stylix
+
     # import home manager custom modules
     ../../../../modules/hm
 
