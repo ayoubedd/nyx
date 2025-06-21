@@ -87,6 +87,18 @@
           }];
           actions = { update-props = { "node.description" = "Laptop"; }; };
         }
+        {
+          matches = [{
+            "device.name" =
+              "alsa_card.pci-0000_00_1f.3-platform-skl_hda_dsp_generic";
+          }];
+          actions = {
+            update-props = {
+              device.description = "Laptop";
+              device.nick = "Laptop";
+            };
+          };
+        }
       ];
     };
   };
