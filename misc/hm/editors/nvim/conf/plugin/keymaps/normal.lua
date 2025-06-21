@@ -1,26 +1,26 @@
 local set = vim.api.nvim_set_keymap
 
-set("n", "<S-l>", "<cmd>BufferLineCycleNext<cr>", { desc = "Go to next buffer" })    -- Next buffer
+set("n", "<S-l>", "<cmd>BufferLineCycleNext<cr>", { desc = "Go to next buffer" }) -- Next buffer
 set("n", "<S-h>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Go to preview buffer" }) -- Prev buffer
 
-set("n", "<C-l>", "<C-w>l", {})                                                      -- Move to left split
-set("n", "<C-h>", "<C-w>h", {})                                                      -- Move to right split
-set("n", "<C-j>", "<C-w>j", {})                                                      -- Move to down split
-set("n", "<C-k>", "<C-w>k", {})                                                      -- Move to upper split
+set("n", "<C-l>", "<C-w>l", {}) -- Move to left split
+set("n", "<C-h>", "<C-w>h", {}) -- Move to right split
+set("n", "<C-j>", "<C-w>j", {}) -- Move to down split
+set("n", "<C-k>", "<C-w>k", {}) -- Move to upper split
 
 set("n", "<leader>h", "<cmd>nohls<cr>", {
 	desc = "No Highlight",
-})                                                                             -- Turn off highlights
+}) -- Turn off highlights
 
 set("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle NvimTree" }) -- Toggle NvimTree
-set("n", "<Esc>", "<cmd>nohls<cr>", { desc = "No Highlight" })                 -- Turn off highlights
+set("n", "<Esc>", "<cmd>nohls<cr>", { desc = "No Highlight" }) -- Turn off highlights
 
 set("n", "<left>", '<cmd>echo "Use h to move!!"<cr>', {})
 set("n", "<right>", '<cmd>echo "Use l to move!!"<cr>', {})
 set("n", "<up>", '<cmd>echo "Use k to move!!"<cr>', {})
 set("n", "<down>", '<cmd>echo "Use j to move!!"<cr>', {})
 
-set("n", "<C-s>", "<cmd>w<cr>", { desc = "Save file" })         -- Save
+set("n", "<C-s>", "<cmd>w<cr>", { desc = "Save file" }) -- Save
 set("n", "<leader>qq", "<cmd>qa!<cr>", { desc = "Force quit" }) -- Force quite
 
 -- Toggle hlsearch if it's on, otherwise just do "enter"
@@ -55,7 +55,6 @@ set("n", "<leader>sb", "<cmd>Telescope buffers<cr>", { desc = "Find buffers" })
 set("n", "<leader>sg", "<cmd>Telescope live_grep<cr>", { desc = "Live grep" })
 set("n", "<leader>sr", "<cmd>Telescope registers<cr>", { desc = "Search registers" })
 
-
 set("n", "<leader>s/", "<Plug>(leap-forward)", { desc = "Leap backward" })
 set("n", "<leader>s?", "<Plug>(leap-backward)", { desc = "Leap backward" })
 
@@ -68,14 +67,38 @@ set(
 	{ desc = "Signature Help", noremap = true, silent = true }
 )
 set("n", "<leader>lD", ":Telescope diagnostics<cr>", { desc = "Telescope Diagnostic", noremap = true, silent = true })
-set("n", "<leader>ls", ":lua require'telescope.builtin'.lsp_references{}<cr>", { desc = "Telescope symbols", noremap = true, silent = true })
-set("n", "<leader>lS", ":lua require'telescope.builtin'.lsp_workspace_symbols{}<cr>", { desc = "Telescope workspace symbols", noremap = true, silent = true })
+set(
+	"n",
+	"<leader>ls",
+	":lua require'telescope.builtin'.lsp_references{}<cr>",
+	{ desc = "Telescope symbols", noremap = true, silent = true }
+)
+set(
+	"n",
+	"<leader>lS",
+	":lua require'telescope.builtin'.lsp_workspace_symbols{}<cr>",
+	{ desc = "Telescope workspace symbols", noremap = true, silent = true }
+)
 
 -- Git keymaps
-set("n", "<leader>gc", ":lua require'telescope.builtin'.git_commits{}<cr>", { desc = "Telescope git commits", noremap = true, silent = true })
-set("n", "<leader>gb", ":lua require'telescope.builtin'.git_branches{}<cr>", { desc = "Telescope git branches", noremap = true, silent = true })
-set("n", "<leader>gs", ":lua require'telescope.builtin'.git_status{}<cr>", { desc = "Telescope git status", noremap = true, silent = true })
-
+set(
+	"n",
+	"<leader>gc",
+	":lua require'telescope.builtin'.git_commits{}<cr>",
+	{ desc = "Telescope git commits", noremap = true, silent = true }
+)
+set(
+	"n",
+	"<leader>gb",
+	":lua require'telescope.builtin'.git_branches{}<cr>",
+	{ desc = "Telescope git branches", noremap = true, silent = true }
+)
+set(
+	"n",
+	"<leader>gs",
+	":lua require'telescope.builtin'.git_status{}<cr>",
+	{ desc = "Telescope git status", noremap = true, silent = true }
+)
 
 set(
 	"n",

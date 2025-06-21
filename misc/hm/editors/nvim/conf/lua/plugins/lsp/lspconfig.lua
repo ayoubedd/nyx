@@ -26,15 +26,15 @@ return {
 			capabilities = capabilities,
 		})
 
-		local json_capabilities = capabilities;
+		local json_capabilities = capabilities
 		json_capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 		lspconfig.jsonls.setup({
 			capabilities = json_capabilities,
-			cmd = { "vscode-json-languageserver", "--stdio" }
+			cmd = { "vscode-json-languageserver", "--stdio" },
 		})
 
-		lspconfig.harper_ls.setup{}
+		lspconfig.harper_ls.setup({})
 
 		lspconfig.typos_lsp.setup({
 			capabilities = capabilities,
@@ -47,18 +47,28 @@ return {
 
 		lspconfig.eslint.setup({
 			capabilities = capabilities,
-			filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx", "vue", "svelte", "astro" }
+			filetypes = {
+				"javascript",
+				"javascriptreact",
+				"javascript.jsx",
+				"typescript",
+				"typescriptreact",
+				"typescript.tsx",
+				"vue",
+				"svelte",
+				"astro",
+			},
 		})
 
 		lspconfig.denols.setup({})
 
 		-- tsserver
 		lspconfig.ts_ls.setup({
-      single_file_support = false,
+			single_file_support = false,
 			capabilities = capabilities,
 			settings = {
-				diagnostics = { ignoredCodes = { 6133 } }
-			}
+				diagnostics = { ignoredCodes = { 6133 } },
+			},
 		})
 
 		-- rust_analyzer
@@ -68,8 +78,8 @@ return {
 			settings = {
 				["rust-analyzer"] = {
 					diagnostics = {
-						enable = true;
-					}
+						enable = true,
+					},
 				},
 			},
 		})
@@ -90,12 +100,25 @@ return {
 		})
 
 		-- configure emmet language server
-		local emmet_caps = capabilities;
+		local emmet_caps = capabilities
 		emmet_caps.textDocument.completion.completionItem.snippetSupport = true
 
 		lspconfig.emmet_ls.setup({
 			capabilities = emmet_caps,
-			filetypes = { "css", "eruby", "html", "javascript", "javascriptreact", "less", "sass", "scss", "svelte", "pug", "typescriptreact", "vue" },
+			filetypes = {
+				"css",
+				"eruby",
+				"html",
+				"javascript",
+				"javascriptreact",
+				"less",
+				"sass",
+				"scss",
+				"svelte",
+				"pug",
+				"typescriptreact",
+				"vue",
+			},
 		})
 
 		-- Lua LS
