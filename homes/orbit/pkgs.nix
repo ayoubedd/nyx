@@ -10,12 +10,8 @@
 
     f2
 
-    obs-studio
-
     # docker-buildx
     lazydocker
-
-    vesktop
 
     # GUI
     qbittorrent
@@ -25,7 +21,6 @@
     ripdrag
     pavucontrol
     seahorse
-    gnome-software
 
     lsof
 
