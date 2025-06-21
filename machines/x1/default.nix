@@ -29,7 +29,7 @@ in {
   networking.hostName = "x1";
   networking.useDHCP = lib.mkDefault true;
 
-  virtualisation.waydroid.enable = true;
+  # virtualisation.waydroid.enable = true;
 
   services.devmon.enable = lib.mkForce false;
 

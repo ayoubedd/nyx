@@ -44,3 +44,6 @@ videv:
 
 viclean:
   rm -rf ~/.config/nvim
+
+mkpasswd:
+  mkpasswd -R 10000 -m sha-512
