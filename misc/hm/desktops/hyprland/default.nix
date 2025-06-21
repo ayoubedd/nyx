@@ -36,6 +36,7 @@
     lo-pkgs.realod-failed-services
     wl-clipboard
     wl-color-picker
+    hyprpicker
     slurp
     grim
     wofi-emoji

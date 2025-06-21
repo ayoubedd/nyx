@@ -29,7 +29,7 @@
 
     lsof
 
-    httplz
+    # httplz
     tokei
     whois
 
