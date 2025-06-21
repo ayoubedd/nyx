@@ -670,22 +670,6 @@
         "type": "github"
       }
     },
-    "nixpkgs_6": {
-      "locked": {
-        "lastModified": 1749285348,
-        "narHash": "sha256-frdhQvPbmDYaScPFiCnfdh3B/Vh81Uuoo0w5TkWmmjU=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "3e3afe5174c561dee0df6f2c2b2236990146329f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nur": {
       "inputs": {
         "flake-parts": "flake-parts_3",
@@ -732,24 +716,6 @@
         "type": "github"
       }
     },
-    "orbit-nvim": {
-      "inputs": {
-        "nixpkgs": "nixpkgs_6"
-      },
-      "locked": {
-        "lastModified": 1749782098,
-        "narHash": "sha256-ub0x9EweOzNeAo/TdhQLqYtdH5jjwMq+iGfu7hHaC+0=",
-        "owner": "ayoubedd",
-        "repo": "nvim",
-        "rev": "c097662a7cdbc34efc9597bf234a803371224193",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ayoubedd",
-        "repo": "nvim",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "devenv": "devenv",
@@ -761,7 +727,6 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs_4",
         "nur": "nur",
-        "orbit-nvim": "orbit-nvim",
         "sherlock": "sherlock",
         "sops-nix": "sops-nix",
         "stylix": "stylix"

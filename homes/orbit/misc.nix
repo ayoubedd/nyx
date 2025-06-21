@@ -1,9 +1,6 @@
 { pkgs, ... }: {
   programs.direnv.enable = true;
 
-  orbit-nvim.enable = true;
-  orbit-nvim.neovide = true;
-
   programs.ssh = {
     enable = true;
     compression = true;

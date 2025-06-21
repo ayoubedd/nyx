@@ -4,6 +4,7 @@ alias all := build-switch-nix-and-homemanager
 
 hostname := `hostname`
 user := `whoami`
+cwd := `pwd`
 
 default:
   @just --list
@@ -36,3 +37,10 @@ gc:
 # Garbage collect
 fmt:
   nix fmt
+
+videv:
+  rm -rf ~/.config/nvim
+  ln -sf '{{ cwd }}'/misc/hm/editors/nvim/conf ~/.config/nvim
+
+viclean:
+  rm -rf ~/.config/nvim

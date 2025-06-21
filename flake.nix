@@ -7,7 +7,7 @@
   };
   inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-  inputs.orbit-nvim.url = "github:ayoubedd/nvim";
+  # inputs.orbit-nvim.url = "github:ayoubedd/nvim";
   inputs.nur.url = "github:nix-community/NUR";
   inputs.devenv.url = "github:cachix/devenv";
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
