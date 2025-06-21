@@ -1,6 +1,17 @@
 { ... }: {
-  services.flatpak.packages = [{
-    appId = "io.github.fizzyizzy05.binary";
-    origin = "flathub";
-  }];
+  services.flatpak.packages = [
+    "com.obsproject.Studio"
+    "com.brave.Browser"
+    "com.spotify.Client"
+    "dev.vencord.Vesktop"
+    "com.github.tchx84.Flatseal"
+  ];
+
+  services.flatpak.uninstallUnmanaged = true;
+
+  services.flatpak.overrides = {
+    "com.getpostman.Postman".Context.sockets =
+      [ "wayland" "!x11" "!fallback-x11" ];
+  };
 }
+
