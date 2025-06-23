@@ -5,7 +5,18 @@
 
     settings = {
       config = {
-        default_apps = { terminal = "alacritty"; };
+        default_apps = {
+          terminal = "alacritty";
+          browser = "firefox %U";
+        };
+
+        units = {
+          lengths = "meters";
+          weights = "kg";
+          volumes = "l";
+          temperatures = "C";
+          currency = "dollar";
+        };
 
         appearance = {
           width = 700;
@@ -16,13 +27,14 @@
           search_icon = true;
           use_base_css = true;
           status_bar = true;
+          search_icon_size = 22;
         };
 
         behavior = {
           caching = true;
           cache = "~/.cache/sherlock_desktop_cache.json";
-          daemonize = false;
-          animation = false;
+          daemonize = true;
+          animation = true;
         };
 
         binds = {
@@ -32,18 +44,6 @@
       };
 
       launchers = [
-        {
-          name = "Teams Event";
-          type = "teams_event";
-          args = {
-            icon = "teams";
-            date_date = "now";
-            event_start = "-5 minutes";
-            event_end = "+15 minutes";
-          };
-          priority = 1;
-          home = true;
-        }
         {
           name = "Weather";
           type = "weather";
