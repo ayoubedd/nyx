@@ -21,6 +21,7 @@
 
     # Applets
     ./applets
+    ./services.nix
 
     ../../browsers/firefox.nix
     ../../terminals/alacritty

@@ -83,6 +83,15 @@ in {
     bind=, escape, submap, reset 
     submap=reset
 
+
+    bind=ALT, n, submap, notifications
+
+    submap=notifications
+    bind=, c, exec, ${swaync-client} -C && ${hyprctl} dispatch submap reset
+    bind=, t, exec, ${swaync-client} -t -sw && ${hyprctl} dispatch submap reset
+    bind=, d, exec, ${swaync-client} --toggle-dnd && ${hyprctl} dispatch submap reset
+    bind=, escape, submap, reset
+    submap=reset
   '';
 
   wayland.windowManager.hyprland.settings = {
@@ -122,8 +131,6 @@ in {
       "$mod, x, exec, ${sherlock} --sub-menu pm"
       "$mod SHIFT, v, exec, ${cliphist} list | sort -r | ${wofi} --dmenu | ${cliphist} decode | ${wl-copy}"
       "$mod SHIFT, c, exec, ${hyprpicker} | ${wl-copy}"
-
-      "$mod_SHIFT, n, exec, ${swaync-client} -t -sw"
 
       "$mod SHIFT, f, exec, $file_manager"
       "$mod SHIFT, b, exec, $browser"
