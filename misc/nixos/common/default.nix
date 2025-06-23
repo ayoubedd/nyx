@@ -15,7 +15,13 @@
   ];
 
   # System packages
-  environment.systemPackages = with pkgs; [ neovim git curl qt5.qtwayland ];
+  environment.systemPackages = with pkgs; [
+    neovim
+    git
+    curl
+    qt5.qtwayland
+    qt6.qtwayland
+  ];
 
   programs.nix-ld.enable = true;
 

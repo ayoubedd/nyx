@@ -92,6 +92,20 @@ in {
     bind=, d, exec, ${swaync-client} --toggle-dnd && ${hyprctl} dispatch submap reset
     bind=, escape, submap, reset
     submap=reset
+
+    env = QT_AUTO_SCREEN_SCALE_FACTOR,2
+    env = QT_QPA_PLATFORM,wayland;xcb
+    env = QT_WAYLAND_DISABLE_WINDOWDECORATION,1
+    env = QT_QPA_PLATFORMTHEME,qt5ct
+
+    env = GDK_BACKEND,wayland,x11,*
+    env = QT_QPA_PLATFORM,wayland;xcb
+    env = SDL_VIDEODRIVER,wayland
+    env = CLUTTER_BACKEND,wayland
+
+    decoration:blur:enabled = false
+    decoration:shadow:enabled = false
+    misc:vfr = true
   '';
 
   wayland.windowManager.hyprland.settings = {
