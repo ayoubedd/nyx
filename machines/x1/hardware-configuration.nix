@@ -1,4 +1,4 @@
-{ lib, pkgs, modulesPath, ... }:
+{ lib, pkgs, modulesPath, config, ... }:
 
 {
   imports = [
@@ -8,9 +8,12 @@
 
   boot.initrd.availableKernelModules =
     [ "xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod" ];
+
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-intel" ];
-  boot.extraModulePackages = [ ];
+  boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
+
+  boot.kernelModules = [ "kvm-intel" "acpi_call" ];
+
   boot.blacklistedKernelModules = [ "iTCO_wdt" ];
 
   boot.loader = {
