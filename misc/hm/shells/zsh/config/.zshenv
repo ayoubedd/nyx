@@ -10,7 +10,8 @@ export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 export WORDCHARS=${WORDCHARS//\//}
 
 # SSH Agent socket
-export SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
+export SSH_AUTH_SOCK=/run/user/$UID/gcr/ssh
+
 
 # Include volta in path
 export VOLTA_HOME="$XDG_DATA_HOME/volta"
@@ -30,8 +31,8 @@ export PATH="$HOME/.local/bin:$HOME/.ghcup/bin:$GOBIN:$CARGO_HOME/bin:$VOLTA_HOM
 
 # Preferred editor for local and remote sessions
 if [[ -n $SSH_CONNECTION ]]; then
-  export VISUAL='vim'
-  export EDITOR='vim'
+  export VISUAL='nvim --clean'
+  export EDITOR='nvim --clean'
 else
   export VISUAL='nvim'
   export EDITOR='nvim'
@@ -44,6 +45,3 @@ export PYTHONSTARTUP="$XDG_CONFIG_HOME/python/pythonstartup.py"
 
 # Curl
 export CURL_HOME="$XDG_CONFIG_HOME/curl"
-
-export OVPN_ROOT="$HOME/Documents/fastvpn-ovpns"
-export NOTES_PATH="$HOME/Documents/Notes"

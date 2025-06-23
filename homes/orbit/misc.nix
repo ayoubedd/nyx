@@ -31,11 +31,6 @@
 
   services.blueman-applet.enable = true;
 
-  services.gnome-keyring = {
-    enable = true;
-    components = [ "secrets" "ssh" ];
-  };
-
   home.file.".config/atuin/config.toml" = {
     enable = true;
     force = true;
