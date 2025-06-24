@@ -29,11 +29,12 @@ in {
   networking.hostName = "x1";
   networking.useDHCP = lib.mkDefault true;
 
-  # virtualisation.waydroid.enable = true;
-
   services.devmon.enable = lib.mkForce false;
 
-  programs.hyprland.enable = true;
+  programs.hyprland = {
+    enable = true;
+    withUWSM = true;
+  };
 
   # Users
   users.users.root = {
