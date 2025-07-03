@@ -1,0 +1,19 @@
+#!/bin/sh
+
+DEFAULT_INTERVAL=$((60 * 15)) # In seconds
+
+RESIZE_TYPE="fit"
+export SWWW_TRANSITION_FPS="${SWWW_TRANSITION_FPS:-60}"
+
+while true; do
+	find "$HOME/Pictures/Wallpapers" -type f \
+	| while read -r img; do
+		echo "$(</dev/urandom tr -dc a-zA-Z0-9 | head -c 8):$img"
+	done \
+	| sort -n | cut -d':' -f2- \
+	| while read -r img; do
+		echo "setting wallpaper: $img"
+		swww img -t grow --transition-duration 4 --transition-pos 0.8,0.8 "$img" 
+		sleep "${2:-$DEFAULT_INTERVAL}"
+	done
+done

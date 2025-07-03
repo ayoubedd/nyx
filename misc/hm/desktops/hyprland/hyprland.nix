@@ -289,15 +289,6 @@ in {
     ];
   };
 
-  services.hyprpaper = {
-    enable = true;
-    settings = {
-      ipc = "on";
-      preload = toString lockscreen_img;
-      wallpaper = ",${toString lockscreen_img}";
-    };
-  };
-
   services.hypridle = {
     enable = true;
     settings = {
