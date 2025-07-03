@@ -1,4 +1,113 @@
 { ... }: {
+
+  home.file.".config/git/template" = {
+    enable = true;
+    force = true;
+    text = ''
+      # feat(): 
+      # fix():
+      # build():
+      # ci():
+      # test():
+      # docs():
+      # refactor():
+      # perf():
+      # style():
+      # chore():
+      # revert():
+
+      # Body
+
+      # Footer
+    '';
+  };
+
+  home.file.".config/git/ignore" = {
+    enable = true;
+    force = true;
+    text = ''
+      *.com
+      *.class
+      *.dll
+      *.exe
+      *.o
+      *.so
+      *.pyc
+      *.pyo
+
+      *.7z
+      *.dmg
+      *.gz
+      *.iso
+      *.jar
+      *.rar
+      *.tar
+      *.zip
+      *.msi
+
+      # Logs and databases
+      *.log
+      logs/
+      *.sql
+      *.sqlite
+
+      # Vim
+      *.swp
+      *.swo
+      *.un~
+
+      # OS generated files
+      .DS_Store
+      .DS_Store?
+      ._*
+      .Spotlight-V100
+      .Trashes
+      ehthumbs.db
+      Thumbs.db
+      desktop.ini
+
+      # Temp files
+      *.bak
+      *.swp
+      *.swo
+      *~
+      *#
+
+      # Secrects
+      .env
+      .env.*.local
+      .env.local
+      *.pem
+      *.key
+      *.crt
+      *.p12
+      *.jks
+      *.keystore
+
+      # IDE files
+      .vscode
+      .idea
+      .iml
+      *.sublime-workspace
+
+      # Misc
+      **/node_modules/
+      **/dist/
+      **/build/
+      *.bak
+      *.tmp
+      *.temp
+      *.old
+      .docker/
+      *.orig
+      __pycache__/
+      *.py[cod]
+      *.pyo
+      .cache/
+      dist/
+    '';
+  };
+
   programs.git = {
     enable = true;
     userEmail = "me@ayoubedd.me";
@@ -15,12 +124,14 @@
     }];
 
     extraConfig = {
-      core.excludesfile = "gitignore";
+      core.excludesfile = "~/.config/git/ignore";
       core.editor = "nvim";
       core.pager = "delta";
       branch.sort = "-committerdate";
       color.ui = "auto";
       init.defaultBranch = "master";
+      commit.template = "~/.config/git/template";
+      push.autoSetupRemote = true;
       alias = {
         # add
         a = "add";
