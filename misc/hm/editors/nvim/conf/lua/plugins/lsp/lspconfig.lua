@@ -31,7 +31,7 @@ return {
 
 		lspconfig.jsonls.setup({
 			capabilities = json_capabilities,
-			cmd = { "vscode-json-languageserver", "--stdio" },
+			cmd = { "vscode-json-language-server", "--stdio" },
 		})
 
 		lspconfig.harper_ls.setup({})
