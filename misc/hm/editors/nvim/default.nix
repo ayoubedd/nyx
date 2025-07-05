@@ -85,6 +85,8 @@
       vscode-langservers-extracted
       emmet-ls
       harper
+      lua-language-server
+      tailwindcss-language-server
 
       # formatters
       nixfmt

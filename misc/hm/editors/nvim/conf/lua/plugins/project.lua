@@ -1,5 +1,5 @@
 return {
-	"ahmedkhalf/project.nvim", -- Changes PWD to the root of the project
+	"DrKJeff16/project.nvim", -- Changes PWD to the root of the project
 	config = function()
 		require("project_nvim").setup({
 			-- Manual mode doesn't automatically change your root directory, so you have
