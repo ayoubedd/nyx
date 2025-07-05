@@ -23,8 +23,6 @@ in {
       PartOf = [ config.wayland.systemd.target ];
     };
 
-    Service = {
-      ExecStart = "${writeShellScriptBin}/bin/reload-wallpaper";
-    };
+    Service = { ExecStart = "${writeShellScriptBin}/bin/reload-wallpaper"; };
   };
 }

@@ -2,7 +2,7 @@ return {
 	"tpope/vim-sleuth", -- Automatically set the 'shiftwidth' and 'expandtab' options based on the current file
 	{
 		"LunarVim/bigfile.nvim", -- Disables certain plugins/features on big files
-		enabled = false;
+		enabled = false,
 		config = function()
 			-- default config
 			require("bigfile").setup({
