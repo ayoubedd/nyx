@@ -397,6 +397,22 @@ vim.lsp.config.svelte = {
 	end,
 }
 
+vim.lsp.config.yamlls = {
+	cmd = { "yaml-language-server", "--stdio" },
+	filetypes = { "yaml", "yaml.docker-compose", "yaml.gitlab", "yaml.helm-values" },
+	root_markers = { ".git" },
+	settings = {
+		yaml = {
+			schemas = {
+				["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*.yaml",
+				["https://raw.githubusercontent.com/yannh/kubernetes-json-schema/refs/heads/master/v1.32.2-standalone-strict/all.json"] = "/*.k8s.yaml",
+			},
+		},
+		-- https://github.com/redhat-developer/vscode-redhat-telemetry#how-to-disable-telemetry-reporting
+		redhat = { telemetry = { enabled = false } },
+	},
+}
+
 vim.lsp.config.pyright = {
 	cmd = { "pyright-langserver", "--stdio" },
 	filetypes = { "python" },

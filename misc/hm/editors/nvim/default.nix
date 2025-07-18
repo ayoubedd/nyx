@@ -87,6 +87,7 @@
       harper
       lua-language-server
       tailwindcss-language-server
+      yaml-language-server
 
       # formatters
       nixfmt
