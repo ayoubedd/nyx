@@ -9,6 +9,7 @@
     rclone
 
     f2
+    cfspeedtest
 
     # docker-buildx
     lazydocker
