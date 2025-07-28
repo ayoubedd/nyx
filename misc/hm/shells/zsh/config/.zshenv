@@ -42,6 +42,7 @@ fi
 export NODE_REPL_HISTORY="$XDG_CACHE_HOME/node_repl_history"
 export DENO_REPL_HISTORY="$XDG_CACHE_HOME/deno_repl_history"
 export PYTHONSTARTUP="$XDG_CONFIG_HOME/python/pythonstartup.py"
+export REDISCLI_HISTFILE="$XDG_CACHE_HOME/rediscli_history"
 
 # Curl
 export CURL_HOME="$XDG_CONFIG_HOME/curl"
