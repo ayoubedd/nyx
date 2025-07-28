@@ -6,6 +6,8 @@
     "dev.vencord.Vesktop"
     "com.github.tchx84.Flatseal"
     "com.getpostman.Postman"
+    "org.inkscape.Inkscape"
+    "org.gimp.GIMP"
   ];
 
   services.flatpak.uninstallUnmanaged = true;
