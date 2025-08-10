@@ -1,9 +1,6 @@
-{ inputs, ... }: {
+{ ... }: {
 
   imports = [
-    # inputs.orbit-nvim.homeManagerModules.orbit-nvim
-    inputs.nix-flatpak.homeManagerModules.nix-flatpak
-
     ../../modules/hm
 
     ./pkgs.nix
@@ -13,7 +10,6 @@
     ./git.nix
 
     ../../misc/hm/desktops/hyprland
-    ../../misc/hm/editors/nvim
   ];
 
   nixpkgs.config.allowUnfree = true;

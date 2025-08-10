@@ -1,6 +1,8 @@
-{ ... }: {
+{ inputs, pkgs, ... }:
+{
 
   programs.sherlock = {
+    # package = inputs.sherlock.packages.${pkgs.system}.default;
     enable = true;
 
     settings = {
@@ -172,8 +174,7 @@
           alias = "yt";
           type = "web_launcher";
           args = {
-            search_engine =
-              "https://www.youtube.com/results?search_query={keyword}";
+            search_engine = "https://www.youtube.com/results?search_query={keyword}";
             icon = "youtube";
           };
           priority = 0;

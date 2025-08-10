@@ -1,4 +1,5 @@
-{ pkgs, inputs, ... }: {
+{ pkgs, inputs, ... }:
+{
   home.packages = with pkgs; [
     inputs.devenv.outputs.packages.x86_64-linux.default
 
@@ -7,6 +8,9 @@
     nix-tree
     comma
     rclone
+
+    gparted
+    exfatprogs
 
     f2
     cfspeedtest

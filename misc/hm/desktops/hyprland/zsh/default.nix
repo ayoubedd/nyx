@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   home.packages = with pkgs; [
     curl
     git
@@ -25,9 +26,12 @@
     zoxide
   ];
 
-  programs.zsh = {
-    enable = true;
-    dotDir = ".config/zsh";
+  programs.zsh.enable = true;
+
+  home.sessionVariables = {
+    ZDOTDIR = "$HOME/.config/zsh";
+    EDITOR = "nvim";
+    VISUAL = "nvim";
   };
 
   home.file = {

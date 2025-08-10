@@ -1,8 +1,8 @@
 { pkgs, lo-pkgs, inputs, host, ... }: {
 
   imports = [
-    inputs.sherlock.homeModules.default
-    inputs.stylix.homeManagerModules.stylix
+    # inputs.sherlock.homeModules.default
+    inputs.stylix.homeModules.stylix
 
     # import home manager custom modules
     ../../../../modules/hm
@@ -23,12 +23,14 @@
     ./applets
     ./services.nix
 
-    ../../browsers/firefox.nix
-    ../../terminals/alacritty
-    ../../shells/zsh
-    ../../media/mpv.nix
-    ../../media/imv.nix
-    ../../media/zathura.nix
+    ./browsers/firefox.nix
+    ./alacritty
+    ./zsh
+    ./mpv.nix
+    ./imv.nix
+    ./zathura.nix
+
+    ./nvim
 
     ./device/${host}
   ];
