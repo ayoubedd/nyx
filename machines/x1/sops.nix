@@ -1,10 +1,13 @@
-{ ... }: {
+{ ... }:
+{
   sops.defaultSopsFile = ../../secrets/orbit.yaml;
   sops.defaultSopsFormat = "yaml";
   sops.age.keyFile = "/home/orbit/.config/sops/age/keys.txt";
 
   sops.secrets = {
-    user_password = { neededForUsers = true; };
+    user_password = {
+      neededForUsers = true;
+    };
 
     root_password = {
       sopsFile = ../../secrets/x1.yaml;

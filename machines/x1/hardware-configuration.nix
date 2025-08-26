@@ -1,4 +1,10 @@
-{ lib, pkgs, modulesPath, config, ... }:
+{
+  lib,
+  pkgs,
+  modulesPath,
+  config,
+  ...
+}:
 
 {
   imports = [
@@ -6,13 +12,21 @@
     ../../misc/nixos/hardware/intel.nix
   ];
 
-  boot.initrd.availableKernelModules =
-    [ "xhci_pci" "thunderbolt" "nvme" "usb_storage" "sd_mod" ];
+  boot.initrd.availableKernelModules = [
+    "xhci_pci"
+    "thunderbolt"
+    "nvme"
+    "usb_storage"
+    "sd_mod"
+  ];
 
   boot.initrd.kernelModules = [ ];
   boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
 
-  boot.kernelModules = [ "kvm-intel" "acpi_call" ];
+  boot.kernelModules = [
+    "kvm-intel"
+    "acpi_call"
+  ];
 
   boot.blacklistedKernelModules = [ "iTCO_wdt" ];
 
@@ -31,7 +45,10 @@
   fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/B4B1-D6F5";
     fsType = "vfat";
-    options = [ "fmask=0022" "dmask=0022" ];
+    options = [
+      "fmask=0022"
+      "dmask=0022"
+    ];
   };
 
   swapDevices = [ ];

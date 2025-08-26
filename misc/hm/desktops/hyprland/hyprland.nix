@@ -19,20 +19,16 @@ let
   pidof = "${pkgs.procps}/bin/pidof";
 
   notify-send = "${pkgs.libnotify}/bin/notify-send";
-  screen_brightness_up = ''
-    ${brightnessctl} set +5% && ${notify-send} "Brightness" "Brightness: $(${brightnessctl} | grep -Eo '[0-9]+%')"'';
-  screen_brightness_down = ''
-    ${brightnessctl} set 5%- && ${notify-send} "Brightness" "Brightness: $(${brightnessctl} | grep -Eo '[0-9]+%')"'';
+  screen_brightness_up = ''${brightnessctl} set +5% && ${notify-send} "Brightness" "Brightness: $(${brightnessctl} | grep -Eo '[0-9]+%')"'';
+  screen_brightness_down = ''${brightnessctl} set 5%- && ${notify-send} "Brightness" "Brightness: $(${brightnessctl} | grep -Eo '[0-9]+%')"'';
 
   grim = "${pkgs.grim}/bin/grim";
   slurp = "${pkgs.slurp}/bin/slurp";
   wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
   wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
 
-  snaparea =
-    "${grim} -g \"$(${slurp})\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | ${wl-copy} -t 'image/png'";
-  snapfull =
-    "${grim} -g \"$(${slurp} -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | ${wl-copy} -t 'image/png'";
+  snaparea = "${grim} -g \"$(${slurp})\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | ${wl-copy} -t 'image/png'";
+  snapfull = "${grim} -g \"$(${slurp} -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | ${wl-copy} -t 'image/png'";
 
   wofi = "${pkgs.wofi}/bin/wofi";
   sherlock = "${inputs.sherlock.packages.x86_64-linux.default}/bin/sherlock";
@@ -50,7 +46,8 @@ let
 
   swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
   swaync-client = "${pkgs.swaynotificationcenter}/bin/swaync-client";
-in {
+in
+{
   wayland.windowManager.hyprland.enable = true;
 
   wayland.windowManager.hyprland.extraConfig = ''
@@ -132,7 +129,10 @@ in {
       "${swaync}"
     ];
 
-    bindm = [ "ALT,mouse:272,movewindow" "ALT_SHIFT,mouse:272,resizewindow" ];
+    bindm = [
+      "ALT,mouse:272,movewindow"
+      "ALT_SHIFT,mouse:272,resizewindow"
+    ];
 
     bind = [
       "$mod, Return, exec, $terminal"
@@ -211,7 +211,9 @@ in {
     monitor = [ "eDP-1,preferred,auto,2,bitdepth,8" ];
 
     decoration = {
-      blur = { enabled = false; };
+      blur = {
+        enabled = false;
+      };
       # shadow = {
       #   enabled = false;
       # };
@@ -232,7 +234,9 @@ in {
       workspace_swipe_touch = true;
     };
 
-    animations = { enabled = true; };
+    animations = {
+      enabled = true;
+    };
 
     input = {
       kb_layout = "us";
@@ -295,36 +299,29 @@ in {
       general = {
         lock_cmd = "${pidof} hyprlock || ${hyprlock}";
         before_sleep_cmd = "${loginctl} lock-session"; # lock before suspend.
-        after_sleep_cmd =
-          "${hyprctl} dispatch dpms on"; # to avoid having to press a key twice to turn on the display.
+        after_sleep_cmd = "${hyprctl} dispatch dpms on"; # to avoid having to press a key twice to turn on the display.
         ignore_dbus_inhibit = false;
       };
 
       listener = [
         {
           timeout = 150; # 2.5min.
-          on-timeout =
-            "${brightnessctl} -s set 10"; # set monitor backlight to minimum, avoid 0 on OLED monitor.
+          on-timeout = "${brightnessctl} -s set 10"; # set monitor backlight to minimum, avoid 0 on OLED monitor.
           on-resume = "${brightnessctl} -r"; # monitor backlight restore.
         }
         {
           timeout = 150; # 2.5min.
-          on-timeout =
-            "${brightnessctl} -sd tpacpi::kbd_backlight set 0"; # turn off keyboard backlight.
-          on-resume =
-            "${brightnessctl} -rd tpacpi::kbd_backlight"; # turn on keyboard backlight.
+          on-timeout = "${brightnessctl} -sd tpacpi::kbd_backlight set 0"; # turn off keyboard backlight.
+          on-resume = "${brightnessctl} -rd tpacpi::kbd_backlight"; # turn on keyboard backlight.
         }
         {
           timeout = 300; # 5min
-          on-timeout =
-            "${loginctl} lock-session"; # lock screen when timeout has passed
+          on-timeout = "${loginctl} lock-session"; # lock screen when timeout has passed
         }
         {
           timeout = 330; # 5.5min
-          on-timeout =
-            "${hyprctl} dispatch dpms off"; # screen off when timeout has passed
-          on-resume =
-            "${hyprctl} dispatch dpms on"; # screen on when activity is detected after timeout has fired.
+          on-timeout = "${hyprctl} dispatch dpms off"; # screen off when timeout has passed
+          on-resume = "${hyprctl} dispatch dpms on"; # screen on when activity is detected after timeout has fired.
         }
         {
           timeout = 1800; # 30min
@@ -341,7 +338,9 @@ in {
         disable_loading_bar = true;
         hide_cursor = true;
       };
-      background = { path = toString lockscreen_img; };
+      background = {
+        path = toString lockscreen_img;
+      };
     };
   };
 }

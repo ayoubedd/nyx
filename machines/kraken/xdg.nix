@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   xdg.terminal-exec.enable = true;
 
   xdg.portal = {
@@ -9,8 +10,15 @@
     ];
 
     config = {
-      common = { default = [ "gtk" ]; };
-      hyprland = { default = [ "hyprland" "gtk" ]; };
+      common = {
+        default = [ "gtk" ];
+      };
+      hyprland = {
+        default = [
+          "hyprland"
+          "gtk"
+        ];
+      };
     };
   };
 }

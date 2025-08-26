@@ -1,4 +1,5 @@
-{ ... }: {
+{ ... }:
+{
   # source https://github.com/CachyOS/CachyOS-Settings/blob/master/usr/lib/sysctl.d/99-cachyos-settings.conf
   # source https://github.com/LudovicoPiero/dotfiles/blob/main/cells/workstations/nixosProfiles/security/default.nix
 

@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   programs.direnv.enable = true;
 
   programs.ssh = {
@@ -23,7 +24,9 @@
       editor = "";
       prompt = "enabled";
       pager = "";
-      aliases = { co = "pr checkout"; };
+      aliases = {
+        co = "pr checkout";
+      };
       http_unix_socket = "";
       browser = "";
     };

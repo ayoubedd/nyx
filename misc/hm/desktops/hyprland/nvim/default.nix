@@ -1,10 +1,12 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   home.packages = with pkgs; [ neovide ];
 
   xdg.configFile."nvim/parser".source = "${
-      pkgs.symlinkJoin {
-        name = "treesitter-parsers";
-        paths = (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
+    pkgs.symlinkJoin {
+      name = "treesitter-parsers";
+      paths =
+        (pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
           p.asm
           p.bash
           p.c
@@ -53,8 +55,8 @@
           p.xml
           p.yaml
         ])).dependencies;
-      }
-    }/parser";
+    }
+  }/parser";
 
   programs.neovim = {
     enable = true;

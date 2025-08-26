@@ -1,1 +1,4 @@
-{ ... }: { imports = [ ./nwg-piotr ]; }
+{ ... }:
+{
+  imports = [ ./nwg-piotr ];
+}

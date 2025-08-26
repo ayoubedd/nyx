@@ -1,6 +1,10 @@
 { lib, nixpkgs, ... }:
 let
-  mkHome = { specialArgs, modules ? [ ], }:
+  mkHome =
+    {
+      specialArgs,
+      modules ? [ ],
+    }:
     lib.homeManagerConfiguration rec {
       pkgs = nixpkgs.legacyPackages.${specialArgs.system};
       extraSpecialArgs = specialArgs // {
@@ -9,6 +13,14 @@ let
       inherit modules;
     };
 
-  systems = [ "aarch64-darwin" "aarch64-linux" "x86_64-darwin" "x86_64-linux" ];
+  systems = [
+    "aarch64-darwin"
+    "aarch64-linux"
+    "x86_64-darwin"
+    "x86_64-linux"
+  ];
 
-in { inherit systems mkHome; }
+in
+{
+  inherit systems mkHome;
+}

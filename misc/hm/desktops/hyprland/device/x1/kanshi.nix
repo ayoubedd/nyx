@@ -1,16 +1,19 @@
-{ ... }: {
+{ ... }:
+{
   services.kanshi = {
     enable = true;
     systemdTarget = "hyprland-session.target";
     settings = [
       {
         profile.name = "undocked";
-        profile.outputs = [{
-          criteria = "eDP-1";
-          adaptiveSync = true;
-          scale = 2.0;
-          status = "enable";
-        }];
+        profile.outputs = [
+          {
+            criteria = "eDP-1";
+            adaptiveSync = true;
+            scale = 2.0;
+            status = "enable";
+          }
+        ];
       }
       {
         profile.name = "docked";

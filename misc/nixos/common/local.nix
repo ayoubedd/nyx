@@ -1,4 +1,5 @@
-{ lib, ... }: {
+{ lib, ... }:
+{
   time.timeZone = lib.mkDefault "Africa/Casablanca";
   time.hardwareClockInLocalTime = false;
 

@@ -1,6 +1,10 @@
-{ lib, pkgs, ... }: {
+{ lib, pkgs, ... }:
+{
   # depedent packges
-  home.packages = with pkgs; [ font-awesome noto-fonts ];
+  home.packages = with pkgs; [
+    font-awesome
+    noto-fonts
+  ];
 
   programs.waybar = {
     enable = true;
@@ -83,11 +87,9 @@
             "none" = "";
             "dnd-notification" = "<span foreground='red'><sup></sup></span>";
             "dnd-none" = "";
-            "inhibited-notification" =
-              "<span foreground='red'><sup></sup></span>";
+            "inhibited-notification" = "<span foreground='red'><sup></sup></span>";
             "inhibited-none" = "";
-            "dnd-inhibited-notification" =
-              "<span foreground='red'><sup></sup></span>";
+            "dnd-inhibited-notification" = "<span foreground='red'><sup></sup></span>";
             "dnd-inhibited-none" = "";
           };
           "return-type" = "json";
@@ -100,7 +102,13 @@
         "temperature" = {
           "critical-threshold" = 80;
           "format" = "{temperatureC}°C {icon}";
-          "format-icons" = [ "" "" "" "" "" ];
+          "format-icons" = [
+            ""
+            ""
+            ""
+            ""
+            ""
+          ];
           "tooltip" = false;
           "hwmon-path" = [ "/sys/class/hwmon/hwmon5/temp1_input" ];
         };
@@ -108,7 +116,12 @@
         "backlight" = {
           "device" = "intel_backlight";
           "format" = "{percent}% {icon}";
-          "format-icons" = [ "" "" "" "" ];
+          "format-icons" = [
+            ""
+            ""
+            ""
+            ""
+          ];
           "min-length" = 7;
         };
 

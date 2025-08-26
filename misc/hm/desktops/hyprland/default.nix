@@ -1,4 +1,11 @@
-{ pkgs, lo-pkgs, inputs, host, ... }: {
+{
+  pkgs,
+  lo-pkgs,
+  inputs,
+  host,
+  ...
+}:
+{
 
   imports = [
     # inputs.sherlock.homeModules.default

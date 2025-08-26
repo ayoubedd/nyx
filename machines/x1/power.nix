@@ -1,4 +1,5 @@
-{ ... }: {
+{ ... }:
+{
   services.thermald.enable = true;
   services.thermald.ignoreCpuidCheck = true;
 

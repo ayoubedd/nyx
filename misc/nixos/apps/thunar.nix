@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   # Thunar
   programs.thunar.enable = true;
   programs.thunar.plugins = with pkgs.xfce; [
@@ -10,8 +11,7 @@
   programs.xfconf.enable = true;
   services.tumbler.enable = true;
 
-  environment.systemPackages = with pkgs;
-    [
-      ffmpegthumbnailer # Need For Video / Image Preview
-    ];
+  environment.systemPackages = with pkgs; [
+    ffmpegthumbnailer # Need For Video / Image Preview
+  ];
 }

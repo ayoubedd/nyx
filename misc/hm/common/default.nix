@@ -1,1 +1,7 @@
-{ ... }: { imports = [ ./nix-index.nix ./flatpak.nix ]; }
+{ ... }:
+{
+  imports = [
+    ./nix-index.nix
+    ./flatpak.nix
+  ];
+}

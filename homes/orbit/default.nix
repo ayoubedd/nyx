@@ -1,4 +1,5 @@
-{ ... }: {
+{ ... }:
+{
 
   imports = [
     ../../modules/hm
@@ -21,4 +22,3 @@
 
   home.stateVersion = "24.11";
 }
-

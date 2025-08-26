@@ -1,4 +1,5 @@
-{ ... }: {
+{ ... }:
+{
   imports = [
     ./waybar.nix
     ./sway-notification-center.nix

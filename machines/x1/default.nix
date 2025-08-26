@@ -1,12 +1,21 @@
-{ lib, pkgs, nixos-hardware, config, inputs, ... }:
+{
+  lib,
+  pkgs,
+  nixos-hardware,
+  config,
+  inputs,
+  ...
+}:
 let
   misc = ../../misc/nixos;
-  polkitAgent =
-    (import (builtins.toPath "${misc}/apps/polkit_pantheon_agent.nix") {
+  polkitAgent = (
+    import (builtins.toPath "${misc}/apps/polkit_pantheon_agent.nix") {
       inherit pkgs;
       wantedBy = "hyprland-session.target";
-    });
-in {
+    }
+  );
+in
+{
   imports = [
     nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
     inputs.sops-nix.nixosModules.sops
@@ -43,10 +52,14 @@ in {
 
   users.users.orbit = with pkgs; {
     isNormalUser = true;
-    extraGroups = [ "wheel" "video" "audio" ]
-      ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
-      ++ lib.optional config.virtualisation.docker.enable "docker"
-      ++ lib.optional config.networking.networkmanager.enable "networkmanager";
+    extraGroups = [
+      "wheel"
+      "video"
+      "audio"
+    ]
+    ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
+    ++ lib.optional config.virtualisation.docker.enable "docker"
+    ++ lib.optional config.networking.networkmanager.enable "networkmanager";
     hashedPasswordFile = config.sops.secrets.user_password.path;
     shell = zsh;
   };

@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   # Services
   services = {
     greetd = {
@@ -39,43 +40,54 @@
         {
           matches = [
             {
-              "node.name" =
-                "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__HDMI1__sink";
+              "node.name" = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__HDMI1__sink";
             }
             {
-              "node.name" =
-                "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__HDMI2__sink";
+              "node.name" = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__HDMI2__sink";
             }
             {
-              "node.name" =
-                "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__HDMI3__sink";
+              "node.name" = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__HDMI3__sink";
             }
             {
-              "node.name" =
-                "alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__Mic2__source";
+              "node.name" = "alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__Mic2__source";
             }
           ];
-          actions = { update-props = { "node.disabled" = true; }; };
+          actions = {
+            update-props = {
+              "node.disabled" = true;
+            };
+          };
         }
         {
-          matches = [{
-            "node.name" =
-              "alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__Mic1__source";
-          }];
-          actions = { update-props = { "node.description" = "Laptop Mic"; }; };
+          matches = [
+            {
+              "node.name" = "alsa_input.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__Mic1__source";
+            }
+          ];
+          actions = {
+            update-props = {
+              "node.description" = "Laptop Mic";
+            };
+          };
         }
         {
-          matches = [{
-            "node.name" =
-              "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__Speaker__sink";
-          }];
-          actions = { update-props = { "node.description" = "Laptop"; }; };
+          matches = [
+            {
+              "node.name" = "alsa_output.pci-0000_00_1f.3-platform-skl_hda_dsp_generic.HiFi__Speaker__sink";
+            }
+          ];
+          actions = {
+            update-props = {
+              "node.description" = "Laptop";
+            };
+          };
         }
         {
-          matches = [{
-            "device.name" =
-              "alsa_card.pci-0000_00_1f.3-platform-skl_hda_dsp_generic";
-          }];
+          matches = [
+            {
+              "device.name" = "alsa_card.pci-0000_00_1f.3-platform-skl_hda_dsp_generic";
+            }
+          ];
           actions = {
             update-props = {
               device.description = "Laptop";

@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   services.pcscd.enable = true;
 
   services.udev.packages = with pkgs; [ yubikey-personalization ];
@@ -25,7 +26,9 @@
       fprintAuth = false;
     };
 
-    hyprlock = { fprintAuth = false; };
+    hyprlock = {
+      fprintAuth = false;
+    };
 
     sudo = {
       u2fAuth = true;

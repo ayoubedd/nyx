@@ -1,4 +1,5 @@
-{ pkgs, lib, ... }: {
+{ pkgs, lib, ... }:
+{
   home.pointerCursor = {
     x11 = {
       enable = true;
@@ -15,14 +16,17 @@
     };
 
     iconTheme = {
-      package =
-        (pkgs.colloid-icon-theme.override { colorVariants = [ "grey" ]; });
+      package = (pkgs.colloid-icon-theme.override { colorVariants = [ "grey" ]; });
       name = "Colloid-Grey-Dark";
     };
 
-    gtk3.extraConfig = { gtk-application-prefer-dark-theme = true; };
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
 
-    gtk4.extraConfig = { gtk-application-prefer-dark-theme = true; };
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
   };
 
   stylix = {

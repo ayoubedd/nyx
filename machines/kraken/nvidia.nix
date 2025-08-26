@@ -1,15 +1,24 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 let
   nverStable = config.boot.kernelPackages.nvidiaPackages.stable.version;
   nverBeta = config.boot.kernelPackages.nvidiaPackages.beta.version;
-  nvidiaPackage = if (lib.versionOlder nverBeta nverStable) then
-    config.boot.kernelPackages.nvidiaPackages.stable
-  else
-    config.boot.kernelPackages.nvidiaPackages.beta;
+  nvidiaPackage =
+    if (lib.versionOlder nverBeta nverStable) then
+      config.boot.kernelPackages.nvidiaPackages.stable
+    else
+      config.boot.kernelPackages.nvidiaPackages.beta;
 
-  extraEnv = { WLR_NO_HARDWARE_CURSORS = "1"; };
-in {
+  extraEnv = {
+    WLR_NO_HARDWARE_CURSORS = "1";
+  };
+in
+{
   config = {
     environment.variables = extraEnv;
     environment.sessionVariables = extraEnv;
@@ -26,6 +35,8 @@ in {
     hardware.nvidia.powerManagement.enable = false;
     hardware.nvidia.open = false;
 
-    services.xserver = { videoDrivers = [ "nvidia" ]; };
+    services.xserver = {
+      videoDrivers = [ "nvidia" ];
+    };
   };
 }

@@ -2,7 +2,13 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 let
   mixins = ../../mixins/nixos;
 
@@ -13,12 +19,14 @@ let
 
   disko = import ./disk-config.nix { device = "/dev/xxx"; };
 
-  polkitAgent =
-    (import (builtins.toPath "${mixins}/apps/polkit_pantheon_agent.nix") {
+  polkitAgent = (
+    import (builtins.toPath "${mixins}/apps/polkit_pantheon_agent.nix") {
       inherit pkgs;
       wantedBy = "hyprland-session.target";
-    });
-in {
+    }
+  );
+in
+{
   imports = [
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
@@ -55,8 +63,7 @@ in {
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
-  hardware.bluetooth.powerOnBoot =
-    lib.mkForce true; # Overriding common nixos config
+  hardware.bluetooth.powerOnBoot = lib.mkForce true; # Overriding common nixos config
 
   programs.hyprland.enable = true;
   security.polkit.enable = true;
@@ -67,10 +74,14 @@ in {
   users.users.orbit = with pkgs; {
     initialPassword = "toor";
     isNormalUser = true;
-    extraGroups = [ "wheel" "video" "audio" ]
-      ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
-      ++ lib.optional config.virtualisation.docker.enable "docker"
-      ++ lib.optional config.networking.networkmanager.enable "networkmanager";
+    extraGroups = [
+      "wheel"
+      "video"
+      "audio"
+    ]
+    ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
+    ++ lib.optional config.virtualisation.docker.enable "docker"
+    ++ lib.optional config.networking.networkmanager.enable "networkmanager";
     shell = zsh;
   };
 

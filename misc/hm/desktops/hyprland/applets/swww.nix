@@ -10,11 +10,14 @@ let
     '';
   };
 
-in {
+in
+{
   services.swww.enable = true;
 
   systemd.user.services.swww-wallpaper-reload = {
-    Install = { WantedBy = [ config.wayland.systemd.target ]; };
+    Install = {
+      WantedBy = [ config.wayland.systemd.target ];
+    };
 
     Unit = {
       ConditionEnvironment = "WAYLAND_DISPLAY";
@@ -23,6 +26,8 @@ in {
       PartOf = [ config.wayland.systemd.target ];
     };
 
-    Service = { ExecStart = "${writeShellScriptBin}/bin/reload-wallpaper"; };
+    Service = {
+      ExecStart = "${writeShellScriptBin}/bin/reload-wallpaper";
+    };
   };
 }

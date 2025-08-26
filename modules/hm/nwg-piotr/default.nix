@@ -1,6 +1,13 @@
-{ lib, pkgs, config, ... }:
-let cfg = config.programs.nwg-piotr;
-in {
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
+let
+  cfg = config.programs.nwg-piotr;
+in
+{
   options = {
     programs.nwg-piotr = {
       enable = lib.mkEnableOption { };
