@@ -1,48 +1,45 @@
-{ inputs, pkgs, ... }:
+{ ... }:
 {
 
   programs.sherlock = {
-    # package = inputs.sherlock.packages.${pkgs.system}.default;
     enable = true;
 
     settings = {
-      config = {
-        default_apps = {
-          terminal = "alacritty";
-          browser = "firefox %U";
-        };
+      default_apps = {
+        terminal = "alacritty";
+        browser = "firefox %U";
+      };
 
-        units = {
-          lengths = "meters";
-          weights = "kg";
-          volumes = "l";
-          temperatures = "C";
-          currency = "dollar";
-        };
+      units = {
+        lengths = "meters";
+        weights = "kg";
+        volumes = "l";
+        temperatures = "C";
+        currency = "dollar";
+      };
 
-        appearance = {
-          width = 700;
-          height = 460;
-          gsk_renderer = "vulkan";
-          recolor_icons = false;
-          icon_size = 22;
-          search_icon = true;
-          use_base_css = true;
-          status_bar = true;
-          search_icon_size = 22;
-        };
+      appearance = {
+        width = 700;
+        height = 460;
+        gsk_renderer = "vulkan";
+        recolor_icons = false;
+        icon_size = 22;
+        search_icon = true;
+        use_base_css = true;
+        status_bar = true;
+        search_icon_size = 22;
+      };
 
-        behavior = {
-          caching = true;
-          cache = "~/.cache/sherlock_desktop_cache.json";
-          daemonize = true;
-          animation = true;
-        };
+      behavior = {
+        caching = true;
+        cache = "~/.cache/sherlock_desktop_cache.json";
+        daemonize = true;
+        animation = true;
+      };
 
-        binds = {
-          prev = "control-p";
-          next = "control-n";
-        };
+      binds = {
+        up = "control-p";
+        down = "control-n";
       };
 
       launchers = [
