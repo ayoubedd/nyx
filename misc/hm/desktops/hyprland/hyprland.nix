@@ -229,10 +229,9 @@ in
       key_press_enables_dpms = true;
     };
 
-    gestures = {
-      workspace_swipe = true;
-      workspace_swipe_touch = true;
-    };
+    gesture = [
+      "3, horizontal, workspace"
+    ];
 
     animations = {
       enabled = true;
