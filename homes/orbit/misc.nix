@@ -4,15 +4,19 @@
 
   programs.ssh = {
     enable = true;
-    compression = true;
-    forwardAgent = true;
+    enableDefaultConfig = false;
 
-    extraConfig = ''
-      Host github.com
-          Hostname ssh.github.com
-          Port 443
-          User git
-    '';
+    matchBlocks = {
+      "*" = {
+        compression = true;
+        forwardAgent = true;
+      };
+      "github.com" = {
+        hostname = "ssh.github.com";
+        port = 443;
+        user = "git";
+      };
+    };
   };
 
   programs.gh = {
