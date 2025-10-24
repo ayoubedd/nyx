@@ -111,8 +111,6 @@
 
   programs.git = {
     enable = true;
-    userEmail = "me@ayoubedd.me";
-    userName = "Ayoub Eddaoudi";
 
     includes = [
       {
@@ -126,7 +124,11 @@
       }
     ];
 
-    extraConfig = {
+    settings = {
+      user = {
+        email = "me@ayoubedd.me";
+        name = "Ayoub Eddaoudi";
+      };
       core.excludesfile = "~/.config/git/ignore";
       core.editor = "nvim";
       core.pager = "delta";
