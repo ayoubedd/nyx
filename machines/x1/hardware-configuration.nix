@@ -28,7 +28,7 @@
     "acpi_call"
   ];
 
-  boot.blacklistedKernelModules = [ "iTCO_wdt" ];
+  boot.blacklistedKernelModules = [ "iTCO_wdt" "xe" ];
 
   boot.loader = {
     systemd-boot.enable = true;
