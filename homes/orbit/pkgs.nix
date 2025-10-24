@@ -12,6 +12,9 @@
     gparted
     exfatprogs
 
+    binsider
+    nvtopPackages.intel
+
     f2
     cfspeedtest
 
