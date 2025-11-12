@@ -25,6 +25,7 @@
     qbittorrent
 
     bandwhich
+    bluetui
 
     ripdrag
     pavucontrol
