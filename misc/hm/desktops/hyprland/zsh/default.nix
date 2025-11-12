@@ -28,6 +28,15 @@
 
   programs.zsh.enable = true;
 
+  programs.yazi = {
+    enable = true;
+    settings = {
+      mgr = {
+        sort_by = "natural";
+      };
+    };
+  };
+
   home.sessionVariables = {
     ZDOTDIR = "$HOME/.config/zsh";
     EDITOR = "nvim";
