@@ -35,6 +35,7 @@
   };
 
   environment.homeBinInPath = true;
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
   fonts.enableDefaultPackages = true;
 
   programs.dconf.enable = true;
