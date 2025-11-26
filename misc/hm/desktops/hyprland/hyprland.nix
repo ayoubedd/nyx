@@ -25,31 +25,23 @@ let
   grim = "${pkgs.grim}/bin/grim";
   slurp = "${pkgs.slurp}/bin/slurp";
   wl-copy = "${pkgs.wl-clipboard}/bin/wl-copy";
-  wl-paste = "${pkgs.wl-clipboard}/bin/wl-paste";
 
   snaparea = "${grim} -g \"$(${slurp})\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | ${wl-copy} -t 'image/png'";
   snapfull = "${grim} -g \"$(${slurp} -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | ${wl-copy} -t 'image/png'";
 
-  wofi = "${pkgs.wofi}/bin/wofi";
   sherlock = "${inputs.sherlock.packages.x86_64-linux.default}/bin/sherlock";
   vicinae = "${pkgs.vicinae}/bin/vicinae";
   firefox = "${pkgs.firefox}/bin/firefox";
   thunar = "${pkgs.xfce.thunar}/bin/thunar";
 
-  waybar = "${pkgs.waybar}/bin/waybar";
-
-  wl-clip-persist = "${pkgs.wl-clip-persist}/bin/wl-clip-persist";
-
-  homescreen_img = ../../../../assets/images/homescreen.png;
   lockscreen_img = ../../../../assets/images/lockscreen.png;
-  cliphist = "${pkgs.cliphist}/bin/cliphist";
   hyprpicker = "${pkgs.hyprpicker}/bin/hyprpicker";
 
-  swaync = "${pkgs.swaynotificationcenter}/bin/swaync";
   swaync-client = "${pkgs.swaynotificationcenter}/bin/swaync-client";
 in
 {
   wayland.windowManager.hyprland.enable = true;
+  wayland.windowManager.hyprland.systemd.enable = false;
 
   wayland.windowManager.hyprland.extraConfig = ''
     bind=ALT, p, submap, snapshot
@@ -133,11 +125,6 @@ in
       "systemctl --user is-active xdg-desktop-portal-hyprland.service && systemctl --user stop xdg-desktop-portal-hyprland.service"
       "systemctl --user restart xdg-desktop-portal.service"
       "$browser"
-      "${waybar}"
-      # "sleep 3; ${cliphist} wipe"
-      # "${wl-paste} --watch ${cliphist} store"
-      "${wl-clip-persist} --clipboard both"
-      # "${swaync}"
     ];
 
     bindm = [
@@ -154,7 +141,6 @@ in
       "$mod, d, exec, $menu"
 
       "$mod, x, exec, ${sherlock} --sub-menu pm"
-      "$mod SHIFT, v, exec, ${cliphist} list | sort -r | ${wofi} --dmenu | ${cliphist} decode | ${wl-copy}"
       "$mod SHIFT, c, exec, ${hyprpicker} | ${wl-copy}"
 
       "$mod SHIFT, f, exec, $file_manager"
@@ -227,9 +213,6 @@ in
       blur = {
         enabled = false;
       };
-      # shadow = {
-      #   enabled = false;
-      # };
       rounding = 5;
     };
     misc = {
@@ -354,11 +337,15 @@ in
         }
         {
           time = "21:00";
-          temperature = 5000;
-          gamma = 0.8;
+          temperature = 4000;
         }
       ];
     };
+  };
+
+  services.wl-clip-persist = {
+    enable = true;
+    clipboardType = "both";
   };
 
   programs.hyprlock = {
