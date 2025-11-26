@@ -43,7 +43,8 @@
     ./device/${host}
   ];
 
-  xdg.configFile."uwsm/env".source = "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
+  xdg.configFile."uwsm/env".source =
+    "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
 
   home.packages = with pkgs; [
     lo-pkgs.realod-failed-services

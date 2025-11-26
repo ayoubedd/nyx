@@ -11,7 +11,9 @@
     url = "github:nix-community/NUR";
     inputs.flake-parts.follows = "flake-parts";
   };
-  inputs.devenv.url = "github:cachix/devenv";
+  inputs.devenv = {
+    url = "github:cachix/devenv?ref=v1.11";
+  };
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
   inputs.sherlock = {
@@ -39,11 +41,24 @@
     inputs.flake-parts.follows = "flake-parts";
     inputs.nur.follows = "nur";
   };
+
   inputs.flake-parts.url = "github:hercules-ci/flake-parts";
+  inputs.flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+  inputs.vicinae.url = "github:vicinaehq/vicinae";
 
   nixConfig = {
-    extra-trusted-public-keys = "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=";
-    extra-substituters = "https://devenv.cachix.org";
+    extra-substituters = [
+      "https://hyprland.cachix.org"
+      "https://vicinae.cachix.org"
+      "https://devenv.cachix.org"
+      "https://nix-community.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
+      "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
   };
 
   outputs =
@@ -105,7 +120,10 @@
               system = "x86_64-linux";
               host = "x1";
             };
-            modules = [ ./homes/orbit ];
+            modules = [
+              ./homes/orbit
+              inputs.vicinae.homeManagerModules.default
+            ];
           };
           "orbit@kraken" = lib.lo.mkHome {
             specialArgs = {

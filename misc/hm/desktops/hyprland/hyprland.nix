@@ -32,6 +32,7 @@ let
 
   wofi = "${pkgs.wofi}/bin/wofi";
   sherlock = "${inputs.sherlock.packages.x86_64-linux.default}/bin/sherlock";
+  vicinae = "${pkgs.vicinae}/bin/vicinae";
   firefox = "${pkgs.firefox}/bin/firefox";
   thunar = "${pkgs.xfce.thunar}/bin/thunar";
 
@@ -90,6 +91,16 @@ in
     bind=, escape, submap, reset
     submap=reset
 
+    bind=ALT, a, submap, player-control
+
+    submap=player-control
+    bind=, r, exec, ${vicinae} vicinae://extensions/dagimg-dot/player-pilot/resume-track && ${hyprctl} dispatch submap reset
+    bind=, p, exec, ${vicinae} vicinae://extensions/dagimg-dot/player-pilot/pause-track && ${hyprctl} dispatch submap reset
+    bind=SHIFT, p, exec, ${vicinae} vicinae://extensions/dagimg-dot/player-pilot/previous-track && ${hyprctl} dispatch submap reset
+    bind=SHIFT, n, exec, ${vicinae} vicinae://extensions/dagimg-dot/player-pilot/next-track && ${hyprctl} dispatch submap reset
+    bind=, escape, submap, reset
+    submap=reset
+
     env = QT_AUTO_SCREEN_SCALE_FACTOR,2
     env = QT_QPA_PLATFORM,wayland;xcb
     env = QT_WAYLAND_DISABLE_WINDOWDECORATION,1
@@ -123,10 +134,10 @@ in
       "systemctl --user restart xdg-desktop-portal.service"
       "$browser"
       "${waybar}"
-      "sleep 3; ${cliphist} wipe"
-      "${wl-paste} --watch ${cliphist} store"
+      # "sleep 3; ${cliphist} wipe"
+      # "${wl-paste} --watch ${cliphist} store"
       "${wl-clip-persist} --clipboard both"
-      "${swaync}"
+      # "${swaync}"
     ];
 
     bindm = [
@@ -171,7 +182,9 @@ in
       "$mod, 0, workspace, 10"
 
       "$mod ALT, l, exec, ${loginctl} lock-session"
-      "$mod, d, exec, ${sherlock}"
+      "$mod, d, exec, ${vicinae} toggle"
+      "$mod, p, exec, ${vicinae} vicinae://extensions/vicinae/clipboard/history"
+      "$mod, w, exec, ${vicinae} vicinae://extensions/vicinae/wm/switch-windows"
 
       "$mod SHIFT, 1, movetoworkspace, 1"
       "$mod SHIFT, 2, movetoworkspace, 2"
@@ -219,7 +232,6 @@ in
       # };
       rounding = 5;
     };
-
     misc = {
       disable_hyprland_logo = true;
       force_default_wallpaper = 0;
@@ -325,6 +337,25 @@ in
         {
           timeout = 1800; # 30min
           on-timeout = "${systemctl} suspend"; # suspend pc
+        }
+      ];
+    };
+  };
+
+  services.hyprsunset = {
+    enable = true;
+    settings = {
+      max-gamma = 150;
+
+      profile = [
+        {
+          time = "7:30";
+          identity = true;
+        }
+        {
+          time = "21:00";
+          temperature = 5000;
+          gamma = 0.8;
         }
       ];
     };

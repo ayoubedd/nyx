@@ -5,6 +5,7 @@ let
   hyprlock = "${pkgs.hyprlock}/bin/hyprlock";
   hyprctl = "${pkgs.hyprland}/bin/hyprctl";
   pidof = "${pkgs.procps}/bin/pidof";
+  systemctl = "${pkgs.systemd}/bin/systemctl";
 in
 {
   # overidding the default config
@@ -37,6 +38,10 @@ in
           timeout = 330; # 5.5min
           on-timeout = "${hyprctl} dispatch dpms off"; # screen off when timeout has passed
           on-resume = "${hyprctl} dispatch dpms on"; # screen on when activity is detected after timeout has fired.
+        }
+        {
+          timeout = 1800;
+          on-timeout = "${systemctl} suspend";
         }
       ];
     };
