@@ -36,6 +36,9 @@
   boot.loader = {
     systemd-boot.enable = true;
     efi.canTouchEfiVariables = true;
+    systemd-boot.editor = false;
+    systemd-boot.memtest86.enable = true;
+    systemd-boot.consoleMode = "1";
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
