@@ -2,7 +2,7 @@
 {
   imports = [
     ./waybar.nix
-    ./sway-notification-center.nix
+    ./swaync.nix
     ./wofi.nix
     ./swww.nix
     ./vicinae.nix
