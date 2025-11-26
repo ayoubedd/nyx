@@ -15,6 +15,8 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  news.display = "silent";
+
   home.username = "orbit";
   home.homeDirectory = "/home/orbit";
 

@@ -29,7 +29,6 @@ let
   snaparea = "${grim} -g \"$(${slurp})\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | ${wl-copy} -t 'image/png'";
   snapfull = "${grim} -g \"$(${slurp} -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | ${wl-copy} -t 'image/png'";
 
-  sherlock = "${inputs.sherlock.packages.x86_64-linux.default}/bin/sherlock";
   vicinae = "${pkgs.vicinae}/bin/vicinae";
   firefox = "${pkgs.firefox}/bin/firefox";
   thunar = "${pkgs.xfce.thunar}/bin/thunar";
@@ -140,7 +139,6 @@ in
       "$mod_SHIFT, space, togglefloating,"
       "$mod, d, exec, $menu"
 
-      "$mod, x, exec, ${sherlock} --sub-menu pm"
       "$mod SHIFT, c, exec, ${hyprpicker} | ${wl-copy}"
 
       "$mod SHIFT, f, exec, $file_manager"

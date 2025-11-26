@@ -31,7 +31,7 @@ in
     ./misc.nix
     ./power.nix
     ./security.nix
-    ./vpn.nix
+    # ./vpn.nix
     ./sops.nix
   ];
 

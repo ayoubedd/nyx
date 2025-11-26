@@ -11,7 +11,7 @@
     ./sysctl.nix
     ./fs.nix
     ./documentation.nix
-    ./quietboot.nix
+    # ./quietboot.nix
     ./local.nix
   ];
 
@@ -27,6 +27,7 @@
   programs.nix-ld.enable = true;
 
   security.rtkit.enable = true;
+  console.font = "972";
 
   services.ananicy = {
     enable = true;

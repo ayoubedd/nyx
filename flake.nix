@@ -16,13 +16,6 @@
   };
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
-  inputs.sherlock = {
-    url = "github:Skxxtz/sherlock";
-    inputs.nixpkgs.follows = "nixpkgs";
-    inputs.home-manager.follows = "home-manager";
-    inputs.flake-parts.follows = "flake-parts";
-  };
-
   inputs.sops-nix = {
     url = "github:Mic92/sops-nix";
     inputs.nixpkgs.follows = "nixpkgs";
