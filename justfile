@@ -6,6 +6,7 @@ hostname := `hostname`
 user := `whoami`
 cwd := `pwd`
 
+# Documentation
 default:
   @just --list
 
@@ -34,16 +35,19 @@ gc:
   nix-collect-garbage --delete-old
   sudo nix-collect-garbage --delete-old
 
-# Garbage collect
+# Format all files
 fmt:
   nix fmt
 
+# Crate a symbolic link from nvim source config directly to config diretory (for dev)
 videv:
   rm -rf ~/.config/nvim
   ln -sf '{{ cwd }}'/misc/hm/editors/nvim/conf ~/.config/nvim
 
+# Remove dev symbolic link
 viclean:
   rm -rf ~/.config/nvim
 
+# Create hashed password
 mkpasswd:
   mkpasswd -R 10000 -m sha-512
