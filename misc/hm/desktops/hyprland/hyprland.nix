@@ -18,9 +18,8 @@ let
   systemctl = "${pkgs.systemd}/bin/systemctl";
   pidof = "${pkgs.procps}/bin/pidof";
 
-  notify-send = "${pkgs.libnotify}/bin/notify-send";
-  screen_brightness_up = ''${brightnessctl} set +5% && ${notify-send} "Brightness" "Brightness: $(${brightnessctl} | grep -Eo '[0-9]+%')"'';
-  screen_brightness_down = ''${brightnessctl} set 5%- && ${notify-send} "Brightness" "Brightness: $(${brightnessctl} | grep -Eo '[0-9]+%')"'';
+  screen_brightness_up = ''${brightnessctl} -s set +5%'';
+  screen_brightness_down = ''${brightnessctl} -s set 5%-'';
 
   grim = "${pkgs.grim}/bin/grim";
   slurp = "${pkgs.slurp}/bin/slurp";
@@ -292,7 +291,6 @@ in
         lock_cmd = "${pidof} hyprlock || ${hyprlock}";
         before_sleep_cmd = "${loginctl} lock-session"; # lock before suspend.
         after_sleep_cmd = "${hyprctl} dispatch dpms on"; # to avoid having to press a key twice to turn on the display.
-        ignore_dbus_inhibit = false;
       };
 
       listener = [
