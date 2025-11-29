@@ -1,4 +1,11 @@
 { lib, pkgs, ... }:
+let
+  alacritty = "${pkgs.alacritty}/bin/alacritty";
+  btop = "${pkgs.btop}/bin/btop";
+  vicinae = "${pkgs.vicinae}/bin/vicinae";
+  wpctl = "${pkgs.wireplumber}/bin/wpctl";
+  blueman = "${pkgs.blueman}/bin/blueman-manager";
+in
 {
   # depedent packges
   home.packages = with pkgs; [
@@ -12,72 +19,140 @@
 
     settings = {
       mainBar = {
-        "modules-left" = [ "hyprland/workspaces" ];
-        "modules-center" = [ "clock" ];
-        "modules-right" = [
-          "network"
-          "pulseaudio"
+        "layer" = "top";
+        "position" = "top";
+        "height" = 35;
+        "spacing" = 5;
+
+        "modules-left" = [
+          "hyprland/workspaces"
           "cpu"
           "memory"
+          "disk"
           "temperature"
-          "upower"
+          "battery"
+        ];
+
+        "modules-center" = [ "clock" ];
+        "modules-right" = [
+          "privacy"
+          "network"
+          "bluetooth"
           "backlight"
+          "wireplumber"
+          "idle_inhibitor"
           "tray"
           "custom/notification"
         ];
 
-        "network" = {
-          "interface" = "wlp0s20f3";
-          "format" = "{ifname} {bandwidthDownBytes}";
-          "format-wifi" = "{essid}  ";
-          "format-ethernet" = "{ipaddr}/{cidr} 󰊗";
-          "format-disconnected" = ""; # An empty format will hide the module.
-          "tooltip-format" = "{ifname} via {gwaddr} 󰊗";
-          "tooltip-format-wifi" = "Signal Strength ({signalStrength}%)  ";
-          "tooltip-format-ethernet" = "{ifname} ";
-          "tooltip-format-disconnected" = "Disconnected";
-          "max-length" = 60;
-        };
-
         "hyprland/workspaces" = {
-          "disable-scroll" = true;
           "format" = "{icon}";
-          "persistent_workspaces" = {
+          "on-click" = "activate";
+          "icon-size" = 8;
+          "sort-by-number" = true;
+          "persistent-workspaces" = {
             "1" = [ ];
             "2" = [ ];
             "3" = [ ];
             "4" = [ ];
             "5" = [ ];
-            "6" = [ ];
           };
         };
 
         "clock" = {
-          "tooltip-format" = ''
-            <big>{:%Y %B}</big>
-            <tt><small>{calendar}</small></tt>'';
           "format" = "{:%a, %d %b, %H:%M}";
+          "tooltip" = false;
         };
 
-        "pulseaudio" = {
-          "reverse-scrolling" = 1;
-          "format" = "{volume}% {icon} {format_source}";
-          "format-bluetooth" = "{volume}% {icon}   {format_source}";
-          "format-bluetooth-muted" = "{icon}  {format_source}";
-          "format-muted" = "{format_source}";
-          "format-source" = "{volume}% ";
-          "format-source-muted" = "";
-          "format-icons" = {
-            "headphone" = "";
-            "hands-free" = "";
-            "headset" = "";
-            "phone" = "";
-            "portable" = "";
-            "car" = "";
-            "default" = [ "Speaker" ];
+        "wireplumber" = {
+          "format" = "{volume}%  {icon}";
+          "format-muted" = "{volume}%   ";
+          "tooltip-format" = "{volume}%";
+          "on-click" = "${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          "max-volume" = 100;
+          "scroll-step" = 5;
+          "format-icons" = [
+            ""
+            ""
+          ];
+        };
+
+        "battery" = {
+          "bat" = "BAT0";
+          "interval" = 60;
+          "format" = "{icon} {time}";
+          "tooltip-format" = "Capacity: {capacity}%, Power: {power}, Cycles: {cycles}";
+          "states" = {
+            "warning" = 30;
+            "critical" = 15;
           };
-          "on-click" = "pavucontrol";
-          "min-length" = 13;
+          "format-icons" = [
+            ""
+            ""
+            ""
+            ""
+            ""
+          ];
+        };
+
+        "backlight" = {
+          "device" = "intel_backlight";
+          "format" = "{percent}% {icon}";
+          "tooltip" = false;
+          "format-icons" = [ "" ];
+        };
+
+        "cpu" = {
+          "interval" = 5;
+          "format" = "   {}%";
+          "max-length" = 10;
+          "on-click" = "${alacritty} --class=alacritty-float --command=${btop}";
+          "tooltip" = false;
+        };
+
+        "memory" = {
+          "interval" = 30;
+          "format" = "   {used:0.1f}G";
+          "on-click" = "${alacritty} --class=alacritty-float --command=${btop}";
+          "tooltip" = false;
+        };
+
+        "disk" = {
+          "format" = "  {percentage_used}%";
+        };
+
+        "temperature" = {
+          "format" = "  {temperatureC}°C";
+          "on-click" = "${alacritty} --class=alacritty-float --command=${btop}";
+          "thermal-zone" = 5;
+          "interval" = 5;
+          "critical-threshold" = 80;
+          "tooltip" = false;
+        };
+
+        "network" = {
+          "interval" = 2;
+          "interface" = "wlp0s20f3";
+          "format-wifi" = "  {bandwidthDownBytes}      {bandwidthUpBytes}    {essid}  ";
+          "on-click" = "${vicinae} vicinae://extensions/dagimg-dot/wifi-commander/manage-saved-networks";
+          "format-ethernet" = "  {bandwidthDownBytes}      {bandwidthUpBytes}    {ipaddr}/{cidr} 󰊗";
+          "format-disconnected" = "Disconnected"; # An empty format will hide the module.
+          "tooltip-format" = "{ifname} via {gwaddr} 󰊗";
+          "tooltip-format-wifi" = "Signal Strength ({signalStrength}%)  ";
+          "tooltip-format-ethernet" = "{ifname} ";
+          "tooltip-format-disconnected" = "Disconnected";
+        };
+
+        bluetooth = {
+          format = "";
+          on-click = "${blueman}";
+          "format-connected" = " {device_alias}";
+          "format-connected-battery" = "{device_battery_percentage}%   {device_alias}  ";
+        };
+
+        "tray" = {
+          "icon-size" = 16;
+          "spacing" = 14;
         };
 
         "custom/notification" = {
@@ -100,254 +175,158 @@
           "on-click-right" = "swaync-client -d -sw";
           "escape" = true;
         };
-        "temperature" = {
-          "critical-threshold" = 80;
-          "format" = "{temperatureC}°C {icon}";
-          "format-icons" = [
-            ""
-            ""
-            ""
-            ""
-            ""
+
+        "privacy" = {
+          "icon-spacing" = 8;
+          "icon-size" = 14;
+          "transition-duration" = 250;
+          "modules" = [
+            {
+              "type" = "screenshare";
+              "tooltip" = true;
+              "tooltip-icon-size" = 24;
+            }
+            {
+              "type" = "audio-out";
+              "tooltip" = true;
+              "tooltip-icon-size" = 24;
+            }
+            {
+              "type" = "audio-in";
+              "tooltip" = true;
+              "tooltip-icon-size" = 24;
+            }
           ];
-          "tooltip" = false;
-          "hwmon-path" = [ "/sys/class/hwmon/hwmon5/temp1_input" ];
+          "ignore-monitor" = true;
         };
 
-        "backlight" = {
-          "device" = "intel_backlight";
-          "format" = "{percent}% {icon}";
-          "format-icons" = [
-            ""
-            ""
-            ""
-            ""
-          ];
-          "min-length" = 7;
-        };
-
-        "cpu" = {
-          "interval" = 10;
-          "format" = "{}%  ";
-          "max-length" = 10;
-        };
-
-        "memory" = {
-          "interval" = 30;
-          "format" = "{}% ";
-          "max-length" = 10;
-        };
-
-        "tray" = {
-          "icon-size" = 16;
-          "spacing" = 10;
+        "idle_inhibitor" = {
+          "format" = "{icon}";
+          "format-icons" = {
+            "activated" = "";
+            "deactivated" = "";
+          };
         };
       };
     };
 
-    style = ''
+    style = /* scss */ ''
+      @define-color foreground #eeeeee;
+      @define-color foreground-inactive #aaaaaa;
+      @define-color background #000000;
+
       * {
-          border: none;
-          border-radius: 0;
-          /* `otf-font-awesome` is required to be installed for icons */
-          font-family: Noto Sans;
-          font-size: 14px;
-          min-height: 24px;
-      }
-        #custom-notification {
-          margin-right: 8px;
-          font-family: "Noto Sans";
-        }
-
-      window#waybar {
-          background: #161616;
+        font-family:
+          "Noto Sans", "Font Awesome 7 Free", "Font Awesome 7 Brands",
+          "Font Awesome 6 Free", "Font Awesome 6 Brands";
+        padding: 0;
+        margin: 0;
+        font-size: 14px;
+        min-height: 24px;
       }
 
-      window#waybar.hidden {
-          opacity: 0.2;
+      tooltip {
+        border-radius: 5px;
+        border: 1px solid white;
+        background: #161616;
+      }
+
+      #waybar {
+        color: @foreground;
+        background-color: @background;
       }
 
       #workspaces {
-          margin-right: 8px;
-          transition: none;
-          background: #161616;
+        margin-right: 1rem;
+        transition: none;
+        background: #161616;
       }
 
       #workspaces button {
-          transition: none;
-          color: #7c818c;
-          background: transparent;
-          padding: 5px;
+        transition: none;
+        color: white;
+        background: transparent;
+        padding: 5px;
+        margin-left: 0.2em;
       }
 
       #workspaces button.persistent {
-          color: #7c818c;
+        color: #7c818c;
+      }
+
+      #workspaces button.focused {
+        color: red;
       }
 
       /* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
       #workspaces button:hover {
-          transition: none;
-          box-shadow: inherit;
-          text-shadow: inherit;
-          border-radius: inherit;
-          color: #161616;
-          background: #7c818c;
+        transition: none;
+        box-shadow: inherit;
+        text-shadow: inherit;
+        border-radius: inherit;
+        color: #161616;
+        background: #7c818c;
       }
 
       #workspaces button.focused {
-          color: white;
+        color: white;
       }
 
       #workspaces button.active {
-          transition: none;
-          box-shadow: inherit;
-          text-shadow: inherit;
-          border-radius: inherit;
-          color: #161616;
-          background: #7c818c;
+        transition: none;
+        box-shadow: inherit;
+        text-shadow: inherit;
+        border-radius: inherit;
+        color: #7c818c;
+        background: transparent;
       }
 
-      #mode {
-          padding-left: 16px;
-          padding-right: 16px;
-          border-radius: 10px;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
-      }
-
-      #clock {
-          padding-left: 16px;
-          padding-right: 16px;
-          border-radius: 10px;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
-      }
-
-      #pulseaudio {
-          margin-right: 8px;
-          padding-left: 16px;
-          padding-right: 16px;
-          border-radius: 10px;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
-      }
-
-      #pulseaudio.muted {
-          background-color: #90b1b1;
-          color: #2a5c45;
-      }
-
-      #memory {
-          padding-left: 5px;
-          padding-right: 5px;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
-      }
-
-      #backlight {
-          margin-right: 8px;
-          padding-left: 16px;
-          padding-right: 16px;
-          border-radius: 10px;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
-      }
-
-      #battery {
-          margin-right: 8px;
-          padding-left: 16px;
-          padding-right: 16px;
-          border-radius: 10px;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
-      }
-
-      #battery.charging {
-          color: #ffffff;
-          background-color: #26A65B;
-      }
-
-      #battery.warning:not(.charging) {
-          background-color: #ffbe61;
-          color: black;
-      }
-
-      #battery.critical:not(.charging) {
-          background-color: #f53c3c;
-          color: #ffffff;
-          animation-name: blink;
-          animation-duration: 0.5s;
-          animation-timing-function: linear;
-          animation-iteration-count: infinite;
-          animation-direction: alternate;
-      }
-
-
-
-      #cpu {
-          /* margin-right: 8px; */
-          padding-left: 16px;
-          padding-right: 5px;
-          border-radius: 10px 0 0 10px;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
-      }
-
-      #network {
-          margin-right: 8px;
-          padding-left: 16px;
-          padding-right: 16px;
-          border-radius: 10px;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
-      }
-
-      #temperature {
-          padding-left: 5px;
-          padding-right: 5px;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
+      #memory,
+      #custom-platform-profile {
+        padding-left: 1em;
       }
 
       #temperature.critical {
-          background-color: #eb4d4b;
+        color: #eb4d4b;
+      }
+      #privacy-item {
+        color: red;
+      }
+      #privacy-item.screenshare {
+        color: green;
+      }
+      #privacy-item.audio-in {
+        color: orange;
+      }
+      #privacy-item.audio-out {
+        color: orange;
       }
 
-      #upower {
-          margin-right: 8px;
-          padding-left: 5px;
-          padding-right: 16px;
-          border-radius:  0 10px 10px 0;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
+      #battery {
+        color: white;
       }
 
-
-
-      #tray {
-          padding-left: 16px;
-          padding-right: 16px;
-          border-radius: 10px;
-          transition: none;
-          color: #ffffff;
-          background: #161616;
+      #battery.charging {
+        color: green;
       }
 
-      @keyframes blink {
-          to {
-              background-color: #ffffff;
-              color: #000000;
-          }
+      #battery.warning {
+        color: orange;
+      }
+
+      #battery.critical {
+        color: red;
+      }
+
+      #wireplumber,
+      #battery,
+      #idle_inhibitor,
+      #network,
+      #bluetooth,
+      #tray,
+      #backlight,
+      #custom-notification {
+        padding-right: 1em;
       }
     '';
   };
