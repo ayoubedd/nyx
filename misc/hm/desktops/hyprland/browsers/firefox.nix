@@ -46,6 +46,7 @@
       sponsorblock
       clearurls
       multi-account-containers
+      localcdn
     ];
 
     settings = {
