@@ -5,3 +5,8 @@ includes = ["*.nix"]
 [formatter.lua]
 command = "stylua"
 includes = ["*.lua"]
+
+[formatter.toml]
+command = "tombi"
+options = ["format"]
+includes = ["*.toml"]

@@ -2,6 +2,7 @@
 
 {
   packages = with pkgs; [
+    tombi
     stylua
     nixfmt
     just
