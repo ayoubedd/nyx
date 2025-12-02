@@ -134,6 +134,9 @@
     # "net.ipv4.tcp_congestion_control" = "bbr";
     "net.core.default_qdisc" = "cake";
     "net.ipv4.tcp_retries2" = 5;
+
+    # Disable core dumps for setuid programs to protect sensitive information.
+    "fs.suid_dumpable" = 0;
   };
 
   boot.kernelModules = [ "tcp_bbr" ];
