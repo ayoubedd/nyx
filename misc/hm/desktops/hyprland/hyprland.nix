@@ -123,6 +123,7 @@ in
       "systemctl --user is-active xdg-desktop-portal-hyprland.service && systemctl --user stop xdg-desktop-portal-hyprland.service"
       "systemctl --user restart xdg-desktop-portal.service"
       "$browser"
+      "sleep 3 && ${pactl} set-sink-mute @DEFAULT_SINK@ 1" # auto mute on startup
     ];
 
     bindm = [
