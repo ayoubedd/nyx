@@ -134,6 +134,7 @@
       core.pager = "delta";
       branch.sort = "-committerdate";
       color.ui = "auto";
+      rerere.enabled = true;
       init.defaultBranch = "master";
       commit.template = "~/.config/git/template";
       push.autoSetupRemote = true;
