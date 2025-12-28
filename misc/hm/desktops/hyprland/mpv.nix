@@ -9,7 +9,7 @@
     vulkan-async-transfer = "yes";
     vulkan-queue-count = 1;
     keepaspect = "";
-    dither-depth = 10;
+    dither-depth = "auto";
 
     # Start in fullscreen mode by default.
     fs = "yes";
@@ -28,7 +28,7 @@
     stop-screensaver = "yes";
 
     # Uses GPU-accelerated video output by default.
-    vo = "gpu";
+    vo = "gpu-next";
 
     # Can cause performance problems with some GPU drivers and GPUs.
     profile = "gpu-hq";
@@ -82,13 +82,13 @@
     "s" = "screenshot"; # take a screenshot of the video in its original resolution with subtitles
     "S" = "screenshot video"; # take a screenshot of the video in its original resolution without subtitles
 
-    "Alt+h" = "add video-pan-x  -0.1"; # move the video right
-    "Alt+l" = "add video-pan-x   0.1"; # move the video left
-    "Alt+k" = "add video-pan-y  -0.1"; # move the video down
-    "Alt+j" = "add video-pan-y   0.1"; # move the video up
+    "Alt+h" = "add video-pan-x  0.1"; # move the video right
+    "Alt+l" = "add video-pan-x   -0.1"; # move the video left
+    "Alt+k" = "add video-pan-y  0.1"; # move the video down
+    "Alt+j" = "add video-pan-y   -0.1"; # move the video up
     "Alt++" = "add video-zoom    0.1"; # zoom in
-    "Alt+-" = "add video-zoom   -0.1"; # zoom out
-    "Alt+r" = "set video-zoom 0; set video-pan-x 0; set video-pan-y 0 "; # reset zoom and pan settings
+    "Alt+-" = "add video-zoom   +0.1"; # zoom out
+    "Alt+R" = "set video-zoom 0; set video-pan-x 0; set video-pan-y 0 "; # reset zoom and pan settings
 
     "Shift+j" = "cycle sub"; # switch subtitle track
     "Shift+k" = "cycle audio"; # switch audio track
