@@ -31,7 +31,7 @@ in
     ./misc.nix
     ./power.nix
     ./security.nix
-    # ./vpn.nix
+    ./vpn.nix
     ./sops.nix
   ];
 
@@ -64,5 +64,5 @@ in
     shell = zsh;
   };
 
-  system.stateVersion = "24.11";
+  system.stateVersion = "26.05";
 }
