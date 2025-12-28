@@ -83,5 +83,6 @@
     };
 
     targets.firefox.profileNames = [ "orbit" ];
+    targets.librewolf.profileNames = [ "orbit" ];
   };
 }
