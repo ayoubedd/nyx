@@ -64,5 +64,6 @@
     nftables
     sof-firmware
     bind # for dig
+    yt-dlp
   ];
 }
