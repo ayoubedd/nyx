@@ -69,6 +69,7 @@ in
           "format-muted" = "{volume}%   ";
           "tooltip-format" = "{volume}%";
           "on-click" = "${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle";
+          "reverse-scrolling" = true;
           "max-volume" = 100;
           "scroll-step" = 5;
           "format-icons" = [
