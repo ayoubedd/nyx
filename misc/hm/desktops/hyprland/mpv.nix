@@ -28,7 +28,7 @@
     stop-screensaver = "yes";
 
     # Uses GPU-accelerated video output by default.
-    vo = "gpu-next";
+    vo = "gpu";
 
     # Can cause performance problems with some GPU drivers and GPUs.
     profile = "gpu-hq";
