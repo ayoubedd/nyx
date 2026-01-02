@@ -42,7 +42,7 @@ fmt:
 # Crate a symbolic link from nvim source config directly to config diretory (for dev)
 videv:
   rm -rf ~/.config/nvim
-  ln -sf '{{ cwd }}'/misc/hm/editors/nvim/conf ~/.config/nvim
+  ln -sf '{{ cwd }}'/misc/hm/desktops/hyprland/nvim/conf ~/.config/nvim
 
 # Remove dev symbolic link
 viclean:
