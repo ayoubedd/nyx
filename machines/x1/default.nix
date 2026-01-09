@@ -34,6 +34,11 @@ in
     ./vpn.nix
     ./sops.nix
   ];
+  boot.kernelParams = [
+    "nowatchdog"
+    "kernel.nmi_watchdog=0"
+    "power_save=30"
+  ];
 
   networking.hostName = "x1";
   networking.useDHCP = lib.mkDefault true;
