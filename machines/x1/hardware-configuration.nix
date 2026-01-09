@@ -31,6 +31,7 @@
   boot.blacklistedKernelModules = [
     "iTCO_wdt"
     "xe"
+    "intel_oc_wdt"
   ];
 
   boot.loader = {
