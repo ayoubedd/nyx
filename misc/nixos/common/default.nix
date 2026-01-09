@@ -27,7 +27,6 @@
   programs.nix-ld.enable = true;
 
   security.rtkit.enable = true;
-  console.font = "972";
 
   services.ananicy = {
     enable = true;
