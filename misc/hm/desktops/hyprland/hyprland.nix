@@ -30,7 +30,7 @@ let
 
   vicinae = "${pkgs.vicinae}/bin/vicinae";
   firefox = "${pkgs.firefox}/bin/firefox";
-  thunar = "${pkgs.xfce.thunar}/bin/thunar";
+  thunar = "${pkgs.thunar}/bin/thunar";
 
   lockscreen_img = ../../../../assets/images/lockscreen.png;
   hyprpicker = "${pkgs.hyprpicker}/bin/hyprpicker";
