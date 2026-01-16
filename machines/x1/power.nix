@@ -28,8 +28,10 @@
 
   services.tlp = {
     enable = true;
+    pd.enable = true;
     settings = {
       TLP_ENABLE = 1;
+      TLP_DISABLE_DEFAULTS = 1;
 
       CPU_DRIVER_OPMODE_ON_AC = "active";
       CPU_DRIVER_OPMODE_ON_BAT = "active";
@@ -46,20 +48,25 @@
       CPU_MAX_PERF_ON_BAT = 40;
 
       CPU_BOOST_ON_AC = 1;
-      CPU_BOOST_ON_BAT = 0;
+      CPU_BOOST_ON_BAT = 1;
 
       CPU_HWP_DYN_BOOST_ON_AC = 1;
-      CPU_HWP_DYN_BOOST_ON_BAT = 0;
+      CPU_HWP_DYN_BOOST_ON_BAT = 1;
 
       NMI_WATCHDOG = 0;
 
       PLATFORM_PROFILE_ON_AC = "performance";
       PLATFORM_PROFILE_ON_BAT = "low-power";
 
-      MEM_SLEEP_ON_AC = "deep";
+      MEM_SLEEP_ON_AC = "s2idle";
       MEM_SLEEP_ON_BAT = "deep";
 
       DISK_DEVICES = "nvme0n1";
+
+      DISK_APM_LEVEL_ON_AC = "254";
+      DISK_APM_LEVEL_ON_BAT = "128";
+
+      DISK_IOSCHED = "bfq";
 
       AHCI_RUNTIME_PM_ON_AC = "on";
       AHCI_RUNTIME_PM_ON_BAT = "auto";
@@ -90,7 +97,7 @@
 
       USB_AUTOSUSPEND = 1;
 
-      USB_AUTOSUSPEND_DISABLE_ON_SHUTDOWN = 0;
+      USB_EXCLUDE_PHONE = 1;
 
       RESTORE_DEVICE_STATE_ON_STARTUP = 0;
 
