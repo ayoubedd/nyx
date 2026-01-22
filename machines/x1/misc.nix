@@ -4,9 +4,10 @@
   services = {
     greetd = {
       enable = true;
+      useTextGreeter = true;
       settings = {
         default_session = {
-          command = "${pkgs.tuigreet}/bin/tuigreet --time";
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --asterisks -g 'FREE AS IN FREEDOM'";
           user = "greeter";
         };
       };
