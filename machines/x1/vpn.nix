@@ -2,9 +2,11 @@
 {
   networking.wireguard.enable = true;
 
-  networking.wireguard.interfaces = {
+  networking.wg-quick.interfaces = {
     homelab = {
-      ips = [ "10.100.0.2/32" ];
+      autostart = false;
+      type = "wireguard";
+      address = [ "10.100.0.2/32" ];
       listenPort = 1235;
       mtu = 1360;
       privateKeyFile = config.sops.secrets.wireguard-privatekey.path;
@@ -15,7 +17,6 @@
             "10.1.2.0/24"
             "10.1.1.0/24"
           ];
-          name = "x1";
           endpoint = "casa-vpn.ayoubedd.me:51820";
           persistentKeepalive = 25;
         }
