@@ -32,7 +32,6 @@ let
   firefox = "${pkgs.firefox}/bin/firefox";
   thunar = "${pkgs.thunar}/bin/thunar";
 
-  lockscreen_img = ../../../../assets/images/lockscreen.png;
   hyprpicker = "${pkgs.hyprpicker}/bin/hyprpicker";
 
   swaync-client = "${pkgs.swaynotificationcenter}/bin/swaync-client";
@@ -378,7 +377,7 @@ in
         hide_cursor = true;
       };
       background = {
-        path = toString lockscreen_img;
+        path = "/home/orbit/Pictures/Wallpapers/lockscreen.png";
       };
     };
   };
