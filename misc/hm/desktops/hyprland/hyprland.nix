@@ -18,8 +18,8 @@ let
   systemctl = "${pkgs.systemd}/bin/systemctl";
   pidof = "${pkgs.procps}/bin/pidof";
 
-  screen_brightness_up = ''${brightnessctl} -s set +5%'';
-  screen_brightness_down = ''${brightnessctl} -s set 5%-'';
+  screen_brightness_up = "${brightnessctl} -s set +5%";
+  screen_brightness_down = "${brightnessctl} -s set 5%-";
 
   grim = "${pkgs.grim}/bin/grim";
   slurp = "${pkgs.slurp}/bin/slurp";
@@ -28,7 +28,7 @@ let
   snaparea = "${grim} -g \"$(${slurp})\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | ${wl-copy} -t 'image/png'";
   snapfull = "${grim} -g \"$(${slurp} -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | ${wl-copy} -t 'image/png'";
 
-  vicinae = "${pkgs.vicinae}/bin/vicinae";
+  vicinae = "${inputs.vicinae.packages.${pkgs.stdenv.system}.default}/bin/vicinae";
   firefox = "${pkgs.firefox}/bin/firefox";
   thunar = "${pkgs.thunar}/bin/thunar";
 
@@ -137,7 +137,6 @@ in
       "$mod_SHIFT, q, killactive,"
       "$mod, M, exit,"
       "$mod_SHIFT, space, togglefloating,"
-      "$mod, d, exec, $menu"
 
       "$mod SHIFT, c, exec, ${hyprpicker} | ${wl-copy}"
 
@@ -254,35 +253,61 @@ in
       no_hardware_cursors = true;
     };
 
-    # plugins = [ ];
-    windowrulev2 = [
-      "workspace 2,class:firefox"
-
-      "float,class:alacritty-float"
-      "center,class:alacritty-float"
-      "size 900 600,class:alacritty-float"
-
-      "float,class:.blueman-manager-wrapped"
-
-      "float,class:org.gnome.seahorse.Application"
-      "size 900 700,class:org.gnome.seahorse.Application"
-
-      "float,class:[tT]hunar"
-      "size 900 600,class:[tT]hunar"
-
-      "float,class:nm-connection-editor"
-      "size 900 600,class:nm-connection-editor"
-
-      "float,class:org.pulseaudio.pavucontrol"
-      "size 900 600,class:org.pulseaudio.pavucontrol"
-
-      "float,class:pavucontrol"
-      "center,class:pavucontrol"
-      "size 700 500,class:pavucontrol"
-
-      "idleinhibit focus,class:mpv"
-      "idleinhibit focus,class:org.pwmt.zathura"
+    windowrule = [
+      {
+        name = "firefox";
+        "match:class" = "firefox";
+        workspace = 2;
+      }
+      {
+        name = "alacritty";
+        "match:class" = "alacritty-float";
+        float = "on";
+        center = "on";
+        size = "900 600";
+      }
+      {
+        name = "blueman";
+        "match:class" = ".blueman-manager-wrapped";
+        size = "900 600";
+        float = "on";
+      }
+      {
+        name = "seahorse";
+        "match:class" = "org.gnome.seahorse.Application";
+        float = "on";
+        size = "900 700";
+      }
+      {
+        name = "thunar";
+        "match:class" = "[tT]hunar";
+        float = "on";
+        size = "900 600";
+      }
+      {
+        name = "network manager editor";
+        "match:class" = "nm-connection-editor";
+        float = "on";
+        size = "900 600";
+      }
+      {
+        name = "pavucontrol";
+        "match:class" = "org.pulseaudio.pavucontrol";
+        float = "on";
+        size = "900 600";
+      }
+      {
+        name = "zathuar";
+        "match:class" = "org.pwmt.zathura";
+        idle_inhibit = "focus";
+      }
+      {
+        name = "mpv";
+        "match:class" = "mpv";
+        idle_inhibit = "focus";
+      }
     ];
+
   };
 
   services.hypridle = {

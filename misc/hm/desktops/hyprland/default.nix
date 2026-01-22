@@ -31,7 +31,7 @@
     ./services.nix
 
     ./browsers/firefox.nix
-    ./browsers/librewolf.nix
+    # ./browsers/librewolf.nix
     ./alacritty
     ./zsh
     ./mpv.nix
