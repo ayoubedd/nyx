@@ -13,9 +13,8 @@
 
     atuin
 
-    ueberzugpp
+    # ueberzugpp
 
-    yazi
     poppler
     fd
     ripgrep
