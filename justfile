@@ -16,11 +16,11 @@ build-switch-nixos machine=hostname:
 
 # Build and switch home-manager config
 build-switch-homemanager machine=hostname user=user :
-  home-manager switch --flake '.#{{ user }}@{{ machine }}' --show-trace
+  home-manager switch --flake '.#{{ user }}@{{ machine }}'
 
 build-switch-nix-and-homemanager machine=hostname user=user :
   sudo nixos-rebuild switch --flake '.#{{ machine }}' 
-  home-manager switch --flake '.#{{ user }}@{{ machine }}' --show-trace
+  home-manager switch --flake '.#{{ user }}@{{ machine }}'
 
 # Update all flake inputs
 upp:
