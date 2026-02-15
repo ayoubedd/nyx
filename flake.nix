@@ -12,7 +12,7 @@
     inputs.flake-parts.follows = "flake-parts";
   };
   inputs.devenv = {
-    url = "github:cachix/devenv?ref=v1.11";
+    url = "github:cachix/devenv?ref=latest";
   };
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
@@ -86,6 +86,7 @@
         {
           formatter = pkgs.treefmt;
           devenv.shells.default = {
+            process.managers.process-compose.configFile = ./.;
             devenv.root =
               let
                 devenvRootFileContent = builtins.readFile devenv-root.outPath;
