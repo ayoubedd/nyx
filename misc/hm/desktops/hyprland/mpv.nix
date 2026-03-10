@@ -3,38 +3,26 @@
   programs.mpv.enable = true;
 
   programs.mpv.config = {
-    # General
     gpu-api = "vulkan";
     vulkan-async-compute = "yes";
     vulkan-async-transfer = "yes";
-    vulkan-queue-count = 1;
-    keepaspect = "";
-    dither-depth = "auto";
+    vulkan-queue-count = 4;
+    vo = "gpu-next";
+    hwdec = "vaapi";
+    vo-vaapi-scaling = "fast";
+    profile = "fast";
 
     # Start in fullscreen mode by default.
     fs = "yes";
 
+    cache = "yes";
+    cache-secs = 10;
+
     # Disable the On Screen Controller (OSC).
     osc = "no";
 
-    # Use a large seekable RAM cache even for local input.
-    cache = "yes";
-
-    # Use extra large RAM cache (needs cache=yes to make it useful).
-    demuxer-max-bytes = "512M";
-    demuxer-max-back-bytes = "128M";
-
     # Stop the screensaver when playing.
     stop-screensaver = "yes";
-
-    # Uses GPU-accelerated video output by default.
-    vo = "gpu";
-
-    # Can cause performance problems with some GPU drivers and GPUs.
-    profile = "gpu-hq";
-
-    # Enables best HW decoder; turn off for software decoding
-    hwdec = "auto-safe";
 
     # Saves the seekbar position on exit
     save-position-on-quit = "yes";
@@ -48,7 +36,7 @@
     cursor-autohide = 100;
 
     # Subtitle
-    sub-visibility = "no";
+    sub-visibility = "yes";
     sub-auto = "fuzzy";
     sub-font = lib.mkForce "Noto Sans";
     slang = "ar,en,eng";
@@ -58,7 +46,7 @@
     screenshot-high-bit-depth = "no";
     screenshot-tag-colorspace = "yes";
     screenshot-png-compression = 9;
-    screenshot-directory = "~/Pictures/Screenshots/";
+    screenshot-directory = "~/Pictures/Screenshots/mpv/";
     screenshot-template = "mpvsnap-20%ty-%tm-%td-%tHh%tMm%tSs";
   };
 
@@ -94,4 +82,124 @@
     "Shift+k" = "cycle audio"; # switch audio track
     "Shift+l" = "cycle video"; # switch video track
   };
+
+  xdg.configFile."mpv/scripts/persistance.lua" = {
+    text = /* lua */ ''
+      -- Script home: https://github.com/d87/mpv-persist-properties
+      local utils = require "mp.utils"
+      local msg = require "mp.msg"
+
+      local opts = {
+          properties = "volume,sub-scale",
+      }
+      (require 'mp.options').read_options(opts, "persist_properties")
+
+      local CONFIG_ROOT = (os.getenv('APPDATA') or os.getenv('HOME')..'/.config')..'/mpv/'
+      if not utils.file_info(CONFIG_ROOT) then
+          -- On Windows if using portable_config dir, APPDATA mpv folder isn't auto-created
+          -- In more recent mpv versions there's a mp.get_script_directory function, but i'm not using it for compatiblity
+          local mpv_conf_path = mp.find_config_file("scripts") -- finds where the scripts folder is located
+          local mpv_conf_dir = utils.split_path(mpv_conf_path)
+          CONFIG_ROOT = mpv_conf_dir
+      end
+      local PCONFIG = CONFIG_ROOT..'persistent_config.json';
+
+      local function split(input)
+          local ret = {}
+          for str in string.gmatch(input, "([^,]+)") do
+              table.insert(ret, str)
+          end
+          return ret
+      end
+      local persisted_properties = split(opts.properties)
+
+      local print = function(...)
+          -- return msg.log("info", ...)
+      end
+
+      -- print("Config Root is "..CONFIG_ROOT)
+
+      local isInitialized = false
+
+      local properties
+
+      local function load_config(file)
+          local f = io.open(file, "r")
+          if f then
+              local jsonString = f:read()
+              f:close()
+
+              if jsonString == nil then
+                  return {}
+              end
+
+              local props = utils.parse_json(jsonString)
+              if props then
+                  return props
+              end
+          end
+          return {}
+      end
+
+      local function save_config(file, properties)
+          local serialized_props = utils.format_json(properties)
+
+          local f = io.open(file, 'w+')
+          if f then
+              f:write(serialized_props)
+              f:close()
+          else
+              msg.log("error", string.format("Couldn't open file: %s", file))
+          end
+      end
+
+      local save_timer = nil
+      local got_unsaved_changed = false
+
+      local function onInitialLoad()
+          properties = load_config(PCONFIG)
+
+          for i, property in ipairs(persisted_properties) do
+              local name = property
+              local value = properties[name]
+              if value ~= nil then
+                  mp.set_property_native(name, value)
+              end
+          end
+
+          for i, property in ipairs(persisted_properties) do
+              local property_type = nil
+              mp.observe_property(property, property_type, function(name)
+                  if isInitialized then
+                      local value = mp.get_property_native(name)
+                      -- print(string.format("%s changed to %s at %s", name, value,  os.time()))
+
+                      properties[name] = value
+
+                      if save_timer then
+                          save_timer:kill()
+                          save_timer:resume()
+                          got_unsaved_changed = true
+                      else
+                          save_timer = mp.add_timeout(5, function()
+                              save_config(PCONFIG, properties)
+                              got_unsaved_changed = false
+                          end)
+                      end
+                  end
+              end)
+          end
+
+          isInitialized = true
+      end
+
+      onInitialLoad()
+      mp.register_event("shutdown", function()
+          if got_unsaved_changed then
+              save_config(PCONFIG, properties)
+          end
+      end)
+    '';
+  };
+
 }
