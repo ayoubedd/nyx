@@ -1,6 +1,7 @@
 vim.lsp.config.tsserver_ls = {
 	init_options = { hostInfo = "neovim" },
-	cmd = { "typescript-language-server", "--stdio" },
+	-- cmd = { "typescript-language-server", "--stdio" },
+	cmd = { "tsgo", "--lsp", "--stdio" },
 	filetypes = { "typescript", "typescriptreact", "javascript", "javascriptreact" },
 	root_markers = { "package.json", "tsconfig.json", "jsconfig.json", ".git" },
 	single_file_support = false,
@@ -213,7 +214,7 @@ vim.lsp.config.eslint = {
 vim.lsp.config.nixd = {
 	cmd = { "nixd" },
 	filetypes = { "nix" },
-	root_markers = { "flake.nix", "git" },
+	root_markers = { "flake.nix", "git", "devenv.nix" },
 }
 
 vim.lsp.config.html = {

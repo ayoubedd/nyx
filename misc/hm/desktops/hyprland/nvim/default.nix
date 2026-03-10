@@ -98,6 +98,7 @@
       black
       stylua
       rustfmt
+      typescript-go
     ];
   };
 
