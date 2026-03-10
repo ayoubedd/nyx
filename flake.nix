@@ -5,7 +5,7 @@
     url = "file+file:///dev/null";
     flake = false;
   };
-  inputs.nixpkgs.url = "nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   inputs.nur = {
     url = "github:nix-community/NUR";
@@ -55,14 +55,12 @@
   };
 
   outputs =
-    { self, devenv-root, ... }@inputs:
+    { devenv-root, ... }@inputs:
     let
       inherit (inputs)
         nixpkgs
         nixos-hardware
         flake-parts
-        nur
-        stylix
         home-manager
         ;
       lib =
@@ -77,16 +75,12 @@
       systems = lib.lo.systems;
       perSystem =
         {
-          config,
-          inputs',
           pkgs,
-          system,
           ...
         }:
         {
           formatter = pkgs.treefmt;
           devenv.shells.default = {
-            process.managers.process-compose.configFile = ./.;
             devenv.root =
               let
                 devenvRootFileContent = builtins.readFile devenv-root.outPath;
