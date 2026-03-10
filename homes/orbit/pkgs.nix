@@ -32,6 +32,7 @@
     seahorse
 
     lsof
+    traceroute
 
     # httplz
     tokei
