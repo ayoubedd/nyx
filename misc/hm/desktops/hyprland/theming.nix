@@ -1,5 +1,14 @@
-{ pkgs, lib, ... }:
 {
+  inputs,
+  pkgs,
+  lib,
+  ...
+}:
+{
+  imports = [
+    inputs.stylix.homeModules.stylix
+  ];
+
   home.pointerCursor = {
     x11 = {
       enable = true;
@@ -38,6 +47,7 @@
     targets.neovim.enable = false;
     targets.hyprlock.enable = false;
     targets.hyprland.enable = false;
+    targets.ghostty.enable = false;
     targets.qt.enable = true;
 
     cursor.name = "volantes_cursors";

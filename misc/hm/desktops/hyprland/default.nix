@@ -2,15 +2,12 @@
   config,
   pkgs,
   lo-pkgs,
-  inputs,
   host,
   ...
 }:
 {
 
   imports = [
-    inputs.stylix.homeModules.stylix
-
     # import home manager custom modules
     ../../../../modules/hm
 
@@ -31,8 +28,8 @@
     ./services.nix
 
     ./browsers/firefox.nix
-    # ./browsers/librewolf.nix
-    ./alacritty
+    ./terminals/alacritty
+    ./terminals/ghostty.nix
     ./zsh
     ./mpv.nix
     ./imv.nix
@@ -55,6 +52,6 @@
     grim
     wofi-emoji
     jq
-    wl-clip-persist # should write a module for this
+    wl-clip-persist
   ];
 }
