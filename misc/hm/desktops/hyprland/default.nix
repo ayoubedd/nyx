@@ -1,7 +1,7 @@
 {
   config,
   pkgs,
-  lo-pkgs,
+  # lo-pkgs,
   host,
   ...
 }:
@@ -44,7 +44,7 @@
     "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
 
   home.packages = with pkgs; [
-    lo-pkgs.realod-failed-services
+    # lo-pkgs.realod-failed-services
     wl-clipboard
     wl-color-picker
     hyprpicker

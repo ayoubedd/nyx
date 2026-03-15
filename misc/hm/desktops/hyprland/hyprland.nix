@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 let
   alacritty = "${pkgs.alacritty}/bin/alacritty";
   pactl = "${pkgs.pulseaudio}/bin/pactl";
@@ -28,7 +28,7 @@ let
   snaparea = "${grim} -g \"$(${slurp})\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | ${wl-copy} -t 'image/png'";
   snapfull = "${grim} -g \"$(${slurp} -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | ${wl-copy} -t 'image/png'";
 
-  vicinae = "${inputs.vicinae.packages.${pkgs.stdenv.system}.default}/bin/vicinae";
+  vicinae = "${pkgs.vicinae}/bin/vicinae";
   firefox = "${pkgs.firefox}/bin/firefox";
   thunar = "${pkgs.thunar}/bin/thunar";
 

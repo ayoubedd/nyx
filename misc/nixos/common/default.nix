@@ -22,6 +22,7 @@
     curl
     qt5.qtwayland
     qt6.qtwayland
+    cacert
   ];
 
   programs.nix-ld.enable = true;

@@ -38,6 +38,8 @@
   inputs.flake-parts.url = "github:hercules-ci/flake-parts";
   inputs.flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
   inputs.vicinae.url = "github:vicinaehq/vicinae";
+  inputs.eilmeldung.url = "github:christo-auer/eilmeldung";
+  inputs.eilmeldung.inputs.nixpkgs.follows = "nixpkgs";
 
   nixConfig = {
     extra-substituters = [
@@ -57,69 +59,64 @@
   outputs =
     { devenv-root, ... }@inputs:
     let
-      inherit (inputs)
-        nixpkgs
-        nixos-hardware
-        flake-parts
-        home-manager
-        ;
-      lib =
-        nixpkgs.lib
-        // home-manager.lib
-        // {
-          lo = (import ./lib { inherit lib nixpkgs; });
-        };
+      inherit (inputs) flake-parts nixpkgs home-manager;
+      devenv-root' =
+        let
+          devenvRootFileContent = builtins.readFile devenv-root.outPath;
+        in
+        nixpkgs.lib.mkIf (devenvRootFileContent != "") devenvRootFileContent;
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [ inputs.devenv.flakeModule ];
-      systems = lib.lo.systems;
+      imports = with inputs; [
+        devenv.flakeModule
+        home-manager.flakeModules.home-manager
+      ];
+      systems = [ "x86_64-linux" ];
       perSystem =
-        {
-          pkgs,
-          ...
-        }:
+        { pkgs, ... }:
         {
           formatter = pkgs.treefmt;
           devenv.shells.default = {
-            devenv.root =
-              let
-                devenvRootFileContent = builtins.readFile devenv-root.outPath;
-              in
-              pkgs.lib.mkIf (devenvRootFileContent != "") devenvRootFileContent;
+            devenv.root = devenv-root';
             imports = [ ./devenv.nix ];
           };
         };
+
       flake = {
         nixosConfigurations = {
-          x1 = lib.nixosSystem {
-            specialArgs = { inherit inputs nixos-hardware; };
-            modules = [ ./machines/x1 ];
+          x1 = nixpkgs.lib.nixosSystem {
+            modules = with inputs; [
+              nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
+              sops-nix.nixosModules.sops
+              disko.nixosModules.disko
+              ./machines/x1
+            ];
           };
-          kraken = lib.nixosSystem {
+          kraken = nixpkgs.lib.nixosSystem {
             specialArgs = { inherit inputs; };
             modules = [ ./machines/kraken ];
           };
         };
 
         homeConfigurations = {
-          "orbit@x1" = lib.lo.mkHome {
-            specialArgs = {
-              inherit inputs;
+          "orbit@x1" = home-manager.lib.homeManagerConfiguration {
+            pkgs = import nixpkgs {
               system = "x86_64-linux";
-              host = "x1";
+              overlays = with inputs; [
+                vicinae.overlays.default
+                devenv.overlays.default
+                eilmeldung.overlays.default
+              ];
             };
-            modules = [
+            extraSpecialArgs.host = "x1";
+            modules = with inputs; [
+              vicinae.homeManagerModules.default
+              stylix.homeModules.stylix
+              nur.modules.homeManager.default
+              nix-flatpak.homeManagerModules.nix-flatpak
+              eilmeldung.homeManager.default
               ./homes/orbit
-              inputs.vicinae.homeManagerModules.default
             ];
-          };
-          "orbit@kraken" = lib.lo.mkHome {
-            specialArgs = {
-              inherit inputs;
-              system = "x86_64-linux";
-              host = "kraken";
-            };
-            modules = [ ./homes/orbit ];
           };
         };
       };

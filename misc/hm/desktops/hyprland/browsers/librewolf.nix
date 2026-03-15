@@ -1,7 +1,5 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 {
-  imports = [ inputs.nur.modules.homeManager.default ];
-
   programs.librewolf = {
     enable = true;
 

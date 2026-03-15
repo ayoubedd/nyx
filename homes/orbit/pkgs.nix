@@ -1,8 +1,6 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 {
   home.packages = with pkgs; [
-    inputs.devenv.outputs.packages.x86_64-linux.default
-
     # Nix stuff
     nix-index
     nix-tree
@@ -66,5 +64,6 @@
     sof-firmware
     bind # for dig
     yt-dlp
+    devenv
   ];
 }

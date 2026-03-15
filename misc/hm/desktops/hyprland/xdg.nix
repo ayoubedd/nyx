@@ -64,6 +64,16 @@ in
       ];
     };
 
+    terminal-exec = {
+      enable = true;
+      settings = {
+        default = [
+          "alacritty.desktop"
+          "ghostty.desktop"
+        ];
+      };
+    };
+
     userDirs = {
       enable = true;
       createDirectories = true;

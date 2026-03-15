@@ -1,14 +1,9 @@
 {
-  inputs,
   pkgs,
   lib,
   ...
 }:
 {
-  imports = [
-    inputs.stylix.homeModules.stylix
-  ];
-
   home.pointerCursor = {
     x11 = {
       enable = true;

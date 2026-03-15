@@ -1,9 +1,7 @@
 {
   lib,
   pkgs,
-  nixos-hardware,
   config,
-  inputs,
   ...
 }:
 let
@@ -17,10 +15,6 @@ let
 in
 {
   imports = [
-    nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
-    inputs.sops-nix.nixosModules.sops
-    inputs.disko.nixosModules.disko
-
     ../../misc/nixos/common
     # ../../misc/nixos/apps/qemu.nix
     ../../misc/nixos/apps/docker.nix
