@@ -31,7 +31,6 @@ in
   boot.kernelParams = [
     "nowatchdog"
     "kernel.nmi_watchdog=0"
-    "power_save=30"
   ];
 
   networking.hostName = "x1";

@@ -1,21 +1,253 @@
-{ ... }:
+{ pkgs, ... }:
 {
-  services.thermald.enable = true;
-  services.thermald.ignoreCpuidCheck = true;
+  boot.kernelParams = [
+    "iwlwifi.power_save=true"
+    "iwlwifi.power_level=5"
+    "iwlmvm.power_scheme=3"
+  ];
+
+  services.irqbalance.enable = true;
+
+  services.thermald = {
+    enable = true;
+    ignoreCpuidCheck = true;
+  };
+
+  services.tuned = {
+    enable = true;
+
+    settings = {
+      dynamic_tuning = true;
+      reapply_sysctl = false;
+    };
+
+    ppdSettings = {
+      main = {
+        default = "balanced";
+      };
+      battery = {
+        balanced = "x1-battery-balanced";
+      };
+      profiles = {
+        balanced = "x1-balanced";
+        performance = "x1-performance";
+        power-saver = "x1-powersave";
+      };
+    };
+
+    profiles = {
+      common = {
+        misc = {
+          type = "sysfs";
+          "/sys/power/mem_sleep" = "deep";
+
+          # disable wake-on-lan
+          "/sys/class/net/wlp0s20f3/device/power/wakeup" = "disabled";
+
+          # Battery thresholds
+          "/sys/class/power_supply/BAT0/charge_control_start_threshold" = 75;
+          "/sys/class/power_supply/BAT0/charge_control_end_threshold" = 80;
+
+          # Active governor
+          "/sys/devices/system/cpu/intel_pstate/status" = "active";
+
+          "/sys/bus/pci/devices/0000:00:08.0/power/control" = "auto";
+          "/sys/bus/pci/devices/0000:00:1f.0/power/control" = "auto";
+          "/sys/bus/pci/devices/0000:00:04.0/power/control" = "auto";
+          "/sys/bus/pci/devices/0000:00:14.3/power/control" = "auto";
+          "/sys/bus/pci/devices/0000:00:1f.5/power/control" = "auto";
+          "/sys/bus/pci/devices/0000:00:00.0/power/control" = "auto";
+          "/sys/bus/pci/devices/0000:00:14.2/power/control" = "auto";
+          "/sys/bus/pci/devices/0000:04:00.0/power/control" = "auto";
+          "/sys/bus/pci/devices/0000:00:0a.0/power/control" = "auto";
+        };
+
+        disk = {
+          devices = "nvme0n1";
+          readahead = 4096;
+          elevator = "kyber";
+        };
+      };
+
+      x1-performance = {
+        main.include = "common";
+
+        cpu = {
+          governor = "performance";
+          energy_perf_bias = "performance";
+          energy_performance_preference = "performance";
+          min_perf_pct = 0;
+          max_perf_pct = 100;
+          force_latency = 99;
+          no_turbo = 0;
+          boost = 1;
+        };
+
+        acpi = {
+          platform_profile = "performance";
+        };
+
+        usb = {
+          autosuspend = 0;
+        };
+
+        sysfs_cpu = {
+          type = "sysfs";
+          "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
+        };
+
+        sysfs_gpu = {
+          type = "sysfs";
+          path = "/sys/class/drm/card0/";
+          devices_udev_regex = ".*card0.*";
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/min_freq" = 400;
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/max_freq" = 1300;
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/power_profile" = "base";
+        };
+
+        sysfs_audio = {
+          type = "sysfs";
+          "/sys/module/snd_hda_intel/parameters/power_save_controller" = "N";
+          "/sys/module/snd_hda_intel/parameters/power_save" = "0";
+        };
+      };
+
+      x1-balanced = {
+        main.include = "common";
+
+        cpu = {
+          governor = "powersave";
+          energy_perf_bias = "balance-performance";
+          energy_performance_preference = "balance_performance";
+          no_turbo = 0;
+          boost = 1;
+        };
+
+        acpi = {
+          platform_profile = "balanced";
+        };
+
+        usb = {
+          autosuspend = 0;
+        };
+
+        sysfs_cpu = {
+          type = "sysfs";
+          "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
+        };
+
+        sysfs_gpu = {
+          type = "sysfs";
+          path = "/sys/class/drm/card0/";
+          devices_udev_regex = ".*card0.*";
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/min_freq" = 100;
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/max_freq" = 700;
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/power_profile" = "base";
+        };
+
+        sysfs_audio = {
+          type = "sysfs";
+          "/sys/module/snd_hda_intel/parameters/power_save_controller" = "N";
+          "/sys/module/snd_hda_intel/parameters/power_save" = "0";
+        };
+      };
+
+      x1-battery-balanced = {
+        main.include = "common";
+
+        cpu = {
+          governor = "powersave";
+          energy_perf_bias = "balance-power";
+          energy_performance_preference = "balance_power";
+          no_turbo = 0;
+          boost = 1;
+        };
+
+        acpi = {
+          platform_profile = "balanced";
+        };
+
+        usb = {
+          autosuspend = 0;
+        };
+
+        sysfs_cpu = {
+          type = "sysfs";
+          "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
+        };
+
+        sysfs_gpu = {
+          type = "sysfs";
+          path = "/sys/class/drm/card0/";
+          devices_udev_regex = ".*card0.*";
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/min_freq" = 100;
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/max_freq" = 500;
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/power_profile" = "base";
+        };
+
+        sysfs_audio = {
+          type = "sysfs";
+          "/sys/module/snd_hda_intel/parameters/power_save_controller" = "N";
+          "/sys/module/snd_hda_intel/parameters/power_save" = "0";
+        };
+      };
+
+      x1-powersave = {
+        main.include = "common";
+
+        cpu = {
+          governor = "powersave";
+          energy_perf_bias = "power";
+          energy_performance_preference = "power";
+          no_turbo = 1;
+          boost = 0;
+        };
+
+        acpi = {
+          platform_profile = "low-power";
+        };
+
+        usb = {
+          autosuspend = 1;
+        };
+
+        sysfs_cpu = {
+          type = "sysfs";
+          "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 0;
+        };
+
+        sysfs_gpu = {
+          type = "sysfs";
+          path = "/sys/class/drm/card0/";
+          devices_udev_regex = ".*card0.*";
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/min_freq" = 100;
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/max_freq" = 400;
+          "/sys/class/drm/card0/device/tile0/gt0/freq0/power_profile" = "power_saving";
+        };
+
+        sysfs_audio = {
+          type = "sysfs";
+          "/sys/module/snd_hda_intel/parameters/power_save_controller" = "Y";
+          "/sys/module/snd_hda_intel/parameters/power_save" = "10";
+        };
+      };
+    };
+
+  };
 
   services.acpid = {
     enable = true;
     handlers.energy_perf_bias = {
       # ac_adapter ACPI0003:00 00000080 00000000 # unplugging
       # ac_adapter ACPI0003:00 00000080 00000001 # plug-in
-      action = ''
+      action = /* sh */ ''
         vals=($1)  # space separated string to array of multiple values
         case ''${vals[3]} in
             00000000)
-                echo 15 | tee /sys/devices/system/cpu/cpu*/power/energy_perf_bias
+                ${pkgs.tuned}/bin/tuned-adm profile x1-battery-balanced
                 ;;
             00000001)
-                echo 0 | tee /sys/devices/system/cpu/cpu*/power/energy_perf_bias
+                ${pkgs.tuned}/bin/tuned-adm profile x1-performance
                 ;;
             *)
                 echo unknown >> /tmp/acpi.log
@@ -23,90 +255,6 @@
         esac
       '';
       event = "ac_adapter/*";
-    };
-  };
-
-  services.tlp = {
-    enable = true;
-    pd.enable = true;
-    settings = {
-      TLP_ENABLE = 1;
-      TLP_DISABLE_DEFAULTS = 1;
-
-      CPU_DRIVER_OPMODE_ON_AC = "active";
-      CPU_DRIVER_OPMODE_ON_BAT = "active";
-
-      CPU_SCALING_GOVERNOR_ON_AC = "performance";
-      CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
-
-      CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-      CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
-
-      CPU_MIN_PERF_ON_AC = 0;
-      CPU_MAX_PERF_ON_AC = 100;
-      CPU_MIN_PERF_ON_BAT = 0;
-      CPU_MAX_PERF_ON_BAT = 40;
-
-      CPU_BOOST_ON_AC = 1;
-      CPU_BOOST_ON_BAT = 1;
-
-      CPU_HWP_DYN_BOOST_ON_AC = 1;
-      CPU_HWP_DYN_BOOST_ON_BAT = 1;
-
-      NMI_WATCHDOG = 0;
-
-      PLATFORM_PROFILE_ON_AC = "performance";
-      PLATFORM_PROFILE_ON_BAT = "low-power";
-
-      MEM_SLEEP_ON_AC = "s2idle";
-      MEM_SLEEP_ON_BAT = "deep";
-
-      DISK_DEVICES = "nvme0n1";
-
-      DISK_APM_LEVEL_ON_AC = "254";
-      DISK_APM_LEVEL_ON_BAT = "128";
-
-      DISK_IOSCHED = "bfq";
-
-      AHCI_RUNTIME_PM_ON_AC = "on";
-      AHCI_RUNTIME_PM_ON_BAT = "auto";
-
-      AHCI_RUNTIME_PM_TIMEOUT = 15;
-
-      INTEL_GPU_MIN_FREQ_ON_AC = 100;
-      INTEL_GPU_MIN_FREQ_ON_BAT = 100;
-
-      INTEL_GPU_MAX_FREQ_ON_AC = 1300;
-      INTEL_GPU_MAX_FREQ_ON_BAT = 500;
-
-      INTEL_GPU_BOOST_FREQ_ON_AC = 1300;
-      INTEL_GPU_BOOST_FREQ_ON_BAT = 700;
-
-      WIFI_PWR_ON_AC = "off";
-      WIFI_PWR_ON_BAT = "on";
-
-      WOL_DISABLE = "Y";
-
-      SOUND_POWER_SAVE_ON_AC = 0;
-      SOUND_POWER_SAVE_ON_BAT = 10;
-
-      SOUND_POWER_SAVE_CONTROLLER = "Y";
-
-      RUNTIME_PM_ON_AC = "on";
-      RUNTIME_PM_ON_BAT = "auto";
-
-      USB_AUTOSUSPEND = 1;
-
-      USB_EXCLUDE_PHONE = 1;
-
-      RESTORE_DEVICE_STATE_ON_STARTUP = 0;
-
-      DEVICES_TO_DISABLE_ON_STARTUP = "nfc";
-
-      DEVICES_TO_ENABLE_ON_STARTUP = "wifi bluetooth";
-
-      START_CHARGE_THRESH_BAT0 = 80;
-      STOP_CHARGE_THRESH_BAT0 = 100;
     };
   };
 }

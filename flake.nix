@@ -13,6 +13,7 @@
   };
   inputs.devenv = {
     url = "github:cachix/devenv?ref=latest";
+    inputs.nixpkgs.follows = "nixpkgs";
   };
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 

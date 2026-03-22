@@ -20,7 +20,6 @@
     "sd_mod"
   ];
 
-  boot.initrd.kernelModules = [ ];
   boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
 
   boot.kernelModules = [
@@ -30,8 +29,11 @@
 
   boot.blacklistedKernelModules = [
     "iTCO_wdt"
-    "xe"
+    "i915"
     "intel_oc_wdt"
+    "nxp_nci_i2c"
+    "nxp_nci"
+    "nfc"
   ];
 
   boot.loader = {

@@ -65,5 +65,7 @@
     bind # for dig
     yt-dlp
     devenv
+    intel-gpu-tools
+    powertop
   ];
 }
