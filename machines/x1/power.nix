@@ -13,6 +13,8 @@
     ignoreCpuidCheck = true;
   };
 
+  services.tlp.enable = false;
+
   services.tuned = {
     enable = true;
 
@@ -237,7 +239,7 @@
 
   services.acpid = {
     enable = true;
-    handlers.energy_perf_bias = {
+    handlers.power_profile_switch = {
       # ac_adapter ACPI0003:00 00000080 00000000 # unplugging
       # ac_adapter ACPI0003:00 00000080 00000001 # plug-in
       action = /* sh */ ''
@@ -247,7 +249,7 @@
                 ${pkgs.tuned}/bin/tuned-adm profile x1-battery-balanced
                 ;;
             00000001)
-                ${pkgs.tuned}/bin/tuned-adm profile x1-performance
+                ${pkgs.tuned}/bin/tuned-adm profile x1-balanced
                 ;;
             *)
                 echo unknown >> /tmp/acpi.log
