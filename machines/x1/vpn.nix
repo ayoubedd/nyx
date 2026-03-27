@@ -6,10 +6,10 @@
     homelab = {
       autostart = false;
       type = "wireguard";
-      address = [ "10.100.0.2/32" ];
+      address = [ "10.100.0.3/32" ];
       listenPort = 1235;
       mtu = 1360;
-      privateKeyFile = config.sops.secrets.wireguard-privatekey.path;
+      privateKeyFile = config.sops.secrets.wg_privkey.path;
       peers = [
         {
           publicKey = "Vop9YfQn9rwtRaPAc/mxWV+NSXbZCZqlWoVwDoCzT2w=";

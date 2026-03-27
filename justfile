@@ -48,6 +48,20 @@ videv:
 viclean:
   rm -rf ~/.config/nvim
 
+# Prepare machine disk for a nix fresh install
+prep-disk machine:
+  sudo disko --flake '.#{{ machine }}' --mode destroy,format,mount --root-mountpoint /mnt
+
+# Install nixos
+nix-os-install machine:
+  sudo nixos-install --flake '.#{{ machine }}' --root /mnt
+
+# Format disk and install nixos on target machine
+install-nix machine:
+  @just prep-disk '{{ machine }}'
+  @just os-install '{{ machine }}'
+
+
 # Create hashed password
 mkpasswd:
   mkpasswd -R 10000 -m sha-512

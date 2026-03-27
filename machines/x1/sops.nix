@@ -1,22 +1,24 @@
 { ... }:
 {
-  sops.defaultSopsFile = ../../secrets/orbit.yaml;
+  sops.defaultSopsFile = ../../secrets/x1.yaml;
   sops.defaultSopsFormat = "yaml";
   sops.age.keyFile = "/home/orbit/.config/sops/age/keys.txt";
 
   sops.secrets = {
-    user_password = {
+    orbit_password = {
       neededForUsers = true;
     };
 
     root_password = {
-      sopsFile = ../../secrets/x1.yaml;
       neededForUsers = true;
     };
 
-    wireguard-privatekey = {
-      sopsFile = ../../secrets/homelab.yaml;
-      restartUnits = [ "wireguard-homelab-peer-x1.service" ];
+    wg_privkey = {
+      restartUnits = [ "wg-quick-homelab.service" ];
+    };
+
+    luks_passphrase = {
+      neededForUsers = true;
     };
   };
 }

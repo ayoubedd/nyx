@@ -27,6 +27,7 @@ in
     ./security.nix
     ./vpn.nix
     ./sops.nix
+    ./disko.nix
   ];
   boot.kernelParams = [
     "nowatchdog"
@@ -58,7 +59,7 @@ in
     ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
     ++ lib.optional config.virtualisation.docker.enable "docker"
     ++ lib.optional config.networking.networkmanager.enable "networkmanager";
-    hashedPasswordFile = config.sops.secrets.user_password.path;
+    hashedPasswordFile = config.sops.secrets.orbit_password.path;
     shell = zsh;
   };
 
