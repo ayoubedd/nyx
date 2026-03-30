@@ -39,6 +39,11 @@ in
 
   services.devmon.enable = lib.mkForce false;
 
+  environment.systemPackages = [
+    # For debugging and troubleshooting Secure Boot.
+    pkgs.sbctl
+  ];
+
   programs.hyprland = {
     enable = true;
     withUWSM = true;

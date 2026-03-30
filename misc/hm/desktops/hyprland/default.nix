@@ -27,7 +27,7 @@
     ./applets
     ./services.nix
 
-    ./browsers/firefox.nix
+    ./browsers/librewolf.nix
     ./terminals/alacritty
     ./terminals/ghostty.nix
     ./zsh

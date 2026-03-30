@@ -37,11 +37,13 @@
   ];
 
   boot.loader = {
-    systemd-boot.enable = true;
+    systemd-boot.enable = lib.mkForce false;
     efi.canTouchEfiVariables = true;
-    systemd-boot.editor = false;
-    systemd-boot.memtest86.enable = true;
-    systemd-boot.consoleMode = "1";
+  };
+
+  boot.lanzaboote = {
+    enable = true;
+    pkiBundle = "/var/lib/sbctl";
   };
 
   boot.kernelPackages = pkgs.linuxPackages_latest;

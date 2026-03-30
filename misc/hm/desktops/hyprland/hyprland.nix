@@ -29,7 +29,7 @@ let
   snapfull = "${grim} -g \"$(${slurp} -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | ${wl-copy} -t 'image/png'";
 
   vicinae = "${pkgs.vicinae}/bin/vicinae";
-  firefox = "${pkgs.firefox}/bin/firefox";
+  librewolf = "${pkgs.librewolf}/bin/librewolf";
   thunar = "${pkgs.thunar}/bin/thunar";
 
   hyprpicker = "${pkgs.hyprpicker}/bin/hyprpicker";
@@ -109,7 +109,7 @@ in
     "$mod" = "SUPER";
     "$terminal" = alacritty;
     "$file_manager" = thunar;
-    "$browser" = firefox;
+    "$browser" = librewolf;
 
     "$left" = "h";
     "$right" = "l";
@@ -254,8 +254,8 @@ in
 
     windowrule = [
       {
-        name = "firefox";
-        "match:class" = "firefox";
+        name = "librewolf";
+        "match:class" = "librewolf";
         workspace = 2;
       }
       {

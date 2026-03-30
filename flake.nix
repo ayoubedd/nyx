@@ -11,6 +11,10 @@
     url = "github:nix-community/NUR";
     inputs.flake-parts.follows = "flake-parts";
   };
+  inputs.lanzaboote = {
+    url = "github:nix-community/lanzaboote/v1.0.0";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
   inputs.devenv = {
     url = "github:cachix/devenv?ref=latest";
     inputs.nixpkgs.follows = "nixpkgs";
@@ -90,6 +94,7 @@
               nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
               sops-nix.nixosModules.sops
               disko.nixosModules.disko
+              lanzaboote.nixosModules.lanzaboote
               ./machines/x1
             ];
           };

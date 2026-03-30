@@ -101,7 +101,7 @@ in
       gen_default_app "thunar.desktop" [
         "inode/directory"
       ]
-      // gen_default_app "firefox.desktop" [
+      // gen_default_app "librewolf.desktop" [
         "x-scheme-handler/http"
         "x-scheme-handler/https"
         "x-scheme-handler/chrome"

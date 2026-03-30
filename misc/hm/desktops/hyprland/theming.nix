@@ -42,7 +42,7 @@
     targets.neovim.enable = false;
     targets.hyprlock.enable = false;
     targets.hyprland.enable = false;
-    targets.ghostty.enable = false;
+    targets.ghostty.enable = true;
     targets.qt.enable = true;
 
     cursor.name = "volantes_cursors";
@@ -66,8 +66,6 @@
 
     fonts.sizes.applications = 11;
 
-    polarity = "dark";
-
     base16Scheme = {
       base00 = "161616";
       base01 = "252525";
@@ -87,7 +85,7 @@
       base0F = "ff7eb6";
     };
 
-    targets.firefox.profileNames = [ "orbit" ];
     targets.librewolf.profileNames = [ "orbit" ];
+    targets.librewolf.colorTheme.enable = true;
   };
 }

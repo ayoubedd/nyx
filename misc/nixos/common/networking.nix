@@ -5,11 +5,20 @@
   networking.nftables.enable = true;
   networking.firewall.enable = true;
 
+  networking.nameservers = [
+    "1.1.1.1#cloudflare-dns.com"
+    "1.0.0.1#cloudflare-dns.com"
+    "9.9.9.9#dns.quad9.net"
+  ];
+
   services.resolved = {
     enable = true;
+    settings.Resolve = {
+      Cache = "no-negative";
+      DNSSEC = true;
+      DNSOverTLS = true;
+    };
     settings.Resolve.fallbackDns = [
-      "1.1.1.1#one.one.one.one"
-      "1.0.0.1#one.one.one.one"
       "8.8.8.8#dns.google"
       "8.4.4.8#dns.google"
     ];

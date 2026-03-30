@@ -6,7 +6,7 @@
     settings = {
       font-size = 12;
       font-family = [ "JetBrainsMono Nerd Font" ];
-      theme = "theme";
+      theme = "stylix";
       async-backend = "io_uring";
       window-padding-x = "6";
       window-padding-y = "6";
