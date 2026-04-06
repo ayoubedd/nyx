@@ -19,7 +19,7 @@
     ./vpn.nix
     ./sops.nix
     ./disko.nix
-    ./routedns.nix
+    ./routedns
   ];
   boot.kernelParams = [
     "nowatchdog"
