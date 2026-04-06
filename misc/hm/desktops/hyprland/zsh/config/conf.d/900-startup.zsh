@@ -12,3 +12,6 @@ eval "$(direnv hook zsh)"
 
 # atuin
 eval "$(atuin init zsh)"
+
+# just
+eval "$(just --completions zsh)" 

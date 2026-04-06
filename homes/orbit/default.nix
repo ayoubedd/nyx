@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
 {
 
   imports = [
@@ -21,6 +21,11 @@
   home.homeDirectory = "/home/orbit";
 
   programs.home-manager.enable = true;
+
+  home.file."${config.home.homeDirectory}/Pictures/Wallpapers" = {
+    source = ../../assets/images/wallpapers;
+    recursive = true;
+  };
 
   home.stateVersion = "26.05";
 }

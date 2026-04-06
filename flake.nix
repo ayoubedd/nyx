@@ -16,8 +16,7 @@
     inputs.nixpkgs.follows = "nixpkgs";
   };
   inputs.devenv = {
-    url = "github:cachix/devenv?ref=latest";
-    inputs.nixpkgs.follows = "nixpkgs";
+    url = "github:cachix/devenv?ref=v2.0.6";
   };
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
@@ -43,8 +42,11 @@
   inputs.flake-parts.url = "github:hercules-ci/flake-parts";
   inputs.flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
   inputs.vicinae.url = "github:vicinaehq/vicinae";
-  inputs.eilmeldung.url = "github:christo-auer/eilmeldung";
-  inputs.eilmeldung.inputs.nixpkgs.follows = "nixpkgs";
+
+  inputs.eilmeldung = {
+    url = "github:christo-auer/eilmeldung";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
 
   nixConfig = {
     extra-substituters = [
@@ -102,6 +104,14 @@
             specialArgs = { inherit inputs; };
             modules = [ ./machines/kraken ];
           };
+          isos = {
+            rescubox = nixpkgs.lib.nixosSystem {
+              modules = [
+                "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
+                ./misc/nixos/iso/rescubox
+              ];
+            };
+          };
         };
 
         homeConfigurations = {
@@ -109,9 +119,10 @@
             pkgs = import nixpkgs {
               system = "x86_64-linux";
               overlays = with inputs; [
-                vicinae.overlays.default
                 devenv.overlays.default
-                eilmeldung.overlays.default
+                # eilmeldung.overlays.default
+                # vicinae.overlays.default
+                (prev: final: { vicinae = inputs.vicinae.packages.x86_64-linux.default; })
               ];
             };
             extraSpecialArgs.host = "x1";

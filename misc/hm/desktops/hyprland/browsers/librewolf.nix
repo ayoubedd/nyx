@@ -185,7 +185,7 @@
         "messaging-system.askForFeedback" = true;
         "messaging-system.rsexperimentloader.enabled" = false;
         "network.IDN_show_punycode" = true;
-        "network.captive-portal-service.enabled" = false;
+        "network.captive-portal-service.enabled" = true;
         "network.connectivity-service.enabled" = false;
         "network.cookie.sameSite.laxByDefault" = true;
         "network.cookie.sameSite.noneRequiresSecure" = true;

@@ -13,11 +13,11 @@
 
   services.resolved = {
     enable = true;
-    settings.Resolve = {
-      Cache = "no-negative";
-      DNSSEC = true;
-      DNSOverTLS = true;
-    };
+    # settings.Resolve = {
+    #   Cache = "no-negative";
+    #   DNSSEC = true;
+    #   DNSOverTLS = true;
+    # };
     settings.Resolve.fallbackDns = [
       "8.8.8.8#dns.google"
       "8.4.4.8#dns.google"

@@ -20,6 +20,8 @@
     "sd_mod"
   ];
 
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_hardened;
   boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
 
   boot.kernelModules = [
@@ -46,7 +48,10 @@
     pkiBundle = "/var/lib/sbctl";
   };
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernel.sysctl = {
+    "fs.xfs.xfssyncd_centisecs" = 10000; # increase writeback interval
+  };
+
 
   swapDevices = [ ];
 

@@ -62,6 +62,15 @@ install-nix machine:
   @just os-install '{{ machine }}'
 
 
+build-iso name:
+  nix build ".#nixosConfigurations.isos.{{ name }}.config.system.build.isoImage"
+
+run-iso:
+  qemu-system-x86_64 -cpu host -smp $(nproc) -m 8G -machine type=q35,accel=kvm \
+    -object rng-random,id=rng0,filename=/dev/urandom -device virtio-rng-pci,rng=rng0 \
+    -device virtio-vga-gl -display sdl,gl=on \
+    -cdrom result/iso/*.iso
+
 # Create hashed password
 mkpasswd:
   mkpasswd -R 10000 -m sha-512

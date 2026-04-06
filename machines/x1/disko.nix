@@ -16,6 +16,13 @@
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
+              mountOptions = [
+                "rw"
+                "relatime"
+                "fmask=0077"
+                "dmask=0077"
+                # "errors=remount-ro 0 2"
+              ];
             };
           };
           root = {

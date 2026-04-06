@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   alacritty = "${pkgs.alacritty}/bin/alacritty";
   pactl = "${pkgs.pulseaudio}/bin/pactl";
@@ -35,6 +35,7 @@ let
   hyprpicker = "${pkgs.hyprpicker}/bin/hyprpicker";
 
   swaync-client = "${pkgs.swaynotificationcenter}/bin/swaync-client";
+  usbguard-notifies = "${pkgs.usbguard-notifier}/bin/usbguard-notifier";
 in
 {
   wayland.windowManager.hyprland.enable = true;
@@ -123,6 +124,7 @@ in
       "systemctl --user restart xdg-desktop-portal.service"
       "$browser"
       "sleep 3 && ${pactl} set-sink-mute @DEFAULT_SINK@ 1" # auto mute on startup
+      "sleep 5 && ${usbguard-notifies}" ## needs a service
     ];
 
     bindm = [
@@ -377,7 +379,7 @@ in
         hide_cursor = true;
       };
       background = {
-        path = "/home/orbit/Pictures/Wallpapers/lockscreen.png";
+        path = "/home/${config.home.username}/Pictures/Wallpapers/lockscreen/lockscreen.png";
       };
     };
   };

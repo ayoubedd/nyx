@@ -67,5 +67,7 @@
     devenv
     intel-gpu-tools
     powertop
+    just
+    direnv
   ];
 }

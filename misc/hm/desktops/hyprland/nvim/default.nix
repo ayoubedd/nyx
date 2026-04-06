@@ -93,7 +93,7 @@
 
       # formatters
       nixfmt
-      nodePackages.prettier
+      # nodePackages.prettier
       prettierd
       black
       stylua

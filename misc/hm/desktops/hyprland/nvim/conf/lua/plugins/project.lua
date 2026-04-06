@@ -11,7 +11,11 @@ return {
 			-- lsp, while **"pattern"** uses vim-rooter like glob pattern matching. Here
 			-- order matters: if one is not detected, the other is used as fallback. You
 			-- can also delete or rearangne the detection methods.
-			use_lsp = true,
+			lsp = {
+				enabled = true,
+			-- eg: { "efm", ... }
+				ignore = {},
+			},
 
 			-- All the patterns used to detect root dir, when **"pattern"** is in
 			-- detection_methods
@@ -33,10 +37,6 @@ return {
 				".sln",
 				".nvim.lua",
 			},
-
-			-- Table of lsp clients to ignore by name
-			-- eg: { "efm", ... }
-			ignore_lsp = {},
 
 			-- Don't calculate root dir on specific directories
 			-- Ex: { "~/.cargo/*", ... }

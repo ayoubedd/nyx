@@ -4,22 +4,13 @@
   config,
   ...
 }:
-let
-  misc = ../../misc/nixos;
-  polkitAgent = (
-    import (builtins.toPath "${misc}/apps/polkit_pantheon_agent.nix") {
-      inherit pkgs;
-      wantedBy = "hyprland-session.target";
-    }
-  );
-in
 {
   imports = [
     ../../misc/nixos/common
-    # ../../misc/nixos/apps/qemu.nix
+    ../../misc/nixos/apps/qemu.nix
     ../../misc/nixos/apps/docker.nix
     ../../misc/nixos/apps/thunar.nix
-    polkitAgent
+    ../../misc/nixos/apps/polkit_gnome_agent.nix
 
     ./hardware-configuration.nix
     ./misc.nix
@@ -28,6 +19,7 @@ in
     ./vpn.nix
     ./sops.nix
     ./disko.nix
+    ./routedns.nix
   ];
   boot.kernelParams = [
     "nowatchdog"
@@ -38,11 +30,6 @@ in
   networking.useDHCP = lib.mkDefault true;
 
   services.devmon.enable = lib.mkForce false;
-
-  environment.systemPackages = [
-    # For debugging and troubleshooting Secure Boot.
-    pkgs.sbctl
-  ];
 
   programs.hyprland = {
     enable = true;
