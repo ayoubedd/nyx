@@ -1,29 +1,6 @@
 {
   description = "My personal NixOS/User configuration";
 
-  inputs.devenv-root = {
-    url = "file+file:///dev/null";
-    flake = false;
-  };
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-  inputs.nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-  inputs.nur = {
-    url = "github:nix-community/NUR";
-    inputs.flake-parts.follows = "flake-parts";
-  };
-  inputs.lanzaboote = {
-    url = "github:nix-community/lanzaboote/v1.0.0";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
-  inputs.devenv = {
-    url = "github:cachix/devenv?ref=v2.0.6";
-  };
-  inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
-
-  inputs.sops-nix = {
-    url = "github:Mic92/sops-nix";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
   inputs.home-manager = {
     url = "github:nix-community/home-manager";
     inputs.nixpkgs.follows = "nixpkgs";
@@ -32,21 +9,36 @@
     url = "github:nix-community/disko";
     inputs.nixpkgs.follows = "nixpkgs";
   };
+  inputs.lanzaboote = {
+    url = "github:nix-community/lanzaboote/v1.0.0";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
   inputs.stylix = {
     url = "github:danth/stylix";
     inputs.nixpkgs.follows = "nixpkgs";
     inputs.flake-parts.follows = "flake-parts";
     inputs.nur.follows = "nur";
   };
+  inputs.nur = {
+    url = "github:nix-community/NUR";
+    inputs.flake-parts.follows = "flake-parts";
+  };
+  inputs.sops-nix = {
+    url = "github:Mic92/sops-nix";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+  inputs.devenv-root = {
+    url = "file+file:///dev/null";
+    flake = false;
+  };
 
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  inputs.nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   inputs.flake-parts.url = "github:hercules-ci/flake-parts";
   inputs.flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
   inputs.vicinae.url = "github:vicinaehq/vicinae";
-
-  inputs.eilmeldung = {
-    url = "github:christo-auer/eilmeldung";
-    inputs.nixpkgs.follows = "nixpkgs";
-  };
+  inputs.devenv.url = "github:cachix/devenv?ref=v2.0.6";
+  inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
   nixConfig = {
     extra-substituters = [
@@ -107,7 +99,7 @@
           isos = {
             rescubox = nixpkgs.lib.nixosSystem {
               modules = [
-                "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
+                "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-base.nix"
                 ./misc/nixos/iso/rescubox
               ];
             };
@@ -120,7 +112,6 @@
               system = "x86_64-linux";
               overlays = with inputs; [
                 devenv.overlays.default
-                # eilmeldung.overlays.default
                 # vicinae.overlays.default
                 (prev: final: { vicinae = inputs.vicinae.packages.x86_64-linux.default; })
               ];
