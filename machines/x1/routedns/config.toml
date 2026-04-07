@@ -2,39 +2,81 @@
 address = "8.8.8.8:853"
 protocol = "dot"
 
-# ----------------- Cloudflare ------------------
+# ----------------- Privacy Focused ------------------
 
-[resolvers.cloudflare-1-1-1-1-dot]
-address = "1.1.1.1:853"
-protocol = "dot"
+[resolvers.joindns4-doh]
+address = "https://unfiltered.joindns4.eu/dns-query"
+protocol = "doh"
+enable-0rtt = true
+doh = { idle-timeout = 60 }
 
-[resolvers.cloudflare-1-0-0-1-dot]
+[resolvers.uncensoreddns-doh]
+address = "https://anycast.uncensoreddns.org/dns-query"
+protocol = "doh"
+enable-0rtt = true
+doh = { idle-timeout = 60 }
+
+[resolvers.applied-privacy-doh]
+address = "https://doh.applied-privacy.net/query"
+protocol = "doh"
+enable-0rtt = true
+doh = { idle-timeout = 60 }
+
+[resolvers.libredns-doh]
+address = "https://doh.libredns.gr/dns-query"
+protocol = "doh"
+enable-0rtt = true
+doh = { idle-timeout = 60 }
+
+[groups.main-resolvers]
+resolvers = ["libredns-doh", "applied-privacy-doh", "uncensoreddns-doh", "joindns4-doh"]
+type = "fastest"
+
+# ----------------- Fallback (Cloudflare and Google) ------------------
+
+# ---------- Cloudflare ----------
+
+[resolvers.cloudflare-doh]
+address = "https://cloudflare-dns.com/dns-query"
+protocol = "doh"
+enable-0rtt = true
+doh = { idle-timeout = 60 }
+
+[resolvers.cloudflare-dot-1]
 address = "1.0.0.1:853"
 protocol = "dot"
 
-[groups.cloudflare-dot]
-resolvers = ["cloudflare-1-1-1-1-dot", "cloudflare-1-0-0-1-dot"]
-type = "fail-rotate"
+[resolvers.cloudflare-dot-2]
+address = "1.1.1.1:853"
+protocol = "dot"
 
-# ----------------- Google ------------------
+# ---------- Google ----------
 
-[resolvers.google-8-8-8-8-dot]
+[resolvers.google-dot-1]
 address = "8.8.8.8:853"
 protocol = "dot"
 
-[resolvers.google-8-8-4-4-dot]
+[resolvers.google-dot-2]
 address = "8.8.4.4:853"
 protocol = "dot"
 
-[groups.google-dot]
-resolvers = ["google-8-8-8-8-dot", "google-8-8-4-4-dot"]
+[groups.google]
+resolvers = ["google-dot-1", "google-dot-2"]
 type = "fail-rotate"
+
+[groups.cloudflare]
+resolvers = ["cloudflare-dot-1", "cloudflare-dot-2", "cloudflare-doh"]
+type = "fail-rotate"
+
+[groups.fallback]
+resolvers = ["cloudflare", "google"]
+type = "fastest"
 
 # ----------------- Merge ------------------
 
 [groups.main]
-type   = "fastest"
-resolvers = ["cloudflare-dot", "google-dot"]
+type   = "fail-rotate"
+resolvers = ["main-resolvers", "fallback"]
 
 [groups.main-updated-ttl]
 type = "ttl-modifier"
@@ -60,7 +102,7 @@ prefetch-max-items = 50
 
 [routers.main-router]
 routes = [
-{ resolver="main-prefetch" }, # default route
+  { resolver="main-prefetch" }, # default route
 ]
 
 [listeners.local-udp-ipv4]
