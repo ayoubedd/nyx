@@ -12,16 +12,16 @@ let
 
 in
 {
-  services.swww.enable = true;
+  services.awww.enable = true;
 
-  systemd.user.services.swww-wallpaper-reload = {
+  systemd.user.services.awww-wallpaper-reload = {
     Install = {
       WantedBy = [ config.wayland.systemd.target ];
     };
 
     Unit = {
       ConditionEnvironment = "WAYLAND_DISPLAY";
-      Description = "swww-wallpaper-reload";
+      Description = "awww-wallpaper-reload";
       After = [ config.wayland.systemd.target ];
       PartOf = [ config.wayland.systemd.target ];
     };

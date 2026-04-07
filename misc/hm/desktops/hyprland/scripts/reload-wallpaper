@@ -13,7 +13,7 @@ while true; do
 	| sort -n | cut -d':' -f2- \
 	| while read -r img; do
 		echo "setting wallpaper: $img"
-		swww img -t grow --transition-duration 4 --transition-pos 0.8,0.8 "$img" 
+		awww img -t grow --transition-duration 4 --transition-pos 0.8,0.8 "$img"
 		sleep "${2:-$DEFAULT_INTERVAL}"
 	done
 done

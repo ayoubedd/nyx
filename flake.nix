@@ -122,7 +122,6 @@
               stylix.homeModules.stylix
               nur.modules.homeManager.default
               nix-flatpak.homeManagerModules.nix-flatpak
-              eilmeldung.homeManager.default
               ./homes/orbit
             ];
           };

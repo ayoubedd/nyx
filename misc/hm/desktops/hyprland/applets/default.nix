@@ -4,7 +4,7 @@
     ./waybar.nix
     ./swaync.nix
     ./wofi.nix
-    ./swww.nix
+    ./awww.nix
     ./vicinae.nix
   ];
 }
