@@ -1,4 +1,4 @@
-{ pkgs, devenv-root, ... }:
+{ pkgs, ... }:
 
 {
   packages = with pkgs; [
