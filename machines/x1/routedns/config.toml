@@ -2,6 +2,10 @@
 address = "8.8.8.8:853"
 protocol = "dot"
 
+[resolvers.homelab]
+address = "10.1.2.2:53"
+protocol = "udp"
+
 # ----------------- Privacy Focused ------------------
 
 [resolvers.joindns4-doh]
@@ -28,9 +32,6 @@ protocol = "doh"
 enable-0rtt = true
 doh = { idle-timeout = 60 }
 
-[groups.main-resolvers]
-resolvers = ["libredns-doh", "applied-privacy-doh", "uncensoreddns-doh", "joindns4-doh"]
-type = "fastest"
 
 # ----------------- Fallback (Cloudflare and Google) ------------------
 
@@ -68,59 +69,68 @@ type = "fail-rotate"
 resolvers = ["cloudflare-dot-1", "cloudflare-dot-2", "cloudflare-doh"]
 type = "fail-rotate"
 
-[groups.fallback]
+# ------------ Resolver Grouping ------------
+
+[groups.fallback-resolvers]
 resolvers = ["cloudflare", "google"]
+type = "fastest"
+
+[groups.main-resolvers]
+resolvers = ["libredns-doh", "applied-privacy-doh", "uncensoreddns-doh", "joindns4-doh"]
 type = "fastest"
 
 # ----------------- Merge ------------------
 
-[groups.main]
+[groups.default]
 type   = "fail-rotate"
-resolvers = ["main-resolvers", "fallback"]
+resolvers = ["main-resolvers", "fallback-resolvers"]
 
-[groups.main-updated-ttl]
+[groups.default-updated-ttl]
 type = "ttl-modifier"
-resolvers = ["main"]
+resolvers = ["default"]
 ttl-min = 300
 ttl-max = 86400
 ttl-select = "average"
-#
+
+
+[routers.main-router]
+routes = [
+  { name = '(^|\.)casa\.ayoubedd\.me\.$', resolver="homelab" },
+ { resolver="default-updated-ttl" }, # default route
+]
+
 [groups.main-cached]
 type = "cache"
-resolvers = ["main-updated-ttl"]
+resolvers = ["main-router"]
 backend = {type = "memory", size = 10000}
 cache-answer-shuffle = "round-robin"
+cache-flush-query = "fflush."
 
 [groups.main-prefetch]
 type = "prefetch"
 resolvers = ["main-cached"]
 prefetch-window = "15m"
 prefetch-threshold = 3
-prefetch-cache-size = 150
+prefetch-cache-size = 256
 prefetch-max-items = 50
 
-
-[routers.main-router]
-routes = [
-  { resolver="main-prefetch" }, # default route
-]
 
 [listeners.local-udp-ipv4]
 address = "127.0.0.1:53"
 protocol = "udp"
-resolver = "main-router"
+resolver = "main-prefetch"
 
 [listeners.local-tcp-ipv4]
 address = "127.0.0.1:53"
 protocol = "tcp"
-resolver = "main-router"
+resolver = "main-prefetch"
 
 [listeners.local-udp-ipv6]
 address = "[::1]:53"
 protocol = "udp"
-resolver = "main-router"
+resolver = "main-prefetch"
 
 [listeners.local-tcp-ipv6]
 address = "[::1]:53"
 protocol = "tcp"
-resolver = "main-router"
+resolver = "main-prefetch"
