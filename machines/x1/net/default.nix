@@ -1,5 +1,9 @@
 { config, ... }:
 {
+  imports = [
+    ./routedns
+  ];
+
   networking.wireguard.enable = true;
 
   networking.wg-quick.interfaces = {
@@ -23,7 +27,7 @@
       ];
     };
 
-    homelab-all = {
+    all = {
       autostart = false;
       type = "wireguard";
       address = [ "10.100.0.3/32" ];

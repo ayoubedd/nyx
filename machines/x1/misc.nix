@@ -7,7 +7,7 @@
       useTextGreeter = true;
       settings = {
         default_session = {
-          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --asterisks -g 'FREE AS IN FREEDOM'";
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --asterisks --kb-power 4 -g 'FREE AS IN FREEDOM'";
           user = "greeter";
         };
       };
@@ -22,18 +22,6 @@
     mask = "\\xff\\xff\\xff\\xff\\x00\\x00\\x00\\x00\\xff\\xff\\xff";
     magicOrExtension = "\\x7fELF....AI\\x02";
   };
-
-  # udev
-  services.udev.extraRules = ''
-    # HDD
-    ACTION=="add|change", KERNEL=="sd[a-z]*", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
-
-    # SSD
-    ACTION=="add|change", KERNEL=="sd[a-z]*|mmcblk[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
-
-    # NVMe SSD
-    ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="none"
-  '';
 
   services.pipewire.wireplumber.extraConfig = {
     "1000-all" = {

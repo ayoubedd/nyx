@@ -4,7 +4,7 @@
     devmon.enable = true;
     gnome.gnome-keyring.enable = true;
     libinput.enable = true;
-    earlyoom.enable = true; # Trigger oom early before systems becomes unusable
+    earlyoom.enable = true;
     dbus.packages = [
       pkgs.gnome-keyring
       pkgs.gcr

@@ -11,7 +11,6 @@
     ./sysctl.nix
     ./fs.nix
     ./documentation.nix
-    # ./quietboot.nix
     ./local.nix
   ];
 

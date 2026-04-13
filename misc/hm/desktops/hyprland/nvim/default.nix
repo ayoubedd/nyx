@@ -54,6 +54,7 @@
           p.vue
           p.xml
           p.yaml
+          p.nix
         ])).dependencies;
     }
   }/parser";
@@ -90,10 +91,11 @@
       lua-language-server
       tailwindcss-language-server
       yaml-language-server
+      deno
 
       # formatters
       nixfmt
-      # nodePackages.prettier
+      prettier
       prettierd
       black
       stylua

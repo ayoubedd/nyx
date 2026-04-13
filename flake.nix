@@ -112,7 +112,6 @@
               system = "x86_64-linux";
               overlays = with inputs; [
                 devenv.overlays.default
-                # vicinae.overlays.default
                 (prev: final: { vicinae = inputs.vicinae.packages.x86_64-linux.default; })
               ];
             };

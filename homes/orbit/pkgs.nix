@@ -16,9 +16,6 @@
     f2
     cfspeedtest
 
-    # docker-buildx
-    lazydocker
-
     # GUI
     qbittorrent
 
@@ -32,7 +29,6 @@
     lsof
     traceroute
 
-    # httplz
     tokei
     whois
 
@@ -69,5 +65,7 @@
     powertop
     just
     direnv
+    ncdu
+    duf
   ];
 }

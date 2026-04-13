@@ -1,10 +1,11 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 {
   services.pcscd.enable = true;
 
   environment.systemPackages = with pkgs; [
     yubioath-flutter
     sbctl # secure boot
+    hello
   ];
 
   services.udev.packages = with pkgs; [ yubikey-personalization ];

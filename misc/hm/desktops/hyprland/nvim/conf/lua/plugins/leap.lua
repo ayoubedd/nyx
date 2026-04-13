@@ -3,7 +3,4 @@ return {
 	dependencies = {
 		"tpope/vim-repeat",
 	},
-	config = function()
-		-- require("leap").create_default_mappings() -- to be changed
-	end,
 }

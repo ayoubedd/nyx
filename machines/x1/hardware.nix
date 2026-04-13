@@ -13,9 +13,9 @@
   ];
 
   boot.initrd.availableKernelModules = [
+    "nvme"
     "xhci_pci"
     "thunderbolt"
-    "nvme"
     "usb_storage"
     "sd_mod"
   ];
@@ -38,7 +38,11 @@
   ];
 
   boot.loader = {
-    systemd-boot.enable = lib.mkForce false;
+    systemd-boot = {
+      enable = lib.mkForce false;
+      configurationLimit = 20;
+      editor = false;
+    };
     efi.canTouchEfiVariables = true;
   };
 
@@ -50,9 +54,6 @@
   boot.kernel.sysctl = {
     "fs.xfs.xfssyncd_centisecs" = 10000; # increase writeback interval
   };
-
-
-  swapDevices = [ ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 }

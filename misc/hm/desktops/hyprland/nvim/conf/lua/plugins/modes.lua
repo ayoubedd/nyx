@@ -1,6 +1,6 @@
 return {
 	"mvllow/modes.nvim",
-	tag = "v0.2.1",
+	tag = "v0.3.0",
 	-- enabled = false,
 	config = function()
 		require("modes").setup({
@@ -27,7 +27,7 @@ return {
 
 			-- Disable modes highlights in specified filetypes
 			-- Please PR commonly ignored filetypes
-			ignore_filetypes = { "NvimTree", "TelescopePrompt", "neo-tree" },
+			filetypes = { "NvimTree", "TelescopePrompt", "neo-tree" },
 		})
 	end,
 }
