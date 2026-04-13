@@ -39,13 +39,6 @@
               ];
               settings = {
                 allowDiscards = true;
-                crypttabExtraOpts = [
-                  "token-timeout=10"
-                  "tpm2-device=auto"
-                  "tpm2-pcrs=0"
-                  "tpm2-measure-pcr=yes"
-                  "x-initrd.attach"
-                ];
               };
               content = {
                 type = "filesystem";
