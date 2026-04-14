@@ -1,8 +1,8 @@
-{ inputs, config, ... }:
+{ config, ... }:
 {
 
   imports = [
-    ../../modules/hm
+    ../../../../modules/hm
 
     ./pkgs.nix
     ./misc.nix
@@ -10,10 +10,8 @@
 
     ./git.nix
 
-    ../../misc/hm/desktops/hyprland
+    ../../../../misc/hm/desktops/hyprland
   ];
-
-  nixpkgs.config.allowUnfree = true;
 
   news.display = "silent";
 
@@ -23,7 +21,7 @@
   programs.home-manager.enable = true;
 
   home.file."${config.home.homeDirectory}/Pictures/Wallpapers" = {
-    source = ../../assets/images/wallpapers;
+    source = ../../../../assets/images/wallpapers;
     recursive = true;
   };
 

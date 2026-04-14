@@ -1,10 +1,10 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   programs.librewolf = {
     enable = true;
 
-    profiles."orbit" = {
-      name = "orbit";
+    profiles.${config.home.username} = {
+      name = config.home.username;
       isDefault = true;
       id = 0;
 

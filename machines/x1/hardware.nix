@@ -12,6 +12,11 @@
     ../../misc/nixos/hardware/intel.nix
   ];
 
+  boot.kernelParams = [
+    "nowatchdog"
+    "kernel.nmi_watchdog=0"
+  ];
+
   boot.initrd.availableKernelModules = [
     "nvme"
     "xhci_pci"

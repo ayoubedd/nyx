@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  config,
   ...
 }:
 {
@@ -85,7 +86,7 @@
       base0F = "ff7eb6";
     };
 
-    targets.librewolf.profileNames = [ "orbit" ];
+    targets.librewolf.profileNames = [ config.home.username ];
     targets.librewolf.colorTheme.enable = true;
   };
 }

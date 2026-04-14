@@ -28,7 +28,7 @@ let
   snaparea = "${grim} -g \"$(${slurp})\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | ${wl-copy} -t 'image/png'";
   snapfull = "${grim} -g \"$(${slurp} -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | ${wl-copy} -t 'image/png'";
 
-  vicinae = "${pkgs.vicinae}/bin/vicinae";
+  vicinae = "${pkgs.vicinaed}/bin/vicinae";
   librewolf = "${pkgs.librewolf}/bin/librewolf";
   thunar = "${pkgs.thunar}/bin/thunar";
 

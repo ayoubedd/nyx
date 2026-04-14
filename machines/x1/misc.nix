@@ -1,5 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
+  services.devmon.enable = lib.mkForce false;
+
   # Services
   services = {
     greetd = {

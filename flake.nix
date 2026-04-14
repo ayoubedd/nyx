@@ -27,74 +27,72 @@
     url = "github:Mic92/sops-nix";
     inputs.nixpkgs.follows = "nixpkgs";
   };
-  inputs.devenv-root = {
-    url = "file+file:///dev/null";
-    flake = false;
-  };
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware/master";
   inputs.flake-parts.url = "github:hercules-ci/flake-parts";
   inputs.flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
-  inputs.vicinae.url = "github:vicinaehq/vicinae";
-  inputs.devenv.url = "github:cachix/devenv?ref=v2.0.6";
+  inputs.vicinae.url = "github:vicinaehq/vicinae?ref=v0.20.12";
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
 
   nixConfig = {
     extra-substituters = [
       "https://hyprland.cachix.org"
       "https://vicinae.cachix.org"
-      "https://devenv.cachix.org"
       "https://nix-community.cachix.org"
     ];
     extra-trusted-public-keys = [
       "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
-      "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };
 
   outputs =
-    { devenv-root, ... }@inputs:
-    let
-      inherit (inputs) flake-parts nixpkgs home-manager;
-      devenv-root' =
-        let
-          devenvRootFileContent = builtins.readFile devenv-root.outPath;
-        in
-        nixpkgs.lib.mkIf (devenvRootFileContent != "") devenvRootFileContent;
-    in
+    { nixpkgs, flake-parts, ... }@inputs:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = with inputs; [
-        devenv.flakeModule
-        home-manager.flakeModules.home-manager
-      ];
       systems = [ "x86_64-linux" ];
       perSystem =
-        { pkgs, ... }:
+        { pkgs, system, ... }:
+        let
+          pkgs' = import nixpkgs {
+            inherit system;
+            overlays = with inputs; [
+              (final: prev: { vicinae = vicinae.packages.${system}.default; })
+            ];
+          };
+        in
         {
-          formatter = pkgs.treefmt;
-          devenv.shells.default = {
-            devenv.root = devenv-root';
-            imports = [ ./devenv.nix ];
+          _module.args.pkgs = pkgs';
+          formatter = pkgs'.treefmt;
+          devShells.default = pkgs'.mkShell {
+            packages = with pkgs'; [
+              tombi
+              stylua
+              nixfmt
+              just
+              sops
+              age
+              just
+              nixfmt
+              disko
+            ];
           };
         };
 
       flake = {
         nixosConfigurations = {
           x1 = nixpkgs.lib.nixosSystem {
+            specialArgs = { inherit inputs; };
             modules = with inputs; [
               nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
               sops-nix.nixosModules.sops
               disko.nixosModules.disko
               lanzaboote.nixosModules.lanzaboote
+              home-manager.nixosModules.home-manager
+              nur.modules.nixos.default
               ./machines/x1
             ];
-          };
-          kraken = nixpkgs.lib.nixosSystem {
-            specialArgs = { inherit inputs; };
-            modules = [ ./machines/kraken ];
           };
           isos = {
             rescubox = nixpkgs.lib.nixosSystem {
@@ -103,26 +101,6 @@
                 ./misc/nixos/iso/rescubox
               ];
             };
-          };
-        };
-
-        homeConfigurations = {
-          "orbit@x1" = home-manager.lib.homeManagerConfiguration {
-            pkgs = import nixpkgs {
-              system = "x86_64-linux";
-              overlays = with inputs; [
-                devenv.overlays.default
-                (prev: final: { vicinae = inputs.vicinae.packages.x86_64-linux.default; })
-              ];
-            };
-            extraSpecialArgs.host = "x1";
-            modules = with inputs; [
-              vicinae.homeManagerModules.default
-              stylix.homeModules.stylix
-              nur.modules.homeManager.default
-              nix-flatpak.homeManagerModules.nix-flatpak
-              ./homes/orbit
-            ];
           };
         };
       };
