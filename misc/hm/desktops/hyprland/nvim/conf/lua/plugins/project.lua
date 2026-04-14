@@ -13,7 +13,7 @@ return {
 			-- can also delete or rearangne the detection methods.
 			lsp = {
 				enabled = true,
-			-- eg: { "efm", ... }
+				-- eg: { "efm", ... }
 				ignore = {},
 			},
 

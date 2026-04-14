@@ -27,7 +27,7 @@
       ];
     };
 
-    all = {
+    tunnel = {
       autostart = false;
       type = "wireguard";
       address = [ "10.100.0.3/32" ];

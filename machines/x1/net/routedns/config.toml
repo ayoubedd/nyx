@@ -32,7 +32,6 @@ protocol = "doh"
 enable-0rtt = true
 doh = { idle-timeout = 60 }
 
-
 # ----------------- Fallback (Cloudflare and Google) ------------------
 
 # ---------- Cloudflare ----------
@@ -76,13 +75,18 @@ resolvers = ["cloudflare", "google"]
 type = "fastest"
 
 [groups.main-resolvers]
-resolvers = ["libredns-doh", "applied-privacy-doh", "uncensoreddns-doh", "joindns4-doh"]
+resolvers = [
+  "libredns-doh",
+  "applied-privacy-doh",
+  "uncensoreddns-doh",
+  "joindns4-doh"
+]
 type = "fastest"
 
 # ----------------- Merge ------------------
 
 [groups.default]
-type   = "fail-rotate"
+type = "fail-rotate"
 resolvers = ["main-resolvers", "fallback-resolvers"]
 
 [groups.default-updated-ttl]
@@ -92,17 +96,10 @@ ttl-min = 300
 ttl-max = 86400
 ttl-select = "average"
 
-
-[routers.main-router]
-routes = [
-  { name = '(^|\.)casa\.ayoubedd\.me\.$', resolver="homelab" },
- { resolver="default-updated-ttl" }, # default route
-]
-
 [groups.main-cached]
 type = "cache"
 resolvers = ["main-router"]
-backend = {type = "memory", size = 10000}
+backend = { type = "memory", size = 10000 }
 cache-answer-shuffle = "round-robin"
 cache-flush-query = "fflush."
 
@@ -114,6 +111,11 @@ prefetch-threshold = 3
 prefetch-cache-size = 256
 prefetch-max-items = 50
 
+[routers.main-router]
+routes = [
+  { name = '(^|\.)casa\.ayoubedd\.me\.$', resolver = "homelab" },
+  { resolver = "default-updated-ttl" },  # default route
+]
 
 [listeners.local-udp-ipv4]
 address = "127.0.0.1:53"

@@ -14,7 +14,10 @@
     };
 
     wg_privkey = {
-      restartUnits = [ "wg-quick-homelab.service" "wg-quick-homelab-all.service" ];
+      restartUnits = [
+        "wg-quick-homelab.service"
+        "wg-quick-homelab-all.service"
+      ];
     };
 
     luks_passphrase = {
