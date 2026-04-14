@@ -32,6 +32,8 @@ up *targets:
 
 # Garbage collect
 gc:
+  nix-env -u --always
+  sudo rm /nix/var/nix/gcroots/auto/*
   nix-collect-garbage --delete-old
   sudo nix-collect-garbage --delete-old
 
