@@ -28,7 +28,7 @@
   networking.useDHCP = lib.mkDefault true;
 
   home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
+  home-manager.useUserPackages = false;
   home-manager.extraSpecialArgs = {
     inherit inputs;
     host = config.networking.hostName;

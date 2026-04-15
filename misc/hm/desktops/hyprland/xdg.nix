@@ -32,6 +32,8 @@ in
     XDG_VIDEOS_DIR = config.xdg.userDirs.videos;
   };
 
+  xdg.configFile."mimeapps.list".force = true;
+
   xdg = {
     enable = true;
 
