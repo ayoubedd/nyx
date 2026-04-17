@@ -94,6 +94,7 @@
               lanzaboote.nixosModules.lanzaboote
               home-manager.nixosModules.home-manager
               nur.modules.nixos.default
+              ./modules/nixos
               ./machines/x1
             ];
           };

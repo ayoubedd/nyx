@@ -1,6 +1,7 @@
 { pkgs, lib, ... }:
 {
   services.devmon.enable = lib.mkForce false;
+  services.fwupd.enable = true;
 
   # Services
   services = {

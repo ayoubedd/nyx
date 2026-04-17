@@ -12,6 +12,8 @@
     ../../misc/nixos/hardware/intel.nix
   ];
 
+  hardware.bluetooth.powerOnBoot = false;
+
   boot.kernelParams = [
     "nowatchdog"
     "kernel.nmi_watchdog=0"
@@ -23,6 +25,7 @@
     "thunderbolt"
     "usb_storage"
     "sd_mod"
+    "tpm_crb"
   ];
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
@@ -54,6 +57,11 @@
   boot.lanzaboote = {
     enable = true;
     pkiBundle = "/var/lib/sbctl";
+
+    autoGenerateKeys.enable = true;
+    autoEnrollKeys = {
+      enable = true;
+    };
   };
 
   boot.kernel.sysctl = {

@@ -1,0 +1,4 @@
+{ ... }:
+{
+  imports = [ ./ensure-pcr.nix ];
+}

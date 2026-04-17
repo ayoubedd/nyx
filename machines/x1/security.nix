@@ -1,16 +1,28 @@
 { pkgs, ... }:
 {
   services.pcscd.enable = true;
+  services.fprintd.enable = true;
+
+  security.tpm2 = {
+    enable = true;
+    pkcs11.enable = true;
+  };
+
+  systemIdentity = {
+    enable = true;
+    pcr15 = "704763c32ce8e3bb53283f8dad0bc2f330f5891fdd7282a8a27de09041e2c2a1";
+  };
 
   environment.systemPackages = with pkgs; [
     yubioath-flutter
+    efibootmgr
+    efitools
+    efivar
+    fwupd
     sbctl # secure boot
-    hello
   ];
 
   services.udev.packages = with pkgs; [ yubikey-personalization ];
-
-  services.fprintd.enable = true;
 
   security.pam.yubico = {
     enable = true;

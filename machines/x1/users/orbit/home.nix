@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, stateVersion, ... }:
 {
 
   imports = [
@@ -25,5 +25,5 @@
     recursive = true;
   };
 
-  home.stateVersion = "26.05";
+  home.stateVersion = stateVersion;
 }

@@ -168,7 +168,6 @@
         "extensions.update.url" = false;
         "extensions.webextensions.restrictedDomains" = "";
         "general.useragent.locale" = "en-US";
-        "geo.provider.use_geoclue" = false;
         "gfx.canvas.accelerated.cache-items" = 8192;
         "gfx.canvas.accelerated.cache-size" = 512;
         "gfx.content.skia-font-cache-size" = 20;

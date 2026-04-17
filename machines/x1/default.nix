@@ -32,6 +32,7 @@
   home-manager.extraSpecialArgs = {
     inherit inputs;
     host = config.networking.hostName;
+    stateVersion = config.system.stateVersion;
   };
 
   system.stateVersion = "26.05";

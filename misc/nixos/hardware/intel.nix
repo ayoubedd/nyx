@@ -30,10 +30,6 @@
 
     # 1. Prevent the kernel from loading the module
     blacklistedKernelModules = [ "i915" ];
-
-    initrd.services.udev.rules = ''
-      blacklist i915
-    '';
   };
 
   services.xserver.videoDrivers = [ "modesetting" ];
