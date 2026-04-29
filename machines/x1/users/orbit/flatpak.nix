@@ -17,6 +17,7 @@
       "org.inkscape.Inkscape"
       "org.gimp.GIMP"
       "io.github.nokse22.trivia-quiz"
+      "com.obsproject.Studio"
     ];
 
     update.auto.enable = false;

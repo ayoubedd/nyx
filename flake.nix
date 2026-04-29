@@ -34,9 +34,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # impermanence = {
+    #   url = "github:nix-community/impermanence";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    #   inputs.home-manager.follows = "home-manager";
+    # };
+
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    vicinae.url = "github:vicinaehq/vicinae?ref=v0.20.12";
+    vicinae.url = "github:vicinaehq/vicinae";
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
 
@@ -53,6 +59,14 @@
 
   outputs =
     { nixpkgs, flake-parts, ... }@inputs:
+    let
+      overlays = with inputs; [
+        vicinae.overlays.default
+      ];
+      overlaysModule = [
+        { nixpkgs.overlays = overlays; }
+      ];
+    in
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" ];
       perSystem =
@@ -60,9 +74,7 @@
         let
           pkgs' = import nixpkgs {
             inherit system;
-            overlays = with inputs; [
-              vicinae.overlays.default
-            ];
+            inherit overlays;
           };
         in
         {
@@ -87,16 +99,19 @@
         nixosConfigurations = {
           x1 = nixpkgs.lib.nixosSystem {
             specialArgs = { inherit inputs; };
-            modules = with inputs; [
-              nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
-              sops-nix.nixosModules.sops
-              disko.nixosModules.disko
-              lanzaboote.nixosModules.lanzaboote
-              home-manager.nixosModules.home-manager
-              nur.modules.nixos.default
-              ./modules/nixos
-              ./machines/x1
-            ];
+            modules =
+              with inputs;
+              [
+                nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
+                sops-nix.nixosModules.sops
+                disko.nixosModules.disko
+                lanzaboote.nixosModules.lanzaboote
+                home-manager.nixosModules.home-manager
+                nur.modules.nixos.default
+                ./modules/nixos
+                ./machines/x1
+              ]
+              ++ overlaysModule;
           };
           isos = {
             rescubox = nixpkgs.lib.nixosSystem {

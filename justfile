@@ -52,7 +52,7 @@ nix-os-install machine:
 # Format disk and install nixos on target machine
 install-nix machine:
   @just prep-disk '{{ machine }}'
-  @just os-install '{{ machine }}'
+  @just nix-os-install '{{ machine }}'
 
 
 build-iso name:
@@ -63,6 +63,9 @@ run-iso:
     -object rng-random,id=rng0,filename=/dev/urandom -device virtio-rng-pci,rng=rng0 \
     -device virtio-vga-gl -display sdl,gl=on \
     -cdrom result/iso/*.iso
+
+sh:
+  nix develop --command $SHELL
 
 # Create hashed password
 mkpasswd:

@@ -55,6 +55,7 @@
           p.xml
           p.yaml
           p.nix
+          p.svelte
         ])).dependencies;
     }
   }/parser";
