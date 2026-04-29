@@ -62,11 +62,11 @@ protocol = "dot"
 
 [groups.google]
 resolvers = ["google-dot-1", "google-dot-2"]
-type = "fail-rotate"
+type = "fail-back"
 
 [groups.cloudflare]
 resolvers = ["cloudflare-dot-1", "cloudflare-dot-2", "cloudflare-doh"]
-type = "fail-rotate"
+type = "fail-back"
 
 # ------------ Resolver Grouping ------------
 
@@ -85,54 +85,86 @@ type = "fastest"
 
 # ----------------- Merge ------------------
 
-[groups.default]
-type = "fail-rotate"
+[groups.default-resolvers]
+type = "fail-back"
 resolvers = ["main-resolvers", "fallback-resolvers"]
+reset-after = 60
+
+[groups.default-collapsed]
+type = "response-collapse"
+resolvers = ["default-resolvers"]
+
+[groups.default-minimized]
+type = "response-minimize"
+resolvers = ["default-collapsed"]
 
 [groups.default-updated-ttl]
 type = "ttl-modifier"
-resolvers = ["default"]
+resolvers = ["default-minimized"]
 ttl-min = 300
 ttl-max = 86400
 ttl-select = "average"
 
-[groups.main-cached]
+[groups.response-blocklist]
+type = "response-blocklist-ip"
+resolvers = ["default-updated-ttl"]
+blocklist-refresh = 86400
+blocklist-source = [
+  { source = "https://github.com/cbuijs/accomplist/raw/refs/heads/main/spamhaus/plain.black.ipcidr.list" },
+  { source = "https://github.com/cbuijs/accomplist/raw/refs/heads/main/malicious-ip/plain.black.ipcidr.list" },
+]
+
+[groups.query-blocklist]
+type = "blocklist-v2"
+resolvers = ["response-blocklist"]
+allow-failure = true
+blocklist-refresh = 86400
+blocklist-source = [
+  { format = "domain", source = "https://github.com/cbuijs/accomplist/raw/refs/heads/main/typosquat/routedns.blocklist.top-n.domain.list" },
+  { format = "domain", source = "https://github.com/cbuijs/accomplist/raw/refs/heads/main/anti-track/routedns.blocklist.top-n.domain.list" },
+  { format = "domain", source = "https://raw.githubusercontent.com/cbuijs/accomplist/refs/heads/main/malicious-dom/routedns.blocklist.top-n.domain.list" },
+  { format = "domain", source = "https://github.com/cbuijs/accomplist/raw/refs/heads/main/google/routedns.blocklist.top-n.domain.list" },
+  { format = "domain", source = "https://github.com/cbuijs/accomplist/raw/refs/heads/main/easylist/routedns.blocklist.top-n.domain.list" },
+  # { format = "domain", source = "https://raw.githubusercontent.com/cbuijs/accomplist/refs/heads/main/malicious-ip/routedns.blocklist.top-n.domain.list" },
+]
+
+[groups.cache]
 type = "cache"
-resolvers = ["main-router"]
+resolvers = ["router"]
 backend = { type = "memory", size = 10000 }
 cache-answer-shuffle = "round-robin"
 cache-flush-query = "fflush."
 
-[groups.main-prefetch]
+[groups.prefetch]
 type = "prefetch"
-resolvers = ["main-cached"]
+resolvers = ["cache"]
 prefetch-window = "15m"
 prefetch-threshold = 3
-prefetch-cache-size = 256
-prefetch-max-items = 50
+# prefetch-cache-size = 1024
+prefetch-max-items = 1024
 
-[routers.main-router]
+[routers.router]
 routes = [
   { name = '(^|\.)casa\.ayoubedd\.me\.$', resolver = "homelab" },
-  { resolver = "default-updated-ttl" },  # default route
+  { resolver = "query-blocklist" },  # default route
 ]
 
 [listeners.local-udp-ipv4]
 address = "127.0.0.1:53"
 protocol = "udp"
-resolver = "main-prefetch"
+resolver = "prefetch"
 
 [listeners.local-tcp-ipv4]
 address = "127.0.0.1:53"
 protocol = "tcp"
-resolver = "main-prefetch"
+resolver = "prefetch"
 
 [listeners.local-udp-ipv6]
 address = "[::1]:53"
 protocol = "udp"
-resolver = "main-prefetch"
+resolver = "prefetch"
 
 [listeners.local-tcp-ipv6]
 address = "[::1]:53"
 protocol = "tcp"
-resolver = "main-prefetch"
+resolver = "prefetch"
