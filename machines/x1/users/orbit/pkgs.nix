@@ -1,38 +1,31 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
-    # Nix stuff
-    nix-index
-    nix-tree
-    comma
-    rclone
-
-    gparted
-    exfatprogs
-
-    binsider
-    nvtopPackages.intel
-
-    f2
-    cfspeedtest
-
     # GUI
     qbittorrent
-
-    bandwhich
-    bluetui
-
-    ripdrag
     pavucontrol
     seahorse
+    gparted
+    exfatprogs # needed for exfat/fat support within gparted
 
+    # Misc
+    bandwhich
+    snitch
     lsof
     traceroute
-
-    tokei
+    f2
     whois
-
-    # CMD
+    ncdu
+    duf
+    s-tui
+    tokei
+    binsider
+    rclone
+    cfspeedtest
+    nvtopPackages.intel
+    comma
+    nix-index
+    nix-tree
     file
     killall
     btop
@@ -54,7 +47,6 @@
     delta
     lazygit
     exiftool
-    atool
     nettools
     nftables
     sof-firmware
@@ -64,8 +56,5 @@
     intel-gpu-tools
     powertop
     just
-    direnv
-    ncdu
-    duf
   ];
 }

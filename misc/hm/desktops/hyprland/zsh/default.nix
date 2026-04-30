@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
   home.packages = with pkgs; [
+    eza
     curl
     git
     gnutar
@@ -10,11 +11,7 @@
     bzip2
     zoxide
     macchina
-
     atuin
-
-    # ueberzugpp
-
     poppler
     fd
     ripgrep
@@ -22,7 +19,8 @@
     imagemagick
     fzf
     jq
-    zoxide
+    direnv
+    atool
   ];
 
   programs.zsh.enable = true;
