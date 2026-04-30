@@ -125,7 +125,11 @@ blocklist-source = [
   { format = "domain", source = "https://raw.githubusercontent.com/cbuijs/accomplist/refs/heads/main/malicious-dom/routedns.blocklist.top-n.domain.list" },
   { format = "domain", source = "https://github.com/cbuijs/accomplist/raw/refs/heads/main/google/routedns.blocklist.top-n.domain.list" },
   { format = "domain", source = "https://github.com/cbuijs/accomplist/raw/refs/heads/main/easylist/routedns.blocklist.top-n.domain.list" },
-  # { format = "domain", source = "https://raw.githubusercontent.com/cbuijs/accomplist/refs/heads/main/malicious-ip/routedns.blocklist.top-n.domain.list" },
+]
+allowlist-format = "domain"
+allowlist = [
+  '.vercel.app.',
+  '.netlify.app.',
 ]
 
 [groups.cache]
