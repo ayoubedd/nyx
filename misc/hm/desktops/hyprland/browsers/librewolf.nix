@@ -13,26 +13,50 @@
       containers = {
         Personal = {
           color = "blue";
-          icon = "fruit";
+          icon = "fingerprint";
           id = 1;
         };
 
         Work = {
           color = "orange";
-          icon = "briefcase";
+          icon = "fingerprint";
           id = 2;
         };
 
-        Finance = {
-          color = "green";
-          icon = "dollar";
+        "NS0" = {
+          color = "red";
+          icon = "fingerprint";
           id = 3;
         };
 
-        Shopping = {
-          color = "blue";
-          icon = "cart";
+        "NS1" = {
+          color = "red";
+          icon = "fingerprint";
           id = 4;
+        };
+
+        "NS2" = {
+          color = "red";
+          icon = "fingerprint";
+          id = 5;
+        };
+
+        "NS3" = {
+          color = "red";
+          icon = "fingerprint";
+          id = 6;
+        };
+
+        "NS4" = {
+          color = "red";
+          icon = "fingerprint";
+          id = 7;
+        };
+
+        "NS5" = {
+          color = "red";
+          icon = "fingerprint";
+          id = 8;
         };
       };
 
@@ -61,6 +85,8 @@
         "browser.bookmarks.showmobilebookmarks" = false;
         "browser.cache.disk.enable" = true;
         "browser.compactmode.show" = true;
+        "sidebar.verticalTabs" = true;
+        "sidebar.verticalTabs.dragToPinPromo.dismissed" = true;
         "browser.contentanalysis.default_result" = 0;
         "browser.contentanalysis.enabled" = false;
         "browser.contentblocking.category" = "strict";
