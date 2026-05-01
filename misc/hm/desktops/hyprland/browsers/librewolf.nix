@@ -45,6 +45,7 @@
           sponsorblock
           clearurls
           multi-account-containers
+          canvasblocker
         ];
       };
 
@@ -217,9 +218,10 @@
         "permissions.default.geo" = 2;
         "permissions.manager.defaultsUrl" = "";
         "privacy.antitracking.isolateContentScriptResources" = true;
-        "privacy.clearOnShutdown_v2.cache" = false;
-        "privacy.clearOnShutdown_v2.cookiesAndStorage" = false;
+        "privacy.clearOnShutdown_v2.cache" = true;
+        "privacy.clearOnShutdown_v2.cookiesAndStorage" = true;
         "privacy.clearOnShutdown_v2.formdata" = true;
+        "privacy.clearOnShutdown_v2.siteSettings" = true;
         "privacy.globalprivacycontrol.enable" = true;
         "privacy.globalprivacycontrol.enabled" = true;
         "privacy.globalprivacycontrol.functionality.enabled" = true;
@@ -446,13 +448,6 @@
         Snippets = false;
         Locked = true;
       };
-      # DNSOverHTTPS = {
-      #   Enabled = true;
-      #   ProviderURL = "https://cloudflare-dns.com/dns-query";
-      #   Locked = true;
-      #   ExcludedDomains = [ "casa.ayoubedd.me" ];
-      #   Fallback = true;
-      # };
       Permissions = {
         Notifications = {
           BlockNewRequests = true;
@@ -461,6 +456,17 @@
       };
       ShowHomeButton = false;
       StartDownloadsInTempDirectory = true;
+      Cookies = {
+        Allow = [
+          "https://github.com"
+          "https://gitlab.com"
+          "https://google.com"
+          "https://youtube.com"
+          "https://discord.com"
+          "https://netflix.com"
+          "https://whatsapp.com"
+        ];
+      };
     };
   };
 }
