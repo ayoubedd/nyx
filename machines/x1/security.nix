@@ -16,8 +16,8 @@
   environment.systemPackages = with pkgs; [
     yubioath-flutter
     efibootmgr
-    efitools
-    efivar
+    # efitools
+    # efivar
     fwupd
     sbctl # secure boot
   ];

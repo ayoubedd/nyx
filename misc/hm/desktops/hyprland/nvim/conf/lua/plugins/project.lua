@@ -57,7 +57,8 @@ return {
 
 			-- Path where project.nvim will store the project history for use in
 			-- telescope
-			datapath = vim.fn.stdpath("data"),
+			-- datapath = vim.fn.stdpath("data"),
+			history = { save_dir = vim.fn.stdpath("data") },
 		})
 	end,
 }

@@ -38,40 +38,14 @@ let
   usbguard-notifies = "${pkgs.usbguard-notifier}/bin/usbguard-notifier";
 in
 {
-  wayland.windowManager.hyprland.enable = true;
-  wayland.windowManager.hyprland.systemd.enable = false;
+  wayland.windowManager.hyprland = {
+    enable = true;
+    package = null;
+    portalPackage = null;
+    systemd.enable = false;
+  };
 
   wayland.windowManager.hyprland.extraConfig = ''
-    bind=ALT, p, submap, snapshot
-
-    submap=snapshot
-    bind=, f, exec, ${snapfull} && ${hyprctl} dispatch submap reset
-    bind=, a, exec, ${snaparea} && ${hyprctl} dispatch submap reset
-    bind=, escape, submap, reset 
-    submap=reset
-
-
-    bind=ALT, r, submap, resize
-
-    submap=resize
-    binde=, $right, resizeactive,15 0
-    binde=, $left, resizeactive,-15 0
-    binde=, $up, resizeactive,0 -15
-    binde=, $down, resizeactive,0 15
-    bind=, escape, submap, reset 
-    submap=reset
-
-    bind=ALT, m, submap, move
-
-    submap=move
-    binde=, $right, moveactive,20 0
-    binde=, $left, moveactive,-20 0
-    binde=, $up, moveactive,0 -20
-    binde=, $down, moveactive,0 20
-    bind=, escape, submap, reset 
-    submap=reset
-
-
     bind=ALT, n, submap, notifications
 
     submap=notifications
@@ -90,22 +64,9 @@ in
     bind=SHIFT, n, exec, ${vicinae} vicinae://extensions/dagimg-dot/player-pilot/next-track && ${hyprctl} dispatch submap reset
     bind=, escape, submap, reset
     submap=reset
-
-    env = QT_AUTO_SCREEN_SCALE_FACTOR,2
-    env = QT_QPA_PLATFORM,wayland;xcb
-    env = QT_WAYLAND_DISABLE_WINDOWDECORATION,1
-    env = QT_QPA_PLATFORMTHEME,qt5ct
-
-    env = GDK_BACKEND,wayland,x11,*
-    env = QT_QPA_PLATFORM,wayland;xcb
-    env = SDL_VIDEODRIVER,wayland
-    env = CLUTTER_BACKEND,wayland
-
-    decoration:blur:enabled = false
-    decoration:shadow:enabled = false
-    misc:vfr = true
   '';
 
+  wayland.windowManager.hyprland.configType = "hyprlang";
   wayland.windowManager.hyprland.settings = {
     "$mod" = "SUPER";
     "$terminal" = alacritty;
@@ -133,70 +94,70 @@ in
     ];
 
     bind = [
-      "$mod, Return, exec, $terminal"
-      "$mod_SHIFT, Return, exec, $terminal --class alacritty-float"
-      "$mod_SHIFT, q, killactive,"
-      "$mod, M, exit,"
-      "$mod_SHIFT, space, togglefloating,"
+      # "$mod, Return, exec, $terminal"
+      # "$mod_SHIFT, Return, exec, $terminal --class alacritty-float"
+      # "$mod_SHIFT, q, killactive,"
+      # "$mod, M, exit,"
+      # "$mod_SHIFT, space, togglefloating,"
 
-      "$mod SHIFT, c, exec, ${hyprpicker} | ${wl-copy}"
+      # "$mod SHIFT, c, exec, ${hyprpicker} | ${wl-copy}"
 
-      "$mod SHIFT, f, exec, $file_manager"
-      "$mod SHIFT, b, exec, $browser"
+      # "$mod SHIFT, f, exec, $file_manager"
+      # "$mod SHIFT, b, exec, $browser"
 
-      "$mod, l, movefocus, r"
-      "$mod, h, movefocus, l"
-      "$mod, k, movefocus, u"
-      "$mod, j, movefocus, d"
+      # "$mod, l, movefocus, r"
+      # "$mod, h, movefocus, l"
+      # "$mod, k, movefocus, u"
+      # "$mod, j, movefocus, d"
 
-      "$mod SHIFT, l, movewindow, r"
-      "$mod SHIFT, h, movewindow, l"
-      "$mod SHIFT, k, movewindow, u"
-      "$mod SHIFT, j, movewindow, d"
+      # "$mod SHIFT, l, movewindow, r"
+      # "$mod SHIFT, h, movewindow, l"
+      # "$mod SHIFT, k, movewindow, u"
+      # "$mod SHIFT, j, movewindow, d"
 
-      "$mod, 1, workspace, 1"
-      "$mod, 2, workspace, 2"
-      "$mod, 3, workspace, 3"
-      "$mod, 4, workspace, 4"
-      "$mod, 5, workspace, 5"
-      "$mod, 6, workspace, 6"
-      "$mod, 7, workspace, 7"
-      "$mod, 8, workspace, 8"
-      "$mod, 9, workspace, 9"
-      "$mod, 0, workspace, 10"
+      # "$mod, 1, workspace, 1"
+      # "$mod, 2, workspace, 2"
+      # "$mod, 3, workspace, 3"
+      # "$mod, 4, workspace, 4"
+      # "$mod, 5, workspace, 5"
+      # "$mod, 6, workspace, 6"
+      # "$mod, 7, workspace, 7"
+      # "$mod, 8, workspace, 8"
+      # "$mod, 9, workspace, 9"
+      # "$mod, 0, workspace, 10"
 
-      "$mod ALT, l, exec, ${loginctl} lock-session"
-      "$mod, d, exec, ${vicinae} toggle"
-      "$mod, p, exec, ${vicinae} vicinae://extensions/vicinae/clipboard/history"
-      "$mod, w, exec, ${vicinae} vicinae://extensions/vicinae/wm/switch-windows"
+      # "$mod ALT, l, exec, ${loginctl} lock-session"
+      # "$mod, d, exec, ${vicinae} toggle"
+      # "$mod, p, exec, ${vicinae} vicinae://extensions/vicinae/clipboard/history"
+      # "$mod, w, exec, ${vicinae} vicinae://extensions/vicinae/wm/switch-windows"
 
-      "$mod SHIFT, 1, movetoworkspace, 1"
-      "$mod SHIFT, 2, movetoworkspace, 2"
-      "$mod SHIFT, 3, movetoworkspace, 3"
-      "$mod SHIFT, 4, movetoworkspace, 4"
-      "$mod SHIFT, 5, movetoworkspace, 5"
-      "$mod SHIFT, 6, movetoworkspace, 6"
-      "$mod SHIFT, 7, movetoworkspace, 7"
-      "$mod SHIFT, 8, movetoworkspace, 8"
-      "$mod SHIFT, 9, movetoworkspace, 9"
-      "$mod SHIFT, 0, movetoworkspace, 10"
+      # "$mod SHIFT, 1, movetoworkspace, 1"
+      # "$mod SHIFT, 2, movetoworkspace, 2"
+      # "$mod SHIFT, 3, movetoworkspace, 3"
+      # "$mod SHIFT, 4, movetoworkspace, 4"
+      # "$mod SHIFT, 5, movetoworkspace, 5"
+      # "$mod SHIFT, 6, movetoworkspace, 6"
+      # "$mod SHIFT, 7, movetoworkspace, 7"
+      # "$mod SHIFT, 8, movetoworkspace, 8"
+      # "$mod SHIFT, 9, movetoworkspace, 9"
+      # "$mod SHIFT, 0, movetoworkspace, 10"
 
-      "$mod, f, fullscreen, 0"
+      # "$mod, f, fullscreen, 0"
 
       "$mod, S, togglespecialworkspace, magic"
       "$mod SHIFT, S, movetoworkspace, special:magic"
 
       # Multimedia
-      ",XF86AudioRaiseVolume, exec, ${volume_up}"
-      ",XF86AudioLowerVolume, exec, ${volume_down}"
-      ",XF86AudioMute, exec, ${volume_mute_toggle}"
-      ",XF86AudioPlay, exec, ${player_play_toggle}"
-      ",XF86AudioNext, exec, ${player_next}"
-      ",XF86AudioPrev, exec, ${player_prev}"
+      # ",XF86AudioRaiseVolume, exec, ${volume_up}"
+      # ",XF86AudioLowerVolume, exec, ${volume_down}"
+      # ",XF86AudioMute, exec, ${volume_mute_toggle}"
+      # ",XF86AudioPlay, exec, ${player_play_toggle}"
+      # ",XF86AudioNext, exec, ${player_next}"
+      # ",XF86AudioPrev, exec, ${player_prev}"
 
       # Brightness controls
-      ",XF86MonBrightnessUp, exec, ${screen_brightness_up}"
-      ",XF86MonBrightnessDown, exec, ${screen_brightness_down}"
+      # ",XF86MonBrightnessUp, exec, ${screen_brightness_up}"
+      # ",XF86MonBrightnessDown, exec, ${screen_brightness_down}"
     ];
 
     general = {
@@ -216,7 +177,7 @@ in
     misc = {
       disable_hyprland_logo = true;
       force_default_wallpaper = 0;
-      vfr = true;
+      # vfr = true;
       font_family = "Cantarell";
       mouse_move_enables_dpms = true;
       key_press_enables_dpms = true;

@@ -14,7 +14,7 @@
     ../../common
 
     # Hyprland config
-    ./hyprland.nix
+    ./hyprland-lua.nix
 
     # Fonts and GTK theming
     ./fonts.nix
@@ -53,5 +53,6 @@
     wofi-emoji
     jq
     wl-clip-persist
+    brightnessctl
   ];
 }

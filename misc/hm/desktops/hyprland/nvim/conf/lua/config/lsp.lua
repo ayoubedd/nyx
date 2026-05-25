@@ -1,4 +1,4 @@
-vim.lsp.config.tsserver_ls = {
+vim.lsp.config.tsgo = {
 	init_options = { hostInfo = "neovim" },
 	-- cmd = { "typescript-language-server", "--stdio" },
 	cmd = { "tsgo", "--lsp", "--stdio" },
@@ -428,14 +428,14 @@ vim.lsp.config.pyright = {
 }
 
 vim.lsp.enable({
-	"tsserver_ls",
+	"tsgo",
 	"css_ls",
 	"lua_ls",
 	"pyright",
-	"eslint",
+	-- "eslint",
 	"rust_analyzer",
 	"clangd",
-	"denols",
+	-- "denols",
 	"emet_ls",
 	"gopls",
 	"nixd",

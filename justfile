@@ -41,6 +41,14 @@ videv:
 viclean:
   rm -rf ~/.config/nvim
 
+hyprdev:
+  rm -rf ~/.config/hypr/hyprland.lua
+  nix repl
+  ln -sf '{{ cwd }}'/misc/hm/desktops/hyprland/hyprland.lua ~/.config/hypr/hyprland.lua
+
+hyprclean:
+  rm -rf ~/.config/hypr/hyprland.lua
+
 # Prepare machine disk for a nix fresh install
 prep-disk machine:
   sudo disko --flake '.#{{ machine }}' --mode destroy,format,mount --root-mountpoint /mnt

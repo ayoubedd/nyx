@@ -1,4 +1,9 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  ...
+}:
 {
   programs.direnv.enable = true;
 
@@ -6,15 +11,15 @@
     enable = true;
     enableDefaultConfig = false;
 
-    matchBlocks = {
+    settings = {
       "*" = {
         compression = true;
         forwardAgent = true;
       };
       "github.com" = {
-        hostname = "ssh.github.com";
+        HostName = "ssh.github.com";
         port = 443;
-        user = "git";
+        User = "git";
       };
     };
   };
@@ -36,7 +41,7 @@
     };
   };
 
-  services.blueman-applet.enable = true;
+  # services.blueman-applet.enable = true;
 
   home.file.".config/atuin/config.toml" = {
     enable = true;

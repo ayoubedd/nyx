@@ -42,17 +42,20 @@
 
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    vicinae.url = "github:vicinaehq/vicinae";
+    vicinae = {
+      url = "github:vicinaehq/vicinae";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
 
   nixConfig = {
     extra-substituters = [
-      "https://vicinae.cachix.org"
+      # "https://vicinae.cachix.org"
       "https://nix-community.cachix.org"
     ];
     extra-trusted-public-keys = [
-      "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
+      # "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };
@@ -61,7 +64,7 @@
     { nixpkgs, flake-parts, ... }@inputs:
     let
       overlays = with inputs; [
-        vicinae.overlays.default
+        # vicinae.overlays.default
       ];
       overlaysModule = [
         { nixpkgs.overlays = overlays; }

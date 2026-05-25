@@ -8,57 +8,57 @@
       isDefault = true;
       id = 0;
 
-      containersForce = true;
-
-      containers = {
-        Personal = {
-          color = "blue";
-          icon = "fingerprint";
-          id = 1;
-        };
-
-        Work = {
-          color = "orange";
-          icon = "fingerprint";
-          id = 2;
-        };
-
-        "NS0" = {
-          color = "red";
-          icon = "fingerprint";
-          id = 3;
-        };
-
-        "NS1" = {
-          color = "red";
-          icon = "fingerprint";
-          id = 4;
-        };
-
-        "NS2" = {
-          color = "red";
-          icon = "fingerprint";
-          id = 5;
-        };
-
-        "NS3" = {
-          color = "red";
-          icon = "fingerprint";
-          id = 6;
-        };
-
-        "NS4" = {
-          color = "red";
-          icon = "fingerprint";
-          id = 7;
-        };
-
-        "NS5" = {
-          color = "red";
-          icon = "fingerprint";
-          id = 8;
-        };
-      };
+      # containersForce = true;
+      #
+      # containers = {
+      #   Personal = {
+      #     color = "blue";
+      #     icon = "fingerprint";
+      #     id = 1;
+      #   };
+      #
+      #   Work = {
+      #     color = "orange";
+      #     icon = "fingerprint";
+      #     id = 2;
+      #   };
+      #
+      #   "NS0" = {
+      #     color = "red";
+      #     icon = "fingerprint";
+      #     id = 3;
+      #   };
+      #
+      #   "NS1" = {
+      #     color = "red";
+      #     icon = "fingerprint";
+      #     id = 4;
+      #   };
+      #
+      #   "NS2" = {
+      #     color = "red";
+      #     icon = "fingerprint";
+      #     id = 5;
+      #   };
+      #
+      #   "NS3" = {
+      #     color = "red";
+      #     icon = "fingerprint";
+      #     id = 6;
+      #   };
+      #
+      #   "NS4" = {
+      #     color = "red";
+      #     icon = "fingerprint";
+      #     id = 7;
+      #   };
+      #
+      #   "NS5" = {
+      #     color = "red";
+      #     icon = "fingerprint";
+      #     id = 8;
+      #   };
+      # };
 
       extensions = {
         force = true;
@@ -240,10 +240,10 @@
         "permissions.default.geo" = 2;
         "permissions.manager.defaultsUrl" = "";
         "privacy.antitracking.isolateContentScriptResources" = true;
-        "privacy.clearOnShutdown_v2.cache" = true;
-        "privacy.clearOnShutdown_v2.cookiesAndStorage" = true;
-        "privacy.clearOnShutdown_v2.formdata" = true;
-        "privacy.clearOnShutdown_v2.siteSettings" = true;
+        "privacy.clearOnShutdown_v2.cache" = false;
+        "privacy.clearOnShutdown_v2.cookiesAndStorage" = false;
+        "privacy.clearOnShutdown_v2.formdata" = false;
+        "privacy.clearOnShutdown_v2.siteSettings" = false;
         "privacy.globalprivacycontrol.enable" = true;
         "privacy.globalprivacycontrol.enabled" = true;
         "privacy.globalprivacycontrol.functionality.enabled" = true;
@@ -299,6 +299,8 @@
         "toolkit.telemetry.unified" = false;
         "toolkit.telemetry.updatePing.enabled" = false;
         "view_source.wrap_long_lines" = true;
+        "librewolf.webgl.prompt" = true;
+        "librewolf.webgl.prompt.hide" = true;
       };
 
       search.force = true;
@@ -440,6 +442,7 @@
       DisableFeedbackCommands = true;
       DisableFirefoxAccounts = true;
       DisableFirefoxStudies = true;
+      # DisableRemoteImprovements = true;
       DisableSetDesktopBackground = true;
       DisableFormHistory = true;
       DisplayBookmarksToolbar = false;
@@ -447,6 +450,7 @@
       DisablePocket = true;
       DisableTelemetry = true;
       DontCheckDefaultBrowser = true;
+      ManualAppUpdateOnly = true;
       ExtensionUpdate = false;
       EnableTrackingProtection = {
         Value = true;
@@ -455,10 +459,11 @@
         Locked = true;
       };
       NetworkPrediction = true;
-      NoDefaultBookmarks = true;
+      # NoDefaultBookmarks = true;
       OfferToSaveLogins = false;
       OfferToSaveLoginsDefault = false;
       OverrideFirstRunPage = "about:blank";
+      OverridePostUpdatePage = "about:blank";
       PasswordManagerEnabled = false;
       PostQuantumKeyAgreementEnabled = true;
       TranslateEnabled = false;
