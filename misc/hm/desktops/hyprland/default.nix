@@ -14,7 +14,7 @@
     ../../common
 
     # Hyprland config
-    ./hyprland-lua.nix
+    ./hyprland.nix
 
     # Fonts and GTK theming
     ./fonts.nix
