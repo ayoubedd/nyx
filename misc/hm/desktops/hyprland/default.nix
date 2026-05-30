@@ -54,5 +54,6 @@
     jq
     wl-clip-persist
     brightnessctl
+    pulseaudio
   ];
 }

@@ -74,12 +74,6 @@ hl.config({
 		font_family = "Cantarell",
 		mouse_move_enables_dpms = true,
 		key_press_enables_dpms = true,
-		vrr = 1,
-	},
-
-	render = {
-		direct_scanout = 1,
-		new_render_scheduling = true,
 	},
 
 	ecosystem = {
@@ -113,6 +107,7 @@ hl.bind(mod .. " + ALT + s", hl.dsp.exec_cmd("vicinae deeplink vicinae://launch/
 hl.bind(mod .. " + d", hl.dsp.exec_cmd("vicinae toggle")) -- needs a fix
 hl.bind(mod .. " + p", hl.dsp.exec_cmd("vicinae deeplink vicinae://launch/clipboard/history"))
 hl.bind(mod .. " + w", hl.dsp.exec_cmd("vicinae deeplink vicinae://launch/wm/switch-windows"))
+hl.bind(mod .. " + e", hl.dsp.exec_cmd("vicinae deeplink vicinae://launch/core/search-emojis"))
 
 for i = 1, 10 do
 	local key = i % 10 -- 10 maps to key 0
@@ -181,8 +176,12 @@ hl.bind(
 	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
 	{ locked = true, repeating = true }
 )
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set +5%"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -s -e4 -n2 set +5%"), { locked = true, repeating = true })
+hl.bind(
+	"XF86MonBrightnessDown",
+	hl.dsp.exec_cmd("brightnessctl -s -e4 -n2 set 5%-"),
+	{ locked = true, repeating = true }
+)
 
 -- Requires playerctl
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
@@ -202,6 +201,8 @@ hl.monitor({
 	mode = "preferred",
 	position = "auto",
 	scale = 2,
+	bitdepth = 8,
+	vrr = 2,
 })
 
 hl.gesture({
@@ -285,3 +286,32 @@ hl.window_rule({
 	match = { class = "mpv" },
 	idle_inhibit = "focus",
 })
+
+-- HDR support
+
+-- hl.monitor({
+-- 	output = "eDP-1",
+-- 	mode = "preferred",
+-- 	position = "auto",
+-- 	scale = 2,
+-- 	bitdepth = 10,
+-- 	vrr = 2,
+-- 	supports_hdr = 1,
+-- 	cm = "hdredid",
+-- 	sdr_min_luminance = 0,
+-- 	sdr_max_luminance = 80,
+-- 	sdrbrightness = 4,
+-- 	sdrsaturation = 1,
+-- })
+--
+-- hl.config({
+-- 	render = {
+-- 		new_render_scheduling = true,
+-- 		cm_auto_hdr = 2,
+-- 		use_fp16 = 2,
+-- 	},
+--
+-- 	quirks = {
+-- 		prefer_hdr = 1,
+-- 	},
+-- })

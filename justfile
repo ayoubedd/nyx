@@ -43,7 +43,7 @@ viclean:
 
 hyprdev:
   rm -rf ~/.config/hypr/hyprland.lua
-  nix repl
+  bash ./scripts/gen_hypr_luarc.sh
   ln -sf '{{ cwd }}'/misc/hm/desktops/hyprland/hyprland.lua ~/.config/hypr/hyprland.lua
 
 hyprclean:
