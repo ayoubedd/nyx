@@ -129,15 +129,39 @@
         email = "me@ayoubedd.me";
         name = "Ayoub Eddaoudi";
       };
-      core.excludesfile = "~/.config/git/ignore";
-      core.editor = "nvim";
-      core.pager = "delta";
+      core = {
+        excludesfile = "~/.config/git/ignore";
+        editor = "nvim";
+        pager = "delta";
+      };
+      push = {
+        autoSetupRemote = true;
+        default = "current";
+        followTags = true;
+      };
+      pull = {
+        rebase = true;
+        default = "current";
+      };
+      advice = {
+        addEmptyPathspec = false;
+        pushNonFastForward = false;
+        statusHints = false;
+      };
+      delta = {
+        navigate = true;
+        dark = true;
+        line-numbers = true;
+        true-color = "always";
+        side-by-side = true;
+        hyperlinks = true;
+      };
+      merge.conflictStyle = "zdiff3";
       branch.sort = "-committerdate";
       color.ui = "auto";
       rerere.enabled = true;
       init.defaultBranch = "master";
       commit.template = "~/.config/git/template";
-      push.autoSetupRemote = true;
       alias = {
         # add
         a = "add";
