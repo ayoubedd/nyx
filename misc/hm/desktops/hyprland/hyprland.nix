@@ -8,6 +8,10 @@ let
   pidof = "${pkgs.procps}/bin/pidof";
 in
 {
+  home.packages = with pkgs; [
+    usbguard-notifier
+  ];
+
   wayland.windowManager.hyprland = {
     enable = true;
     package = null;

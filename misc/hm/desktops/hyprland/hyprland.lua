@@ -80,10 +80,6 @@ hl.config({
 		no_update_news = true,
 		no_donation_nag = false,
 	},
-
-	debug = {
-		vfr = true,
-	},
 })
 
 hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker | wl-copy"), { locked = true, repeating = true })
@@ -220,8 +216,8 @@ hl.on("hyprland.start", function()
 		"systemctl --user is-active xdg-desktop-portal-hyprland.service && systemctl --user stop xdg-desktop-portal-hyprland.service"
 	)
 	hl.exec_cmd("systemctl --user restart xdg-desktop-portal.service")
-	hl.exec_cmd("sleep 3 && pactl set-sink-mute @DEFAULT_SINK@ 1")
-	hl.exec_cmd("sleep 5 && usbguard-notifies")
+	hl.exec_cmd("sleep 3 & pactl set-sink-mute @DEFAULT_SINK@ 1")
+	hl.exec_cmd("sleep 3 & usbguard-notifier")
 	hl.exec_cmd(browser)
 	hl.exec_cmd(terminal)
 end)
