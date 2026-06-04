@@ -10,7 +10,6 @@
     p7zip
     bzip2
     zoxide
-    macchina
     atuin
     poppler
     fd

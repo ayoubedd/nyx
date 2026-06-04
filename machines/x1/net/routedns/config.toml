@@ -150,6 +150,8 @@ allowlist = [
   "vercel.app.",
   "netlify.app.",
   "animetosho.org.",
+  "withgoogle.com.",
+  "appspot.com."
 ]
 
 [groups.cache]

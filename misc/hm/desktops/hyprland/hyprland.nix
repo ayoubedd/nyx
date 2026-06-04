@@ -85,7 +85,7 @@ in
         hide_cursor = true;
       };
       background = {
-        path = "/home/${config.home.username}/Pictures/Wallpapers/lockscreen/lockscreen.png";
+        path = "/home/${config.home.username}/Pictures/Wallpapers/lockscreen.png";
       };
     };
   };
