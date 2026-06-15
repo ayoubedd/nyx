@@ -12,11 +12,10 @@ for FILE in "$ZDOTDIR/conf.d"/[0-9]*.zsh(Nn); do
   source "$FILE"
 done
 
+plug "reobin/typewritten"
 plug "zsh-users/zsh-autosuggestions"
-plug "agkozak/agkozak-zsh-prompt"
 plug "zsh-users/zsh-completions"
 plug "zsh-users/zsh-syntax-highlighting"
-plug "zsh-users/zsh-history-substring-search"
 plug "arzzen/calc.plugin.zsh"
 plug "jeffreytse/zsh-vi-mode"
 plug "TunaCuma/zsh-vi-man"

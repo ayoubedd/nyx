@@ -1,28 +1,8 @@
-# "agkozak/agkozak-zsh-prompt"
-AGKOZAK_MULTILINE=0
-AGKOZAK_LEFT_PROMPT_ONLY=1
-AGKOZAK_PROMPT_DIRTRIM=2
-AGKOZAK_BLANK_LINES=1
-AGKOZAK_SHOW_STASH=1
-AGKOZAK_SHOW_BG=1
-AGKOZAK_BG_STRING='j'
-AGKOZAK_COLORS_EXIT_STATUS=red
-AGKOZAK_COLORS_USER_HOST=green
-AGKOZAK_COLORS_PATH=blue
-AGKOZAK_COLORS_BRANCH_STATUS=yellow
-AGKOZAK_COLORS_PROMPT_CHAR=white      # Default text color
-AGKOZAK_COLORS_CMD_EXEC_TIME=gray    # Default text color
-AGKOZAK_COLORS_VIRTUALENV=green
-AGKOZAK_COLORS_BG_STRING=magenta
-
-
-# "zsh-users/zsh-history-substring-search"
-HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=transparent,fg=green,bold'
-HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='bg=transparent,fg=red,bold'
-HISTORY_SUBSTRING_SEARCH_FUZZY=1
-HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
-HISTORY_SUBSTRING_SEARCH_PREFIXED=1
-
 # "zsh-users/zsh-autosuggestions"
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
+TYPEWRITTEN_SYMBOL="->"
+TYPEWRITTEN_RELATIVE_PATH="adaptive"
+TYPEWRITTEN_CURSOR="terminal"
+TYPEWRITTEN_PROMPT_LAYOUT="singleline_verbose"
+TYPEWRITTEN_COLORS="user:red;host:#08bdba;host_user_connector:#484848;current_directory:#78a9ff;git_branch:#be95ff;arrow:#7b7c7e;symbol:#3ddbd9;symbol_error:#ee5396;git_status_staged:#25be6a;git_status_modified:#08bdba;git_status_new:#33b1ff;git_status_deleted:#ee5396;git_status_unmerged:#ff7eb6"
