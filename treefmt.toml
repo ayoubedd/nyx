@@ -1,12 +1,21 @@
 [formatter.nixfmt-rfc-style]
 command = "nixfmt"
 includes = ["*.nix"]
+priority = 100
 
 [formatter.lua]
 command = "stylua"
 includes = ["*.lua"]
+priority = 200
 
 [formatter.toml]
 command = "tombi"
 options = ["format"]
 includes = ["*.toml"]
+priority = 300
+
+[formatter.deadnix]
+command = "deadnix"
+options = ["--fail"]
+includes = ["*.nix"]
+priority = 0

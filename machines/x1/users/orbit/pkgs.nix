@@ -28,6 +28,7 @@
     seahorse
     gparted
     exfatprogs # needed for exfat/fat support within gparted
+    zed-editor
 
     # Misc
     bandwhich

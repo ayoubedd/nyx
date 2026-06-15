@@ -10,5 +10,7 @@
     just
     nixfmt
     disko
+    deadnix
+    treefmt
   ];
 }

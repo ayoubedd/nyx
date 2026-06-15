@@ -1,14 +1,20 @@
 return {
 	"lewis6991/hover.nvim",
 	config = function()
-		require("hover").setup({
-			init = function()
-				-- Require providers
-				require("hover.providers.lsp")
-				require("hover.providers.dap")
-				require("hover.providers.man")
-				require("hover.providers.dictionary")
-			end,
+		require("hover").config({
+			providers = {
+				"hover.providers.lsp",
+				"hover.providers.dap",
+				"hover.providers.diagnostic",
+				"hover.providers.man",
+				"hover.providers.dictionary",
+				-- Optional, disabled by default:
+				-- 'hover.providers.gh',
+				-- 'hover.providers.gh_user',
+				-- 'hover.providers.jira',
+				-- 'hover.providers.fold_preview',
+				-- 'hover.providers.highlight',
+			},
 			preview_opts = {
 				border = "single",
 			},
@@ -17,7 +23,7 @@ return {
 			preview_window = false,
 			title = true,
 			mouse_providers = {
-				"LSP",
+				"hover.providers.lsp",
 			},
 			mouse_delay = 1000,
 		})

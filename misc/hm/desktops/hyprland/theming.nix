@@ -36,15 +36,13 @@
 
   stylix = {
     enable = true;
-    # image = ../../../../assets/images/homescreen.png;
+    polarity = "dark";
 
-    targets.hyprpaper.enable = lib.mkForce false;
     targets.wofi.enable = false;
     targets.neovim.enable = false;
     targets.hyprlock.enable = false;
     targets.hyprland.enable = false;
-    targets.ghostty.enable = true;
-    targets.qt.enable = true;
+    targets.kitty.enable = lib.mkForce false;
 
     cursor.name = "volantes_cursors";
     cursor.size = 24;

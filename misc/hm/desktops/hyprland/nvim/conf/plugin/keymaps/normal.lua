@@ -8,11 +8,7 @@ set("n", "<C-h>", "<C-w>h", {}) -- Move to right split
 set("n", "<C-j>", "<C-w>j", {}) -- Move to down split
 set("n", "<C-k>", "<C-w>k", {}) -- Move to upper split
 
-set("n", "<leader>h", "<cmd>nohls<cr>", {
-	desc = "No Highlight",
-}) -- Turn off highlights
-
-set("n", "<leader>e", "<cmd>Neotree toggle<cr>", { desc = "Toggle NvimTree" }) -- Toggle NvimTree
+set("n", "<leader>e", "<cmd>Oil<cr>", { desc = "Open Oil" }) -- Open oil
 set("n", "<Esc>", "<cmd>nohls<cr>", { desc = "No Highlight" }) -- Turn off highlights
 
 set("n", "<left>", '<cmd>echo "Use h to move!!"<cr>', {})
@@ -20,7 +16,6 @@ set("n", "<right>", '<cmd>echo "Use l to move!!"<cr>', {})
 set("n", "<up>", '<cmd>echo "Use k to move!!"<cr>', {})
 set("n", "<down>", '<cmd>echo "Use j to move!!"<cr>', {})
 
-set("n", "<C-s>", "<cmd>w<cr>", { desc = "Save file" }) -- Save
 set("n", "<leader>qq", "<cmd>qa!<cr>", { desc = "Force quit" }) -- Force quite
 
 -- Toggle hlsearch if it's on, otherwise just do "enter"
@@ -41,13 +36,6 @@ set("n", "<M-h>", "<c-w>5>", { desc = "Increase width of split" })
 set("n", "<M-k>", "<C-W>+", { desc = "Increase height of split" })
 set("n", "<M-j>", "<C-W>-", { desc = "Decrease height of split" })
 set("n", "<M-=>", "<C-W>=", { desc = "Equalize split sizes" })
-
--- restore the session for the current directory
-set("n", "<leader>pr", [[<cmd>lua require("persistence").load()<cr>]], { desc = "Restore session" })
-
--- restore the last session
-set("n", "<leader>pl", [[<cmd>lua require("persistence").load({ last = true })<cr>]], { desc = "Restore last session" })
-set("n", "<leader>c", "<cmd>bdelete<cr>", { desc = "Close buffer" })
 
 set("n", "<leader>s", "", { desc = "Search" })
 set("n", "<leader>sf", "<cmd>Telescope find_files<cr>", { desc = "Find files" })

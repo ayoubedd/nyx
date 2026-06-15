@@ -1,7 +1,17 @@
-{ config, stateVersion, ... }:
+{
+  config,
+  stateVersion,
+  inputs,
+  ...
+}:
 {
 
-  imports = [
+  imports = with inputs; [
+    vicinae.homeManagerModules.default
+    stylix.homeModules.stylix
+    nur.modules.homeManager.default
+    nix-flatpak.homeManagerModules.nix-flatpak
+
     ../../../../modules/hm
 
     ./pkgs.nix
@@ -11,6 +21,7 @@
     ./git.nix
 
     ../../../../misc/hm/desktops/hyprland
+
   ];
 
   news.display = "silent";

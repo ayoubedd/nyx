@@ -57,7 +57,7 @@ in
         };
       };
 
-      xdgOpenUsePortal = true;
+      # xdgOpenUsePortal = false;
 
       configPackages = with pkgs; [
         xdg-desktop-portal-hyprland
@@ -70,8 +70,7 @@ in
       enable = true;
       settings = {
         default = [
-          "alacritty.desktop"
-          "ghostty.desktop"
+          "kitty.desktop"
         ];
       };
     };

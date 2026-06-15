@@ -28,8 +28,9 @@
     ./services.nix
 
     ./browsers/librewolf.nix
-    ./terminals/alacritty
-    ./terminals/ghostty.nix
+    # ./terminals/alacritty
+    # ./terminals/ghostty.nix
+    ./terminals/kitty
     ./zsh
     ./mpv.nix
     ./imv.nix

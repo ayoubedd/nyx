@@ -1,9 +1,11 @@
 return {
 	"stevearc/oil.nvim",
-	dependencies = { "nvim-tree/nvim-web-devicons", "folke/snacks.nvim", "antosha417/nvim-lsp-file-operations" },
+	-- Optional dependencies
+	dependencies = { { "nvim-mini/mini.icons", opts = {} } },
+	lazy = false,
+	---@module 'oil'
+	---@type oil.SetupOpts
 	opts = {
-		-- Oil will take over directory buffers (e.g. `vim .` or `:e src/`)
-		-- Set to false if you still want to use netrw.
 		default_file_explorer = true,
 		-- Id is automatically added at the beginning, and name at the end
 		-- See :help oil-columns
@@ -11,7 +13,7 @@ return {
 			"icon",
 			"permissions",
 			"size",
-			-- "mtime",
+			"mtime",
 		},
 		-- Buffer-local options to use for oil buffers
 		buf_options = {
@@ -41,6 +43,8 @@ return {
 		-- Note that the cleanup process only starts when none of the oil buffers are currently displayed
 		cleanup_delay_ms = 2000,
 		lsp_file_methods = {
+			-- Enable or disable LSP file operations
+			enabled = true,
 			-- Time to wait for LSP file operations to complete before skipping
 			timeout_ms = 1000,
 			-- Set to true to autosave buffers that are updated with LSP willRenameFiles
@@ -52,6 +56,8 @@ return {
 		constrain_cursor = "editable",
 		-- Set to true to watch the filesystem for changes and reload oil
 		experimental_watch_for_changes = true,
+		-- Set to true to watch the filesystem for changes and reload oil
+		watch_for_changes = true,
 		-- Keymaps in oil buffer. Can be any value that `vim.keymap.set` accepts OR a table of keymap
 		-- options with a `callback` (e.g. { callback = function() ... end, desc = "", mode = "n" })
 		-- Additionally, if it is a string that matches "actions.<name>",
@@ -67,7 +73,7 @@ return {
 			["<C-p>"] = "actions.preview",
 			["<C-c>"] = "actions.close",
 			["<C-l>"] = "actions.refresh",
-			["-"] = "actions.parent",
+			["gp"] = "actions.parent",
 			["_"] = "actions.open_cwd",
 			["`"] = "actions.cd",
 			["~"] = "actions.tcd",
@@ -80,7 +86,7 @@ return {
 		use_default_keymaps = true,
 		view_options = {
 			-- Show files and directories that start with "."
-			show_hidden = true,
+			show_hidden = false,
 			-- This function defines what is considered a "hidden" file
 			is_hidden_file = function(name, bufnr)
 				return vim.startswith(name, ".")

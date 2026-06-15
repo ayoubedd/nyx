@@ -1,6 +1,6 @@
-{ lib, pkgs, ... }:
+{ pkgs, lib, ... }:
 let
-  alacritty = "${pkgs.alacritty}/bin/alacritty";
+  terminal = lib.getExe pkgs.kitty;
   btop = "${pkgs.btop}/bin/btop";
   vicinae = "${pkgs.vicinae}/bin/vicinae";
   wpctl = "${pkgs.wireplumber}/bin/wpctl";
@@ -107,14 +107,14 @@ in
           "interval" = 5;
           "format" = "   {}%";
           "max-length" = 10;
-          "on-click" = "${alacritty} --class=alacritty-float --command=${btop}";
+          "on-click" = "${terminal} --class=floating-terminal ${btop}";
           "tooltip" = false;
         };
 
         "memory" = {
           "interval" = 30;
           "format" = "   {used:0.1f}G";
-          "on-click" = "${alacritty} --class=alacritty-float --command=${btop}";
+          "on-click" = "${terminal} --class=floating-terminal ${btop}";
           "tooltip" = false;
         };
 
@@ -124,7 +124,7 @@ in
 
         "temperature" = {
           "format" = "  {temperatureC}°C";
-          "on-click" = "${alacritty} --class=alacritty-float --command=${btop}";
+          "on-click" = "${terminal} --class=floating-terminal ${btop}";
           "thermal-zone" = 5;
           "interval" = 5;
           "critical-threshold" = 80;

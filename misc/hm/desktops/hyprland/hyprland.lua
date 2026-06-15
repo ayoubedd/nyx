@@ -1,5 +1,6 @@
 local mod = "SUPER"
-local terminal = "alacritty"
+local terminal = "kitty"
+local terminal_floating = "kitty --class floating-terminal"
 local file_manager = "thunar"
 local browser = "librewolf"
 
@@ -11,6 +12,10 @@ local snapfull =
 	"grim -g \"$(slurp -o)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_full.png | wl-copy -t 'image/png'"
 local snaparea =
 	"grim -g \"$(slurp)\" - | tee ~/Pictures/Screenshots/$(date +%Y%m%d_%Hh%Mm%Ss)_area.png | wl-copy -t 'image/png'"
+
+function exec_cmd(cmd)
+	return hl.dsp.exec_cmd("uwsm app -- " .. cmd)
+end
 
 hl.config({
 	dwindle = {
@@ -82,7 +87,7 @@ hl.config({
 	},
 })
 
-hl.bind(mod .. " + SHIFT + C", hl.dsp.exec_cmd("hyprpicker | wl-copy"), { locked = true, repeating = true })
+hl.bind(mod .. " + SHIFT + C", exec_cmd("hyprpicker | wl-copy"), { locked = true, repeating = true })
 
 hl.bind(mod .. " + " .. left, hl.dsp.focus({ direction = "left" }))
 hl.bind(mod .. " + " .. right, hl.dsp.focus({ direction = "right" }))
@@ -97,13 +102,17 @@ hl.bind(mod .. " + q", hl.dsp.window.close())
 hl.bind(mod .. " + SHIFT + q", hl.dsp.window.kill())
 hl.bind(mod .. " + SHIFT + Space", hl.dsp.window.float())
 hl.bind(mod .. " + f", hl.dsp.window.fullscreen())
-hl.bind(mod .. " + ALT + l", hl.dsp.exec_cmd("vicinae deeplink vicinae://launch/power/lock")) -- needs a fix
-hl.bind(mod .. " + ALT + s", hl.dsp.exec_cmd("vicinae deeplink vicinae://launch/power/suspen")) -- needs a fix
+hl.bind(mod .. " + ALT + l", exec_cmd("vicinae deeplink vicinae://launch/power/lock")) -- needs a fix
+hl.bind(mod .. " + ALT + s", exec_cmd("vicinae deeplink vicinae://launch/power/suspend")) -- needs a fix
 
-hl.bind(mod .. " + d", hl.dsp.exec_cmd("vicinae toggle")) -- needs a fix
-hl.bind(mod .. " + p", hl.dsp.exec_cmd("vicinae deeplink vicinae://launch/clipboard/history"))
-hl.bind(mod .. " + w", hl.dsp.exec_cmd("vicinae deeplink vicinae://launch/wm/switch-windows"))
-hl.bind(mod .. " + e", hl.dsp.exec_cmd("vicinae deeplink vicinae://launch/core/search-emojis"))
+hl.bind(mod .. " + d", exec_cmd("vicinae toggle")) -- needs a fix
+hl.bind(mod .. " + p", exec_cmd("vicinae deeplink vicinae://launch/clipboard/history"))
+hl.bind(mod .. " + w", exec_cmd("vicinae deeplink vicinae://launch/wm/switch-windows"))
+hl.bind(mod .. " + e", exec_cmd("vicinae deeplink vicinae://launch/core/search-emojis"))
+hl.bind(
+	mod .. " + s",
+	exec_cmd("vicinae deeplink vicinae://launch/@rastsislaux/store.vicinae.pulseaudio/outputDevices")
+)
 
 for i = 1, 10 do
 	local key = i % 10 -- 10 maps to key 0
@@ -111,10 +120,10 @@ for i = 1, 10 do
 	hl.bind(mod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
 
-hl.bind(mod .. " + Return", hl.dsp.exec_cmd(terminal))
-hl.bind(mod .. " + SHIFT + Return", hl.dsp.exec_cmd(terminal .. " --class alacritty-float"))
-hl.bind(mod .. " + SHIFT + B", hl.dsp.exec_cmd(browser))
-hl.bind(mod .. " + SHIFT + F", hl.dsp.exec_cmd(file_manager))
+hl.bind(mod .. " + Return", exec_cmd("" .. terminal))
+hl.bind(mod .. " + SHIFT + Return", exec_cmd("" .. terminal_floating))
+hl.bind(mod .. " + SHIFT + B", exec_cmd("" .. browser))
+hl.bind(mod .. " + SHIFT + F", exec_cmd("" .. file_manager))
 
 hl.bind("ALT + R", hl.dsp.submap("resize"))
 hl.bind("ALT + M", hl.dsp.submap("move"))
@@ -141,49 +150,41 @@ end)
 
 hl.define_submap("snapshot", "reset", function()
 	-- Set repeating binds for resizing the active window.
-	hl.bind("f", hl.dsp.exec_cmd(snapfull))
-	hl.bind("a", hl.dsp.exec_cmd(snaparea))
+	hl.bind("f", exec_cmd(snapfull))
+	hl.bind("a", exec_cmd(snaparea))
 end)
 
 hl.define_submap("notifications", "reset", function()
-	hl.bind("c", hl.dsp.exec_cmd("swaync-client -C"))
-	hl.bind("t", hl.dsp.exec_cmd("swaync-client -t -sw"))
-	hl.bind("d", hl.dsp.exec_cmd("swaync-client --toggle-dnd"))
+	hl.bind("c", exec_cmd("swaync-client -C"))
+	hl.bind("t", exec_cmd("swaync-client -t -sw"))
+	hl.bind("d", exec_cmd("swaync-client --toggle-dnd"))
 end)
 
 -- Laptop multimedia keys for volume and LCD brightness
 hl.bind(
 	"XF86AudioRaiseVolume",
-	hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),
+	exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),
 	{ locked = true, repeating = true }
 )
 hl.bind(
 	"XF86AudioLowerVolume",
-	hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
+	exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
 	{ locked = true, repeating = true }
 )
-hl.bind(
-	"XF86AudioMute",
-	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
-	{ locked = true, repeating = true }
-)
+hl.bind("XF86AudioMute", exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true })
 hl.bind(
 	"XF86AudioMicMute",
-	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
+	exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
 	{ locked = true, repeating = true }
 )
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -s -e4 -n2 set +5%"), { locked = true, repeating = true })
-hl.bind(
-	"XF86MonBrightnessDown",
-	hl.dsp.exec_cmd("brightnessctl -s -e4 -n2 set 5%-"),
-	{ locked = true, repeating = true }
-)
+hl.bind("XF86MonBrightnessUp", exec_cmd("brightnessctl -s -e4 -n2 set +5%"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", exec_cmd("brightnessctl -s -e4 -n2 set 5%-"), { locked = true, repeating = true })
 
 -- Requires playerctl
-hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
+hl.bind("XF86AudioNext", exec_cmd("playerctl next"), { locked = true })
+hl.bind("XF86AudioPause", exec_cmd("playerctl play-pause"), { locked = true })
+hl.bind("XF86AudioPlay", exec_cmd("playerctl play-pause"), { locked = true })
+hl.bind("XF86AudioPrev", exec_cmd("playerctl previous"), { locked = true })
 
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
 hl.env("QT_QPA_PLATFORMTHEME", "qt5ct")
@@ -216,10 +217,10 @@ hl.on("hyprland.start", function()
 		"systemctl --user is-active xdg-desktop-portal-hyprland.service && systemctl --user stop xdg-desktop-portal-hyprland.service"
 	)
 	hl.exec_cmd("systemctl --user restart xdg-desktop-portal.service")
-	hl.exec_cmd("sleep 3 & pactl set-sink-mute @DEFAULT_SINK@ 1")
-	hl.exec_cmd("sleep 3 & usbguard-notifier")
-	hl.exec_cmd(browser)
-	hl.exec_cmd(terminal)
+	hl.exec_cmd("sleep 3 & uwsm app -- pactl set-sink-mute @DEFAULT_SINK@ 1")
+	hl.exec_cmd("sleep 3 & uwsm app -- usbguard-notifier")
+	hl.exec_cmd("uwsm app -- " .. browser)
+	hl.exec_cmd("uwsm app -- " .. terminal)
 end)
 
 -- Window Rules
@@ -230,8 +231,8 @@ hl.window_rule({
 })
 
 hl.window_rule({
-	name = "alacritty",
-	match = { class = "alacritty-float" },
+	name = "kitty",
+	match = { class = "floating-terminal" },
 	float = true,
 	center = true,
 	size = "900 600",

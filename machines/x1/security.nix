@@ -97,6 +97,7 @@
         ))
         { return polkit.Result.YES; }
       })
+
     '';
   };
 }

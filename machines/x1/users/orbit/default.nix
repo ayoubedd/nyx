@@ -24,15 +24,6 @@
     shell = zsh;
   };
 
-  home-manager.users.orbit =
-    { ... }:
-    {
-      imports = with inputs; [
-        vicinae.homeManagerModules.default
-        stylix.homeModules.stylix
-        nur.modules.homeManager.default
-        nix-flatpak.homeManagerModules.nix-flatpak
-        ./home.nix
-      ];
-    };
+  home-manager.extraSpecialArgs = { inherit inputs; };
+  home-manager.users.orbit = ./home.nix;
 }

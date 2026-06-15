@@ -52,72 +52,30 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
   };
 
-  nixConfig = {
-    extra-substituters = [
-      # "https://vicinae.cachix.org"
-      "https://nix-community.cachix.org"
-    ];
-    extra-trusted-public-keys = [
-      # "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-    ];
-  };
-
   outputs =
     { nixpkgs, flake-parts, ... }@inputs:
-    let
-      overlays = with inputs; [
-        # vicinae.overlays.default
-      ];
-      overlaysModule = [
-        { nixpkgs.overlays = overlays; }
-      ];
-    in
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "x86_64-linux" ];
       perSystem =
-        { system, ... }:
-        let
-          pkgs' = import nixpkgs {
-            inherit system;
-            inherit overlays;
-          };
-        in
+        { pkgs, ... }:
         {
-          _module.args.pkgs = pkgs';
-          formatter = pkgs'.treefmt;
-          devShells.default = pkgs'.mkShell {
-            packages = with pkgs'; [
-              tombi
-              stylua
-              nixfmt
-              just
-              sops
-              age
-              just
-              nixfmt
-              disko
-            ];
-          };
+          formatter = pkgs.treefmt;
         };
 
       flake = {
         nixosConfigurations = {
           x1 = nixpkgs.lib.nixosSystem {
             specialArgs = { inherit inputs; };
-            modules =
-              with inputs;
-              [
-                nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
-                sops-nix.nixosModules.sops
-                disko.nixosModules.disko
-                lanzaboote.nixosModules.lanzaboote
-                home-manager.nixosModules.home-manager
-                nur.modules.nixos.default
-                ./modules/nixos
-                ./machines/x1
-              ]
-              ++ overlaysModule;
+            modules = with inputs; [
+              nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
+              sops-nix.nixosModules.sops
+              disko.nixosModules.disko
+              lanzaboote.nixosModules.lanzaboote
+              home-manager.nixosModules.home-manager
+              nur.modules.nixos.default
+              ./modules/nixos
+              ./machines/x1
+            ];
           };
           isos = {
             rescubox = nixpkgs.lib.nixosSystem {

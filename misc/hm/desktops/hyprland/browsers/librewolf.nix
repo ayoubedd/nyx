@@ -70,6 +70,7 @@
           clearurls
           multi-account-containers
           canvasblocker
+          user-agent-string-switcher
         ];
       };
 
