@@ -49,6 +49,13 @@ hyprdev:
 hyprclean:
   rm -rf ~/.config/hypr/hyprland.lua
 
+zshdev:
+  rm -rf ~/.config/zsh
+  ln -sf '{{ cwd }}'/misc/hm/desktops/hyprland/zsh/config ~/.config/zsh
+
+zshclean:
+  rm -rf ~/.config/zsh
+
 # Prepare machine disk for a nix fresh install
 prep-disk machine:
   sudo disko --flake '.#{{ machine }}' --mode destroy,format,mount --root-mountpoint /mnt

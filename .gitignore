@@ -14,3 +14,8 @@ devenv.local.yaml
 
 # pre-commit
 .pre-commit-config.yaml
+*.zwc
+.zcompdump
+.zcalc_history               
+.zsh_history                 
+.zshrc_*

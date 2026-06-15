@@ -75,6 +75,9 @@
       };
 
       settings = {
+        "full-screen-api.transition-duration.enter" = "200 200";
+        "full-screen-api.transition-duration.leave" = "200 200";
+        "full-screen-api.transition.timeout" = 1000;
         "accessibility.force_disabled" = 1;
         "app.normandy.api_url" = "";
         "app.normandy.enabled" = false;
