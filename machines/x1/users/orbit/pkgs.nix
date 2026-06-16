@@ -1,6 +1,5 @@
 { pkgs, ... }:
 {
-
   programs.opencode = {
     enable = true;
     extraPackages = with pkgs; [
@@ -28,20 +27,16 @@
     seahorse
     gparted
     exfatprogs # needed for exfat/fat support within gparted
-    zed-editor
 
     # Misc
-    bandwhich
-    snitch
+    rustnet
     lsof
     traceroute
     f2
     whois
     ncdu
     duf
-    s-tui
     tokei
-    binsider
     rclone
     cfspeedtest
     nvtopPackages.intel
@@ -75,7 +70,6 @@
     bind # for dig
     yt-dlp
     devenv
-    intel-gpu-tools
     powertop
   ];
 }
