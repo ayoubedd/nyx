@@ -1,10 +1,7 @@
 return {
 	"glepnir/lspsaga.nvim",
+  enabled = false,
 	event = { "BufReadPre", "BufNewFile" },
-	dependencies = {
-		-- "nvim-treesitter/nvim-treesitter", -- optional
-		"nvim-tree/nvim-web-devicons", -- optional
-	},
 	config = function()
 		require("lspsaga").setup({
 			lightbulb = {

@@ -8,7 +8,6 @@ set("n", "<C-h>", "<C-w>h", {}) -- Move to right split
 set("n", "<C-j>", "<C-w>j", {}) -- Move to down split
 set("n", "<C-k>", "<C-w>k", {}) -- Move to upper split
 
-set("n", "<leader>e", "<cmd>Oil<cr>", { desc = "Open Oil" }) -- Open oil
 set("n", "<Esc>", "<cmd>nohls<cr>", { desc = "No Highlight" }) -- Turn off highlights
 
 set("n", "<left>", '<cmd>echo "Use h to move!!"<cr>', {})
@@ -17,6 +16,7 @@ set("n", "<up>", '<cmd>echo "Use k to move!!"<cr>', {})
 set("n", "<down>", '<cmd>echo "Use j to move!!"<cr>', {})
 
 set("n", "<leader>qq", "<cmd>qa!<cr>", { desc = "Force quit" }) -- Force quite
+set("n", "<leader>c", "<cmd>bd<cr>", { desc = "Force quit" }) -- Force quite
 
 -- Toggle hlsearch if it's on, otherwise just do "enter"
 set("n", "<cr>", "", {

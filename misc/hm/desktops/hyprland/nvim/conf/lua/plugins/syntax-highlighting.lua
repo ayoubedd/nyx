@@ -6,21 +6,7 @@ return {
 		lazy = false, -- Tree-sitter must load immediately at startup
 		config = function()
 			require("nvim-treesitter").setup({
-				ensure_installed = {
-					"svelte",
-					"nix",
-					"html",
-					"css",
-					"javascript",
-					"typescript",
-					"lua",
-					"markdown",
-					"c",
-					"vim",
-					"vimdoc",
-					"json",
-					"zig",
-				},
+				ensure_installed = { "nix", "html", "lua", "c", "vim", "vimdoc", "json" },
 				auto_install = true,
 				highlight = {
 					enable = true,
