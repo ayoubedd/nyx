@@ -58,10 +58,45 @@
     enable = true;
     pkiBundle = "/var/lib/sbctl";
 
-    autoGenerateKeys.enable = true;
     autoEnrollKeys = {
       enable = true;
     };
+
+    measuredBoot = {
+      enable = true;
+      pcrs = [
+        # --- Platform/Firmware Integrity (Highly Static) ---
+        0 # Motherboard BIOS/UEFI firmware executable code
+        1 # Motherboard BIOS/UEFI internal configuration settings
+        2 # Option ROM code (e.g., physical GPU/RAID card firmware)
+        # 3 # Option ROM configurations and settings
+
+        # --- Bootloader Integrity ---
+        # 4 # EFI Bootloader executable code (e.g., systemd-boot / GRUB binary)
+        # 5 # Bootloader configuration files, variables, and partition data
+
+        # --- Secure Boot & System Validation ---
+        # 6 # Host platform power management and reset transitions
+        7 # # Secure Boot enforcement state and internal certificate keys
+
+        # --- Linux Kernel Integrity (Changes on every OS update) ---
+        # 8 # Unused / Reserved
+        # 9 # Linux kernel image and initrd/initramfs archive
+        # 10 # IMA (Integrity Measurement Architecture) logs
+        # 11 # Kernel boot parameters and systemd execution state
+        # 12 # Linux kernel command line configuration arguments
+
+        # --- Extended & Custom Policies ---
+        # 13 # System extensions (sysexts) measurements
+        # 14 # Shim bootloader signature policy profiles
+        # 15 # Operating system base identity hashes / root images
+        # 16 # Debugging interfaces and testing assertions
+      ];
+    };
+
+    configurationLimit = 8;
+
+    autoGenerateKeys.enable = true;
   };
 
   boot.kernel.sysctl = {

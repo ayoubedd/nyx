@@ -42,6 +42,7 @@
                 crypttabExtraOpts = [
                   "tpm2-device=auto"
                   "tpm2-measure-pcr=yes"
+                  "tpm2-pcrs=0+1+2+7"
                 ];
               };
               content = {
