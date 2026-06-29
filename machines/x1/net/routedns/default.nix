@@ -7,4 +7,9 @@
     enable = true;
     configFile = pkgs.writeText "config" (builtins.readFile ./config.toml);
   };
+  systemd.services.routedns = {
+    serviceConfig = {
+      CacheDirectory = "routedns";
+    };
+  };
 }

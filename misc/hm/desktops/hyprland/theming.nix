@@ -86,5 +86,9 @@
 
     targets.librewolf.profileNames = [ config.home.username ];
     targets.librewolf.colorTheme.enable = true;
+
+    targets.qt = {
+      standardDialogs = "xdgdesktopportal";
+    };
   };
 }

@@ -15,6 +15,7 @@
       tree-sitter
       ripgrep
       inotify-tools
+      emmylua-ls
 
       # lsp servers
       nixd
@@ -29,6 +30,7 @@
       svelte-language-server
       typescript-language-server
       vscode-langservers-extracted
+      css-variables-language-server
       emmet-ls
       harper
       lua-language-server

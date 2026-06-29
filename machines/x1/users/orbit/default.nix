@@ -16,6 +16,8 @@
       "wheel"
       "video"
       "audio"
+      "kvm"
+      "adbusers"
     ]
     ++ lib.optional config.virtualisation.libvirtd.enable "libvirtd"
     ++ lib.optional config.virtualisation.docker.enable "docker"

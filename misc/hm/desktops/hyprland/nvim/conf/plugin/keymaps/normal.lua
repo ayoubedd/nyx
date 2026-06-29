@@ -98,10 +98,9 @@ set("n", "<leader>ld", ":Telescope lsp_definitions<cr>", { desc = "Go To Definit
 set("n", "<leader>lR", ":Telescope lsp_references<cr>", { desc = "References", noremap = true, silent = true })
 
 -- LSP_Saga
-set("n", "<leader>lk", ":Lspsaga hover_doc<cr>", { desc = "Hover Docs", noremap = true, silent = true })
-set("n", "gd", ":Lspsaga goto_definition<cr>", { desc = "Goto Definition", noremap = true, silent = true })
-set("n", "<leader>lr", ":Lspsaga rename<cr>", { desc = "Rename", noremap = true, silent = true })
-set("n", "<leader>la", ":Lspsaga code_action<cr>", { desc = "Code Action", noremap = true, silent = true })
+set("n", "gd", ":lua vim.lsp.buf.definition()<cr>", { desc = "Goto Definition", noremap = true, silent = true })
+set("n", "<leader>lr", ":lua vim.lsp.buf.rename()<cr>", { desc = "Rename", noremap = true, silent = true })
+-- set("n", "<leader>la", ":Lspsaga code_action<cr>", { desc = "Code Action", noremap = true, silent = true })
 
 set(
 	"n",
