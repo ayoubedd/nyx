@@ -1,7 +1,14 @@
 { pkgs, lib, ... }:
 {
   services.devmon.enable = lib.mkForce false;
-  services.fwupd.enable = true;
+  # services.fwupd.enable = true;
+
+  console = {
+    enable = true;
+    font = "ter-v32b";
+    packages = [ pkgs.terminus_font ];
+    keyMap = "us";
+  };
 
   # Services
   services = {

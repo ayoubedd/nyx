@@ -189,7 +189,7 @@ hl.bind("XF86AudioPrev", exec_cmd("playerctl previous"), { locked = true })
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
 hl.env("QT_QPA_PLATFORMTHEME", "qt5ct")
 hl.env("GDK_BACKEND", "wayland,x11,*")
-hl.env("QT_QPA_PLATFORM", "wayland,xcb")
+hl.env("QT_QPA_PLATFORM", "wayland")
 hl.env("SDL_VIDEODRIVER", "wayland")
 hl.env("CLUTTER_BACKEND", "wayland")
 
@@ -221,6 +221,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("sleep 3 & uwsm app -- usbguard-notifier")
 	hl.exec_cmd("uwsm app -- " .. browser)
 	hl.exec_cmd("uwsm app -- " .. terminal)
+  hl.exec_cmd("bash -c hypr-powersave")
 end)
 
 -- Window Rules
@@ -240,7 +241,7 @@ hl.window_rule({
 
 hl.window_rule({
 	name = "blueman",
-	match = { class = ".blueman-manager-wrapped" },
+	match = { class = "blueman-manager" },
 	size = "900 600",
 	float = true,
 })

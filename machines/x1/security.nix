@@ -1,4 +1,13 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
+let
+  targetUser = builtins.head (builtins.attrNames config.home-manager.users);
+  userLibrewolf = config.home-manager.users.${targetUser}.programs.librewolf.finalPackage;
+in
 {
   services.pcscd.enable = true;
   services.fprintd.enable = true;
@@ -13,12 +22,74 @@
     pcr15 = "704763c32ce8e3bb53283f8dad0bc2f330f5891fdd7282a8a27de09041e2c2a1";
   };
 
+  services.opensnitch = {
+    enable = true;
+    rules = {
+      systemd-timesyncd = {
+        name = "systemd-timesyncd Allow All";
+        enabled = true;
+        action = "allow";
+        duration = "always";
+        operator = {
+          type = "simple";
+          sensitive = false;
+          operand = "process.path";
+          data = "${pkgs.systemd}/lib/systemd/systemd-timesyncd";
+        };
+      };
+      librewolf = {
+        name = "Librewolf Allow All";
+        enabled = true;
+        action = "allow";
+        duration = "always";
+        operator = {
+          type = "simple";
+          sensitive = false;
+          operand = "process.path";
+          data = "${userLibrewolf}/lib/librewolf/librewolf";
+        };
+      };
+      routedns = {
+        name = "Routedns Allow All";
+        enabled = true;
+        action = "allow";
+        duration = "always";
+        operator = {
+          type = "simple";
+          sensitive = false;
+          operand = "process.path";
+          data = "${pkgs.routedns}/bin/routedns";
+        };
+      };
+      nsncd = {
+        name = "nsncd Allow All";
+        enabled = true;
+        action = "allow";
+        duration = "always";
+        operator = {
+          type = "simple";
+          operand = "process.path";
+          data = "${pkgs.nsncd}/bin/nsncd";
+        };
+      };
+      networkmanager = {
+        name = "NetworkManager Allow All";
+        enabled = true;
+        action = "allow";
+        duration = "always";
+        operator = {
+          type = "simple";
+          operand = "process.path";
+          data = "${pkgs.networkmanager}/bin/NetworkManager";
+        };
+      };
+    };
+  };
+
   environment.systemPackages = with pkgs; [
+    opensnitch-ui
     yubioath-flutter
     efibootmgr
-    # efitools
-    # efivar
-    fwupd
     sbctl # secure boot
   ];
 

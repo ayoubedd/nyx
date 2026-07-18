@@ -2,12 +2,13 @@
   lib,
   config,
   inputs,
+  pkgs,
   ...
 }:
 {
   imports = [
     ../../misc/nixos/common
-    ../../misc/nixos/apps/qemu.nix
+    # ../../misc/nixos/apps/qemu.nix
     ../../misc/nixos/apps/docker.nix
     ../../misc/nixos/apps/thunar.nix
     ../../misc/nixos/apps/polkit_gnome_agent.nix

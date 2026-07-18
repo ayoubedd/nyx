@@ -1,9 +1,68 @@
 { pkgs, ... }:
+let
+  sudo = "${pkgs.sudo}/bin/sudo";
+  awk = "${pkgs.gawk}/bin/awk";
+  hyprctl = "${pkgs.hyprland}/bin/hyprctl";
+  hypr-powersave = pkgs.writeScriptBin "hypr-powersave" ''
+    #!${pkgs.bash}/bin/bash
+    # 1. Dynamically find the username and UID of the active graphical session
+    USER_NAME=$(stat -c '%U' /dev/dri/card1 2>/dev/null)
+
+    if [ -z "$USER_NAME" ] || [ "$USER_NAME" = "root" ]; then
+      USER_NAME=$(who | ${awk} '{print $1}' | head -n1)
+    fi
+
+    if [ -z "$USER_NAME" ]; then
+      USER_NAME=$(id -nu 1000)
+    fi
+
+    USER_ID=$(id -u "$USER_NAME")
+    XDG_RUNTIME_DIR="/run/user/$USER_ID"
+
+    # 2. Extract the active Hyprland instance signature from the runtime directory
+    HYPR_SIG=$(ls -t "$XDG_RUNTIME_DIR/hypr/" 2>/dev/null | grep -E '^[a-f0-9]+_[0-9]+_[0-9]+$' | head -n1)
+
+    if [ -z "$HYPR_SIG" ]; then
+      HYPR_SIG=$(ls -t "$XDG_RUNTIME_DIR/hypr/" 2>/dev/null | grep -v "\.sock" | head -n1)
+    fi
+
+    if [ -z "$HYPR_SIG" ]; then
+      echo "No active Hyprland instance signature found."
+      exit 0 # Exit with 0 so the systemd service doesn't report a "failed" state if no one is logged in
+    fi
+
+    # 3. Check the AC status (0 = battery, 1 = plugged in)
+    STATUS=$(cat /sys/class/power_supply/AC/online)
+
+    # Note: We explicitly path to hyprctl from pkgs here or assume it's in the environment.
+    # To be perfectly safe inside systemd, let's use the absolute path if available, 
+    # but since it's a user bin, it's safer to just run it as the user.
+    if [ "$STATUS" -eq 0 ]; then
+      env XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" HYPRLAND_INSTANCE_SIGNATURE="$HYPR_SIG" ${hyprctl} eval 'hl.config({ animations = { enabled = false } })'
+    else
+      env XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" HYPRLAND_INSTANCE_SIGNATURE="$HYPR_SIG" ${hyprctl} eval 'hl.config({ animations = { enabled = true } })'
+    fi
+  '';
+in
 {
   boot.kernelParams = [
+    "intel_pstate=enable"
+
+    # Net
     "iwlwifi.power_save=true"
     "iwlwifi.power_level=5"
     "iwlmvm.power_scheme=3"
+
+    # Storage
+    "nvme_core.default_ps_max_latency_us=10000"
+
+    # Intel i915 Graphics
+    "i915.enable_fbc=1"
+    "i915.enable_psr=1"
+    "i915.enable_guc=3"
+
+    # Force PCIe Runtime Power Management across the board
+    "pcie_aspm=force"
   ];
 
   services.irqbalance.enable = true;
@@ -11,6 +70,18 @@
   services.thermald = {
     enable = true;
     ignoreCpuidCheck = true;
+  };
+
+  services.pipewire.extraConfig.pipewire."99-input-denoiser" = {
+    "context.properties" = {
+      "default.clock.min-quantum" = 1024; # Reduces wakeups
+    };
+  };
+  # Ensure wireplumber suspends idle nodes
+  services.pipewire.wireplumber.extraConfig."10-power-clean" = {
+    "monitor.bluez.properties" = {
+      "bluez5.suspend-on-idle" = true;
+    };
   };
 
   services.tlp.enable = false;
@@ -67,7 +138,7 @@
         disk = {
           devices = "nvme0n1";
           readahead = 4096;
-          elevator = "kyber";
+          elevator = "none";
         };
       };
 
@@ -78,20 +149,20 @@
           governor = "performance";
           energy_perf_bias = "performance";
           energy_performance_preference = "performance";
-          min_perf_pct = 0;
+          min_perf_pct = 0; # ALLOW the CPU to drop frequency at idle so it can cool down
           max_perf_pct = 100;
-          force_latency = 99;
-          no_turbo = 0;
           boost = 1;
+          no_turbo = 0;
+
+          # Thermals-safe adjustments:
+          sampling_down_factor = 1; # Don't delay down-clocking; let it drop immediately when done
+          pm_qos_resume_latency_us = 0; # DO NOT disable C-states; the laptop needs them to prevent cooking
+          force_latency = "cstate.name:C1|None"; # Minimal target without blocking deeper package sleep
         };
 
-        acpi = {
-          platform_profile = "performance";
-        };
-
-        usb = {
-          autosuspend = 0;
-        };
+        acpi.platform_profile = "performance";
+        usb.autosuspend = 0;
+        audio.timeout = 0;
 
         sysfs_cpu = {
           type = "sysfs";
@@ -100,17 +171,13 @@
 
         sysfs_gpu = {
           type = "sysfs";
-          path = "/sys/class/drm/card0/";
-          devices_udev_regex = ".*card0.*";
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/min_freq" = 400;
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/max_freq" = 1300;
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/power_profile" = "base";
-        };
-
-        sysfs_audio = {
-          type = "sysfs";
-          "/sys/module/snd_hda_intel/parameters/power_save_controller" = "N";
-          "/sys/module/snd_hda_intel/parameters/power_save" = "0";
+          path = "/sys/class/drm/card1/";
+          devices_udev_regex = ".*card1.*";
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_min_freq_mhz" = 400;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_max_freq_mhz" = 1300;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_boost_freq_mhz" = 1300;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_power_profile" = "base";
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 0;
         };
       };
 
@@ -118,20 +185,20 @@
         main.include = "common";
 
         cpu = {
-          governor = "powersave";
+          governor = "powersave|ondemand";
           energy_perf_bias = "balance-performance";
           energy_performance_preference = "balance_performance";
-          no_turbo = 0;
+          min_perf_pct = 0;
+          max_perf_pct = 100;
           boost = 1;
+          no_turbo = 0;
+          sampling_down_factor = 1;
+          pm_qos_resume_latency_us = 0;
         };
 
-        acpi = {
-          platform_profile = "balanced";
-        };
-
-        usb = {
-          autosuspend = 0;
-        };
+        acpi.platform_profile = "balanced";
+        usb.autosuspend = 0;
+        audio.timeout = 0;
 
         sysfs_cpu = {
           type = "sysfs";
@@ -140,18 +207,15 @@
 
         sysfs_gpu = {
           type = "sysfs";
-          path = "/sys/class/drm/card0/";
-          devices_udev_regex = ".*card0.*";
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/min_freq" = 100;
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/max_freq" = 700;
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/power_profile" = "base";
+          path = "/sys/class/drm/card1/";
+          devices_udev_regex = ".*card1.*";
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_min_freq_mhz" = 100;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_max_freq_mhz" = 800;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_boost_freq_mhz" = 1000;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_power_profile" = "base";
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 0;
         };
 
-        sysfs_audio = {
-          type = "sysfs";
-          "/sys/module/snd_hda_intel/parameters/power_save_controller" = "N";
-          "/sys/module/snd_hda_intel/parameters/power_save" = "0";
-        };
       };
 
       x1-battery-balanced = {
@@ -161,17 +225,16 @@
           governor = "powersave";
           energy_perf_bias = "balance-power";
           energy_performance_preference = "balance_power";
-          no_turbo = 0;
-          boost = 1;
+          min_perf_pct = 0;
+          max_perf_pct = 60;
+          boost = 0;
+          no_turbo = 1;
+          sampling_down_factor = 1;
+          pm_qos_resume_latency_us = 0;
         };
 
-        acpi = {
-          platform_profile = "balanced";
-        };
-
-        usb = {
-          autosuspend = 0;
-        };
+        acpi.platform_profile = "low-power";
+        usb.autosuspend = 1;
 
         sysfs_cpu = {
           type = "sysfs";
@@ -180,17 +243,23 @@
 
         sysfs_gpu = {
           type = "sysfs";
-          path = "/sys/class/drm/card0/";
-          devices_udev_regex = ".*card0.*";
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/min_freq" = 100;
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/max_freq" = 500;
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/power_profile" = "base";
+          path = "/sys/class/drm/card1/";
+          devices_udev_regex = ".*card1.*";
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_min_freq_mhz" = 100;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_max_freq_mhz" = 600;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_boost_freq_mhz" = 600;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_power_profile" = "power_saving";
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 1;
         };
 
         sysfs_audio = {
           type = "sysfs";
           "/sys/module/snd_hda_intel/parameters/power_save_controller" = "Y";
-          "/sys/module/snd_hda_intel/parameters/power_save" = "15";
+        };
+
+        audio = {
+          timeout = 1;
+          reset_controller = true;
         };
       };
 
@@ -201,17 +270,16 @@
           governor = "powersave";
           energy_perf_bias = "power";
           energy_performance_preference = "power";
-          no_turbo = 1;
+          min_perf_pct = 0;
+          max_perf_pct = 50; # Strict clamp to keep the laptop completely silent and ice-cold
           boost = 0;
+          no_turbo = 1;
+          sampling_down_factor = 1;
+          pm_qos_resume_latency_us = 0;
         };
 
-        acpi = {
-          platform_profile = "low-power";
-        };
-
-        usb = {
-          autosuspend = 1;
-        };
+        acpi.platform_profile = "low-power";
+        usb.autosuspend = 1;
 
         sysfs_cpu = {
           type = "sysfs";
@@ -220,17 +288,23 @@
 
         sysfs_gpu = {
           type = "sysfs";
-          path = "/sys/class/drm/card0/";
-          devices_udev_regex = ".*card0.*";
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/min_freq" = 100;
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/max_freq" = 400;
-          "/sys/class/drm/card0/device/tile0/gt0/freq0/power_profile" = "power_saving";
+          path = "/sys/class/drm/card1/";
+          devices_udev_regex = ".*card1.*";
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_min_freq_mhz" = 100;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_max_freq_mhz" = 400;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_boost_freq_mhz" = 400;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_power_profile" = "power_saving";
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 1;
         };
 
         sysfs_audio = {
           type = "sysfs";
           "/sys/module/snd_hda_intel/parameters/power_save_controller" = "Y";
-          "/sys/module/snd_hda_intel/parameters/power_save" = "10";
+        };
+
+        audio = {
+          timeout = 1;
+          reset_controller = true;
         };
       };
     };
@@ -243,27 +317,15 @@
       # ac_adapter ACPI0003:00 00000080 00000000 # unplugging
       # ac_adapter ACPI0003:00 00000080 00000001 # plug-in
       action = /* sh */ ''
-        USER_NAME="orbit" # well well well
-        USER_ID=$(id -u "$USER_NAME")
-
-        HYPR_PID=$(${pkgs.procps}/bin/pgrep -u "$USER_ID" Hyprland | head -n 1)
-
-        HYPR_SIG=$(${pkgs.procps}/bin/pgrep -P "$HYPR_PID" | xargs -I {} grep -aoP 'HYPRLAND_INSTANCE_SIGNATURE=\K[^ \0]+' /proc/{}/environ 2>/dev/null | head -n 1)
-        XDG_RUNTIME_DIR=$(${pkgs.procps}/bin/pgrep -P "$HYPR_PID" | xargs -I {} grep -aoP 'XDG_RUNTIME_DIR=\K[^ \0]+' /proc/{}/environ 2>/dev/null | head -n 1)
-
         vals=($1)  # space separated string to array of multiple values
+
+        ${hypr-powersave}/bin/hypr-powersave
         case ''${vals[3]} in
             00000000)
                 ${pkgs.tuned}/bin/tuned-adm profile x1-battery-balanced
-                env XDG_RUNTIME_DIR="/run/user/$USER_ID" \
-                  HYPRLAND_INSTANCE_SIGNATURE="$HYPR_SIG" \
-                  ${pkgs.hyprland}/bin/hyprctl keyword animations:enabled 0
                 ;;
             00000001)
                 ${pkgs.tuned}/bin/tuned-adm profile x1-balanced
-                env XDG_RUNTIME_DIR="/run/user/$USER_ID" \
-                  HYPRLAND_INSTANCE_SIGNATURE="$HYPR_SIG" \
-                  ${pkgs.hyprland}/bin/hyprctl keyword animations:enabled 1
                 ;;
             *)
                 echo unknown >> /tmp/acpi.log
@@ -273,4 +335,6 @@
       event = "ac_adapter/*";
     };
   };
+
+  environment.systemPackages = [ hypr-powersave ];
 }

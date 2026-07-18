@@ -143,6 +143,7 @@ in
       ]
       // gen_default_app "mpv.desktop" [
         "application/ogg"
+        "text/vnd.trolltech.linguist"
         "application/x-ogg"
         "application/mxf"
         "application/sdp"

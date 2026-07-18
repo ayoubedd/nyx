@@ -38,11 +38,12 @@
 
   boot.blacklistedKernelModules = [
     "iTCO_wdt"
-    "i915"
     "intel_oc_wdt"
     "nxp_nci_i2c"
     "nxp_nci"
     "nfc"
+    "joydev"
+    "mousedev"
   ];
 
   boot.loader = {
@@ -94,7 +95,7 @@
       ];
     };
 
-    configurationLimit = 8;
+    configurationLimit = 4;
 
     autoGenerateKeys.enable = true;
   };

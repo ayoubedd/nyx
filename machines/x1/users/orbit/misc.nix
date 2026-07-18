@@ -38,6 +38,8 @@
 
   # services.blueman-applet.enable = true;
 
+  services.opensnitch-ui.enable = true;
+
   home.file.".config/atuin/config.toml" = {
     enable = true;
     force = true;

@@ -4,7 +4,6 @@
     ./routedns
   ];
 
-  # services.opensnitch.enable = true; # Broken pkg
   networking.wireguard.enable = true;
   networking.firewall.allowPing = false;
 

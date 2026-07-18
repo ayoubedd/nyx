@@ -6,6 +6,7 @@
 }:
 {
   home.pointerCursor = {
+    enable = true;
     x11 = {
       enable = true;
       defaultCursor = "volantes_cursors";
