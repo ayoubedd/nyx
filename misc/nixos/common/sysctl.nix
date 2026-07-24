@@ -67,7 +67,7 @@
 
     # Enable BBR3
     # The BBR3 congestion control algorithm can help achieve higher bandwidths and lower latencies for internet traffic
-    # "net.ipv4.tcp_congestion_control" = "bbr";
+    "net.ipv4.tcp_congestion_control" = "bbr";
 
     # TCP SYN cookie protection
     # Helps protect against SYN flood attacks. Only kicks in when net.ipv4.tcp_max_syn_backlog is reached:
@@ -132,11 +132,12 @@
     # both incoming and outgoing connections:
     # Bufferbloat mitigations + slight improvement in throughput & latency
     # "net.ipv4.tcp_congestion_control" = "bbr";
-    "net.core.default_qdisc" = "cake";
+    # "net.core.default_qdisc" = "cake";
     "net.ipv4.tcp_retries2" = 5;
 
     # Disable core dumps for setuid programs to protect sensitive information.
     "fs.suid_dumpable" = 0;
+    "net.core.default_qdisc" = "fq";
   };
 
   boot.kernelModules = [ "tcp_bbr" ];

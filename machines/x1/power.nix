@@ -62,6 +62,8 @@ in
 
     # Force PCIe Runtime Power Management across the board
     "pcie_aspm=force"
+
+    "rcutree.enable_rcu_lazy=1"
   ];
 
   services.irqbalance.enable = true;
@@ -90,7 +92,7 @@ in
 
     settings = {
       dynamic_tuning = true;
-      reapply_sysctl = true;
+      reapply_sysctl = false;
     };
 
     ppdSettings = {
@@ -163,7 +165,7 @@ in
         usb.autosuspend = 0;
         audio.timeout = 0;
 
-        cpu = {
+        cpu_dynamic_boot = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
         };
@@ -196,7 +198,6 @@ in
           type = "sysctl";
           "vm.dirty_expire_centisecs" = 300;
           "vm.dirty_writeback_centisecs" = 1500;
-          "vm.laptop_mode" = 0;
         };
       };
 
@@ -219,7 +220,7 @@ in
         usb.autosuspend = 0;
         audio.timeout = 0;
 
-        cpu = {
+        cpu_dynamic_boot = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
         };
@@ -252,7 +253,6 @@ in
           type = "sysctl";
           "vm.dirty_expire_centisecs" = 300;
           "vm.dirty_writeback_centisecs" = 1500;
-          "vm.laptop_mode" = 0;
         };
       };
 
@@ -274,7 +274,7 @@ in
         acpi.platform_profile = "low-power";
         usb.autosuspend = 1;
 
-        cpu = {
+        cpu_dynamic_boot = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
         };
@@ -317,7 +317,6 @@ in
           type = "sysctl";
           "vm.dirty_expire_centisecs" = 5000;
           "vm.dirty_writeback_centisecs" = 3000;
-          "vm.laptop_mode" = 1;
         };
       };
 
@@ -326,7 +325,7 @@ in
 
         cpu = {
           governor = "powersave";
-          energy_perf_bias = "power";
+          energy_perf_bias = "power"; # "performance", "balance-performance", "normal", "balance-power" and "power"
           energy_performance_preference = "power";
           min_perf_pct = 0;
           max_perf_pct = 50; # Strict clamp to keep the laptop completely silent and ice-cold
@@ -339,7 +338,7 @@ in
         acpi.platform_profile = "low-power";
         usb.autosuspend = 1;
 
-        cpu = {
+        cpu_dynamic_boost = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 0;
         };
@@ -382,7 +381,6 @@ in
           type = "sysctl";
           "vm.dirty_expire_centisecs" = 6000;
           "vm.dirty_writeback_centisecs" = 6000;
-          "vm.laptop_mode" = 1;
         };
       };
     };

@@ -8,7 +8,6 @@
 
   boot = {
     kernelParams = [
-      "i915.fastboot=1"
       "i915.enable_psr2_sel_fetch=1"
       "i915.enable_dc=4"
       "module_blacklist=xe"
@@ -35,5 +34,6 @@
     LIBVA_DRIVER_NAME = "iHD";
   };
 
+  hardware.enableRedistributableFirmware = true;
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
