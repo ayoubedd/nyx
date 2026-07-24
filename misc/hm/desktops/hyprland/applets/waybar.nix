@@ -34,6 +34,7 @@ in
         ];
 
         "modules-center" = [ "clock" ];
+
         "modules-right" = [
           "privacy"
           "network"

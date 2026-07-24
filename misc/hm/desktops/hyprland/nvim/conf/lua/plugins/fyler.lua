@@ -80,8 +80,8 @@ return {
 		},
 	},
 	config = function(_, opts)
-    local fyler = require('fyler');
-    fyler.setup(opts);
+		local fyler = require("fyler")
+		fyler.setup(opts)
 		vim.keymap.set("n", "<leader>e", function()
 			fyler.open({ kind = "split_right_most" })
 		end, { desc = "Fyler.nvim - Open" })

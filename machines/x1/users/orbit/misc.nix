@@ -10,6 +10,9 @@
       "*" = {
         compression = true;
         forwardAgent = true;
+        SetEnv = {
+          TERM = "xterm-256color";
+        };
       };
       "github.com" = {
         HostName = "ssh.github.com";

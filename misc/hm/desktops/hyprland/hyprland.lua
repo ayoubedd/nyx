@@ -221,7 +221,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("sleep 3 & uwsm app -- usbguard-notifier")
 	hl.exec_cmd("uwsm app -- " .. browser)
 	hl.exec_cmd("uwsm app -- " .. terminal)
-  hl.exec_cmd("bash -c hypr-powersave")
+	hl.exec_cmd("bash -c hypr-powersave")
 end)
 
 -- Window Rules
@@ -259,11 +259,19 @@ hl.window_rule({
 	float = true,
 	size = "900 600",
 })
+
 hl.window_rule({
 	name = "network manager editor",
 	match = { class = "nm-connection-editor" },
 	float = true,
 	size = "900 600",
+})
+
+hl.window_rule({
+	name = "Screen Share Dialog",
+	match = { title = "Select what to share" },
+	float = false,
+	size = "600 200",
 })
 
 hl.window_rule({

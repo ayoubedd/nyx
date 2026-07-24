@@ -1,6 +1,6 @@
 # ls
 local ls=exa
-alias exa="$ls --icons"
+alias exa="$ls --icons always"
 alias {l,ls}="$ls"
 alias lsa="$ls -lah"
 alias ll="$ls -lh"

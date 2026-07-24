@@ -1,11 +1,11 @@
 return {
 	"anuvyklack/windows.nvim",
-  enabled = false,
+	enabled = false,
 	dependencies = {
 		"anuvyklack/middleclass",
 	},
 	config = function()
-    local windows = require('windows');
+		local windows = require("windows")
 
 		vim.o.winwidth = 5
 		vim.o.winminwidth = 5
@@ -13,9 +13,9 @@ return {
 
 		windows.setup({
 			ignore = {
-        buftype = { "fyler_finder" },
-        filetype = { "fyler_finder" },
-      },
+				buftype = { "fyler_finder" },
+				filetype = { "fyler_finder" },
+			},
 		})
 	end,
 }

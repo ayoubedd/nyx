@@ -6,6 +6,17 @@
   ...
 }:
 
+let
+  kernel = pkgs.cachyosKernels.linux-cachyos-bore-lto-x86_64-v4.override {
+    pname = "cachyos-bore-lto-x86_64-v4";
+    version = "7.1.4";
+    src = pkgs.fetchurl {
+      url = "https://github.com/CachyOS/linux/releases/download/cachyos-7.1.4-2/cachyos-7.1.4-2.tar.gz";
+      hash = "sha256-ZOYqj0WtRbKfTBDHLx/Z84oohw97QAJVdpG1UCOGt3s=";
+    };
+    hzTicks = "250";
+  };
+in
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -28,7 +39,9 @@
     "tpm_crb"
   ];
 
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v4;
+  boot.kernelPackages = pkgs.linuxKernel.packagesFor kernel;
   boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
 
   boot.kernelModules = [

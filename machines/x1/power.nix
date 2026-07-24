@@ -1,6 +1,5 @@
 { pkgs, ... }:
 let
-  sudo = "${pkgs.sudo}/bin/sudo";
   awk = "${pkgs.gawk}/bin/awk";
   hyprctl = "${pkgs.hyprland}/bin/hyprctl";
   hypr-powersave = pkgs.writeScriptBin "hypr-powersave" ''
@@ -91,7 +90,7 @@ in
 
     settings = {
       dynamic_tuning = true;
-      reapply_sysctl = false;
+      reapply_sysctl = true;
     };
 
     ppdSettings = {
@@ -164,12 +163,12 @@ in
         usb.autosuspend = 0;
         audio.timeout = 0;
 
-        sysfs_cpu = {
+        cpu = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
         };
 
-        sysfs_gpu = {
+        gpu = {
           type = "sysfs";
           path = "/sys/class/drm/card1/";
           devices_udev_regex = ".*card1.*";
@@ -178,6 +177,26 @@ in
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_boost_freq_mhz" = 1300;
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_power_profile" = "base";
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 0;
+        };
+
+        uncore = {
+          type = "sysfs";
+          path = "/sys/devices/system/cpu/intel_uncore_frequency";
+          "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/min_freq_khz" = 1000000;
+          "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/max_freq_khz" = 3600000;
+        };
+
+        aspm = {
+          type = "sysfs";
+          path = "/sys/module/pcie_aspm";
+          "/sys/module/pcie_aspm/parameters/policy" = "performance";
+        };
+
+        vm = {
+          type = "sysctl";
+          "vm.dirty_expire_centisecs" = 300;
+          "vm.dirty_writeback_centisecs" = 1500;
+          "vm.laptop_mode" = 0;
         };
       };
 
@@ -200,12 +219,12 @@ in
         usb.autosuspend = 0;
         audio.timeout = 0;
 
-        sysfs_cpu = {
+        cpu = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
         };
 
-        sysfs_gpu = {
+        gpu = {
           type = "sysfs";
           path = "/sys/class/drm/card1/";
           devices_udev_regex = ".*card1.*";
@@ -216,6 +235,25 @@ in
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 0;
         };
 
+        uncore = {
+          type = "sysfs";
+          path = "/sys/devices/system/cpu/intel_uncore_frequency";
+          "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/min_freq_khz" = 400000;
+          "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/max_freq_khz" = 3000000;
+        };
+
+        aspm = {
+          type = "sysfs";
+          path = "/sys/module/pcie_aspm";
+          "/sys/module/pcie_aspm/parameters/policy" = "powersave";
+        };
+
+        sysctl_vm = {
+          type = "sysctl";
+          "vm.dirty_expire_centisecs" = 300;
+          "vm.dirty_writeback_centisecs" = 1500;
+          "vm.laptop_mode" = 0;
+        };
       };
 
       x1-battery-balanced = {
@@ -236,12 +274,12 @@ in
         acpi.platform_profile = "low-power";
         usb.autosuspend = 1;
 
-        sysfs_cpu = {
+        cpu = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
         };
 
-        sysfs_gpu = {
+        gpu = {
           type = "sysfs";
           path = "/sys/class/drm/card1/";
           devices_udev_regex = ".*card1.*";
@@ -252,7 +290,7 @@ in
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 1;
         };
 
-        sysfs_audio = {
+        audio = {
           type = "sysfs";
           "/sys/module/snd_hda_intel/parameters/power_save_controller" = "Y";
         };
@@ -260,6 +298,26 @@ in
         audio = {
           timeout = 1;
           reset_controller = true;
+        };
+
+        uncore = {
+          type = "sysfs";
+          path = "/sys/devices/system/cpu/intel_uncore_frequency";
+          "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/min_freq_khz" = 400000;
+          "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/max_freq_khz" = 1800000;
+        };
+
+        aspm = {
+          type = "sysfs";
+          path = "/sys/module/pcie_aspm";
+          "/sys/module/pcie_aspm/parameters/policy" = "powersave";
+        };
+
+        sysctl_vm = {
+          type = "sysctl";
+          "vm.dirty_expire_centisecs" = 5000;
+          "vm.dirty_writeback_centisecs" = 3000;
+          "vm.laptop_mode" = 1;
         };
       };
 
@@ -281,12 +339,12 @@ in
         acpi.platform_profile = "low-power";
         usb.autosuspend = 1;
 
-        sysfs_cpu = {
+        cpu = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 0;
         };
 
-        sysfs_gpu = {
+        gpu = {
           type = "sysfs";
           path = "/sys/class/drm/card1/";
           devices_udev_regex = ".*card1.*";
@@ -297,7 +355,7 @@ in
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 1;
         };
 
-        sysfs_audio = {
+        audio = {
           type = "sysfs";
           "/sys/module/snd_hda_intel/parameters/power_save_controller" = "Y";
         };
@@ -305,6 +363,26 @@ in
         audio = {
           timeout = 1;
           reset_controller = true;
+        };
+
+        uncore = {
+          type = "sysfs";
+          path = "/sys/devices/system/cpu/intel_uncore_frequency";
+          "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/min_freq_khz" = 400000;
+          "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/max_freq_khz" = 1000000;
+        };
+
+        aspm = {
+          type = "sysfs";
+          path = "/sys/module/pcie_aspm";
+          "/sys/module/pcie_aspm/parameters/policy" = "powersupersave";
+        };
+
+        vm = {
+          type = "sysctl";
+          "vm.dirty_expire_centisecs" = 6000;
+          "vm.dirty_writeback_centisecs" = 6000;
+          "vm.laptop_mode" = 1;
         };
       };
     };
