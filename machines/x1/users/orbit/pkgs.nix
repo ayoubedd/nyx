@@ -67,7 +67,7 @@
     nettools
     nftables
     sof-firmware
-    bind # for dig
+    dig
     yt-dlp
     devenv
     powertop

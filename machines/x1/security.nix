@@ -22,7 +22,7 @@ in
   };
 
   services.opensnitch = {
-    enable = true;
+    enable = false;
     rules = {
       systemd-timesyncd = {
         name = "systemd-timesyncd Allow All";
@@ -86,7 +86,7 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    opensnitch-ui
+    # opensnitch-ui
     yubioath-flutter
     efibootmgr
     sbctl # secure boot

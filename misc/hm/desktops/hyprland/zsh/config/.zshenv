@@ -4,10 +4,6 @@ export WORDCHARS=${WORDCHARS//\//}
 # SSH Agent socket
 export SSH_AUTH_SOCK=/run/user/$UID/gcr/ssh
 
-
-# Include volta in path
-export VOLTA_HOME="$XDG_DATA_HOME/volta"
-
 # Go path
 export GOPATH="$XDG_DATA_HOME/go"
 export GOCACHE="$XDG_CACHE_HOME/go"

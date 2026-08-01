@@ -15,6 +15,13 @@ let
       hash = "sha256-ZOYqj0WtRbKfTBDHLx/Z84oohw97QAJVdpG1UCOGt3s=";
     };
     hzTicks = "250";
+    lto = "full";
+    processorOpt = "x86_64-v4";
+    acpiCall = true;
+    bbr3 = true;
+
+    performanceGovernor = true;
+    autofdo = true;
   };
 in
 {

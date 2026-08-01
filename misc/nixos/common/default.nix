@@ -28,12 +28,6 @@
 
   security.rtkit.enable = true;
 
-  services.ananicy = {
-    enable = true;
-    package = pkgs.ananicy-cpp;
-    rulesProvider = pkgs.ananicy-rules-cachyos;
-  };
-
   environment.homeBinInPath = true;
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   fonts.enableDefaultPackages = true;

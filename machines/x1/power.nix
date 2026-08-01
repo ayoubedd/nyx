@@ -119,8 +119,8 @@ in
           "/sys/class/net/wlp0s20f3/device/power/wakeup" = "disabled";
 
           # Battery thresholds
-          "/sys/class/power_supply/BAT0/charge_control_start_threshold" = 75;
-          "/sys/class/power_supply/BAT0/charge_control_end_threshold" = 80;
+          "/sys/class/power_supply/BAT0/charge_control_start_threshold" = 80;
+          "/sys/class/power_supply/BAT0/charge_control_end_threshold" = 100;
 
           # Active governor
           "/sys/devices/system/cpu/intel_pstate/status" = "active";
