@@ -20,6 +20,9 @@ let
     bbr3 = true;
     lto = "full";
     processorOpt = "x86_64-v4";
+    ccHarder = true;
+    hugepage = "madvise";
+    preemptType = "voluntary";
 
     performanceGovernor = true;
     autofdo = true;
