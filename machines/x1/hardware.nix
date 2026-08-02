@@ -25,7 +25,6 @@ let
     preemptType = "voluntary";
 
     performanceGovernor = true;
-    autofdo = true;
   };
 in
 {
