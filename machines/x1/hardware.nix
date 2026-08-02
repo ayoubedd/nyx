@@ -14,11 +14,12 @@ let
       url = "https://github.com/CachyOS/linux/releases/download/cachyos-7.1.4-2/cachyos-7.1.4-2.tar.gz";
       hash = "sha256-ZOYqj0WtRbKfTBDHLx/Z84oohw97QAJVdpG1UCOGt3s=";
     };
-    hzTicks = "250";
-    lto = "full";
-    processorOpt = "x86_64-v4";
+    hzTicks = "300";
+    tickrate = "idle";
     acpiCall = true;
     bbr3 = true;
+    lto = "full";
+    processorOpt = "x86_64-v4";
 
     performanceGovernor = true;
     autofdo = true;
