@@ -8,12 +8,12 @@
 
 let
   kernel = pkgs.cachyosKernels.linux-cachyos-bore-lto-x86_64-v4.override {
-    pname = "cachyos-bore-lto-x86_64-v4";
-    version = "7.1.4";
-    src = pkgs.fetchurl {
-      url = "https://github.com/CachyOS/linux/releases/download/cachyos-7.1.4-2/cachyos-7.1.4-2.tar.gz";
-      hash = "sha256-ZOYqj0WtRbKfTBDHLx/Z84oohw97QAJVdpG1UCOGt3s=";
-    };
+    # pname = "cachyos-bore-lto-x86_64-v4";
+    # version = "7.1.4";
+    # src = pkgs.fetchurl {
+      # url = "https://github.com/CachyOS/linux/releases/download/cachyos-7.1.4-2/cachyos-7.1.4-2.tar.gz";
+      # hash = "sha256-ZOYqj0WtRbKfTBDHLx/Z84oohw97QAJVdpG1UCOGt3s=";
+    # };
     hzTicks = "300";
     tickrate = "idle";
     acpiCall = true;
@@ -21,7 +21,7 @@ let
     lto = "full";
     processorOpt = "x86_64-v4";
     ccHarder = true;
-    hugepage = "madvise";
+    hugepage = "always";
     preemptType = "voluntary";
 
     performanceGovernor = true;

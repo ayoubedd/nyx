@@ -152,7 +152,9 @@ allowlist = [
   "netlify.app.",
   "animetosho.org.",
   "withgoogle.com.",
-  "appspot.com."
+  "appspot.com.",
+  "1337x.to.",
+  "thepiratebay.org."
 ]
 
 [groups.cache]

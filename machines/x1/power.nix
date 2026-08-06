@@ -66,7 +66,7 @@ in
     "rcutree.enable_rcu_lazy=1"
   ];
 
-  services.irqbalance.enable = true;
+  # services.irqbalance.enable = true; # disabled cuz, cachyos kernel prefer last used cpu for cache locality
 
   services.thermald = {
     enable = true;
