@@ -305,13 +305,31 @@
         "view_source.wrap_long_lines" = true;
         "librewolf.webgl.prompt" = true;
         "librewolf.webgl.prompt.hide" = true;
+        "image.jxl.enabled" = true;
       };
 
       search.force = true;
-      search.default = "google";
+      search.default = "gooogle";
 
       search.engines = {
-        google.metaData.alias = "@g"; # builtin engines only support specifying one additional alias
+        gooogle = {
+          name = "Gooogle";
+          metaData.alias = "@g";
+          urls = [
+            {
+              template = "https://www.google.com/search";
+              params = [
+                {
+                  name = "q";
+                  value = "{searchTerms}";
+                }
+              ];
+            }
+          ];
+          definedAliases = [ "@g" ];
+          icon = "https://www.google.com/favicon.ico";
+          updateInterval = 24 * 60 * 60 * 1000; # every day
+        };
 
         nix-packages = {
           name = "Nix Packages";
@@ -353,7 +371,7 @@
             }
           ];
           definedAliases = [ "@no" ];
-          icon = "https://search.nixos.org/favicon.png";
+          icon = "https://search.nixos.org/images/nixos-logomark-default-gradient-none.svg";
           updateInterval = 24 * 60 * 60 * 1000; # every day
         };
 

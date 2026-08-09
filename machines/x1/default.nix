@@ -41,7 +41,7 @@
 
   nix.buildMachines = [
     {
-      hostName = "10.1.2.107";
+      hostName = "nixbuilder-1.casa.ayoubedd.me";
       sshUser = "nixbuilder";
       sshKey = "/root/.ssh/id_rsa";
       system = "x86_64-linux";
