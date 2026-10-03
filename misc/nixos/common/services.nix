@@ -7,7 +7,7 @@
     earlyoom.enable = true;
     dbus.packages = [
       pkgs.gnome-keyring
-      pkgs.gcr
+      pkgs.gcr_4
     ];
   };
 

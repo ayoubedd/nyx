@@ -34,7 +34,7 @@ let
     STATUS=$(cat /sys/class/power_supply/AC/online)
 
     # Note: We explicitly path to hyprctl from pkgs here or assume it's in the environment.
-    # To be perfectly safe inside systemd, let's use the absolute path if available, 
+    # To be perfectly safe inside systemd, let's use the absolute path if available,
     # but since it's a user bin, it's safer to just run it as the user.
     if [ "$STATUS" -eq 0 ]; then
       env XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" HYPRLAND_INSTANCE_SIGNATURE="$HYPR_SIG" ${hyprctl} eval 'hl.config({ animations = { enabled = false } })'
@@ -134,6 +134,8 @@ in
           "/sys/bus/pci/devices/0000:00:14.2/power/control" = "auto";
           "/sys/bus/pci/devices/0000:04:00.0/power/control" = "auto";
           "/sys/bus/pci/devices/0000:00:0a.0/power/control" = "auto";
+
+          "/sys/devices/system/cpu/cpuidle/current_governor" = "teo";
         };
 
         disk = {
@@ -154,18 +156,14 @@ in
           max_perf_pct = 100;
           boost = 1;
           no_turbo = 0;
-
-          # Thermals-safe adjustments:
-          sampling_down_factor = 1; # Don't delay down-clocking; let it drop immediately when done
-          pm_qos_resume_latency_us = 0; # DO NOT disable C-states; the laptop needs them to prevent cooking
-          force_latency = "cstate.name:C1|None"; # Minimal target without blocking deeper package sleep
+          sampling_down_factor = 100;
         };
 
         acpi.platform_profile = "performance";
         usb.autosuspend = 0;
         audio.timeout = 0;
 
-        cpu_dynamic_boot = {
+        cpu_dynamic_boost = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
         };
@@ -205,22 +203,21 @@ in
         main.include = "common";
 
         cpu = {
-          governor = "powersave|ondemand";
-          energy_perf_bias = "balance-performance";
-          energy_performance_preference = "balance_performance";
+          governor = "powersave";
+          energy_perf_bias = "balance-power";
+          energy_performance_preference = "balance_power";
           min_perf_pct = 0;
           max_perf_pct = 100;
           boost = 1;
           no_turbo = 0;
           sampling_down_factor = 1;
-          pm_qos_resume_latency_us = 0;
         };
 
         acpi.platform_profile = "balanced";
         usb.autosuspend = 0;
         audio.timeout = 0;
 
-        cpu_dynamic_boot = {
+        cpu_dynamic_boost = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
         };
@@ -230,23 +227,23 @@ in
           path = "/sys/class/drm/card1/";
           devices_udev_regex = ".*card1.*";
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_min_freq_mhz" = 100;
-          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_max_freq_mhz" = 800;
-          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_boost_freq_mhz" = 1000;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_max_freq_mhz" = 600;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_boost_freq_mhz" = 700;
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_power_profile" = "base";
-          "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 0;
+          "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 1;
         };
 
         uncore = {
           type = "sysfs";
           path = "/sys/devices/system/cpu/intel_uncore_frequency";
           "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/min_freq_khz" = 400000;
-          "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/max_freq_khz" = 3000000;
+          "/sys/devices/system/cpu/intel_uncore_frequency/package_00_die_00/max_freq_khz" = 2000000;
         };
 
         aspm = {
           type = "sysfs";
           path = "/sys/module/pcie_aspm";
-          "/sys/module/pcie_aspm/parameters/policy" = "powersave";
+          "/sys/module/pcie_aspm/parameters/policy" = "default";
         };
 
         sysctl_vm = {
@@ -268,13 +265,12 @@ in
           boost = 0;
           no_turbo = 1;
           sampling_down_factor = 1;
-          pm_qos_resume_latency_us = 0;
         };
 
         acpi.platform_profile = "low-power";
         usb.autosuspend = 1;
 
-        cpu_dynamic_boot = {
+        cpu_dynamic_boost = {
           type = "sysfs";
           "/sys/devices/system/cpu/intel_pstate/hwp_dynamic_boost" = 1;
         };
@@ -288,11 +284,6 @@ in
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_boost_freq_mhz" = 600;
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_power_profile" = "power_saving";
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 1;
-        };
-
-        audio = {
-          type = "sysfs";
-          "/sys/module/snd_hda_intel/parameters/power_save_controller" = "Y";
         };
 
         audio = {
@@ -325,14 +316,12 @@ in
 
         cpu = {
           governor = "powersave";
-          energy_perf_bias = "power"; # "performance", "balance-performance", "normal", "balance-power" and "power"
+          energy_perf_bias = "power";
           energy_performance_preference = "power";
           min_perf_pct = 0;
           max_perf_pct = 50; # Strict clamp to keep the laptop completely silent and ice-cold
           boost = 0;
           no_turbo = 1;
-          sampling_down_factor = 1;
-          pm_qos_resume_latency_us = 0;
         };
 
         acpi.platform_profile = "low-power";
@@ -352,11 +341,6 @@ in
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/rps_boost_freq_mhz" = 400;
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_power_profile" = "power_saving";
           "/sys/class/drm/card1/device/drm/card1/gt/gt0/slpc_ignore_eff_freq" = 1;
-        };
-
-        audio = {
-          type = "sysfs";
-          "/sys/module/snd_hda_intel/parameters/power_save_controller" = "Y";
         };
 
         audio = {
@@ -410,6 +394,35 @@ in
       '';
       event = "ac_adapter/*";
     };
+  };
+
+  services.throttled = {
+    enable = true;
+    extraConfig = ''
+      [GENERAL]
+      Enabled: True
+      Autoreload: True
+
+      [AC]
+      # How often to override Lenovo's controller
+      Update_Rate_s: 5
+      # Sustained power limit (PL1)
+      PL1_Tdp_W: 15
+      PL1_Duration_s: 28
+      # Short burst power limit (PL2)
+      PL2_Tdp_W: 25
+      PL2_Duration_S: 0.002
+      # Max temperature before thermal throttling
+      Trip_Temp_C: 90
+
+      [BATTERY]
+      Update_Rate_s: 5
+      PL1_Tdp_W: 15
+      PL1_Duration_s: 28
+      PL2_Tdp_W: 25
+      PL2_Duration_S: 0.002
+      Trip_Temp_C: 85
+    '';
   };
 
   environment.systemPackages = [ hypr-powersave ];

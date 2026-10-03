@@ -27,5 +27,14 @@ bindkey -M viins '^ ' autosuggest-accept
 bindkey -M vicmd yy zsh-system-clipboard-vicmd-vi-yank-whole-line
 bindkey -M viopp y zsh-system-clipboard-vicmd-vi-yank
 
-zle -N yazi_fm
-bindkey -M vicmd f yazi_fm
+function yazi_shim() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+	yazi "$@" --cwd-file="$tmp"
+	if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+		cd -- "$cwd"
+	fi
+	rm -f -- "$tmp"
+}
+
+zle -N yazi_shim
+bindkey -M vicmd f yazi_shim

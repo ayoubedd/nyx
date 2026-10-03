@@ -15,7 +15,7 @@
     fd
     ripgrep
     resvg
-    imagemagick
+    imagemagickBig
     fzf
     jq
     direnv

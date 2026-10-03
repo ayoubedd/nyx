@@ -27,7 +27,6 @@
     shell = zsh;
   };
 
-
   home-manager.extraSpecialArgs = { inherit inputs; };
   home-manager.users.orbit = ./home.nix;
 }

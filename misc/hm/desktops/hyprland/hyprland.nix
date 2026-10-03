@@ -1,4 +1,8 @@
-{ pkgs, config, ... }:
+{
+  pkgs,
+  config,
+  ...
+}:
 let
   brightnessctl = "${pkgs.brightnessctl}/bin/brightnessctl";
   loginctl = "${pkgs.systemd}/bin/loginctl";
@@ -15,11 +19,13 @@ in
   wayland.windowManager.hyprland = {
     enable = true;
     package = null;
-    # portalPackage = null;
     systemd.enable = false;
   };
 
-  wayland.windowManager.hyprland.extraConfig = builtins.readFile ./hyprland.lua;
+  home.file.".config/hypr" = {
+    source = ./hypr;
+    recursive = true;
+  };
 
   services.hypridle = {
     enable = true;
@@ -38,7 +44,7 @@ in
         }
         {
           timeout = 150; # 2.5min.
-          on-timeout = "${brightnessctl} -sd tpacpi::kbd_backlight set 0"; # turn off keyboard backlight.
+          on-timeout = "${brightnessctl} -sd tpacpi::kbd_backlight set 00"; # turn off keyboard backlight.
           on-resume = "${brightnessctl} -rd tpacpi::kbd_backlight"; # turn on keyboard backlight.
         }
         {

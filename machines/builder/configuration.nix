@@ -1,6 +1,4 @@
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
@@ -37,9 +35,7 @@
     isSystemUser = true;
     shell = pkgs.bash;
     description = "Remote Nix Builder";
-    openssh.authorizedKeys.keys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDEYDO0g7cCEyEIvb8DqNQHhG4d6uMeEeBrRGbEQzhdYG5PzsK5XUBTORYpZMUkv5schIXeHZViT0oNqSezTtvtMz6L1gqMFHJHv7/PiVhTKgTrOUyK+ksOIWkrfYhwdeza2eTz2ptnugTaOGcwp4E2D5y2lqjwl3nxg6iqHlO3So+hsVFVH76xlSXsIfFZ2TiUV83+vI/3pkZWR873RUcWhvJG/xG9Nok81XK3X+5tydcIHBBy8Xka7v4RchzxPCK8FnVsK5ugNp1neUQLPnuTvP7XY0Dz9t/dl1GsXQVHq8HuYytYDcPBGzz6MlQN8ZQYt6ahS1uOdWrQkLfeHUCFORR6FIqr6/ZkdqrInITePVsNpzopzdeQ/Q//1+9PS57xN4MuUk9ipCNrhvt3wcfvTJQO4NshgdkJEEn9TwvOwOp0ULQNKX/szWmR7pgZfRTpaUI2IkSULCKTqkSYgNLcylKR+sdC3j0xYvorIH3YJz13USRX2c3+MFcYGpsRTT8="
-    ];
+    openssh.authorizedKeys.keys = [ ];
     group = "nixbuilder";
   };
 

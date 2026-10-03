@@ -33,10 +33,6 @@
       inputs.flake-parts.follows = "flake-parts";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    eilmeldung = {
-      url = "github:christo-auer/eilmeldung";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     # impermanence = {
     #   url = "github:nix-community/impermanence";
     #   inputs.nixpkgs.follows = "nixpkgs";
@@ -52,18 +48,19 @@
       url = "github:vicinaehq/vicinae";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    vm-curator = {
+      url = "github:mroboff/vm-curator";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
-
   };
 
   nixConfig = {
     extra-substituters = [
-      "https://cache.xinux.uz"
       "https://attic.xuyh0120.win/lantian"
     ];
     extra-trusted-public-keys = [
-      "cache.xinux.uz:BXCrtqejFjWzWEB9YuGB7X2MV4ttBur1N8BkwQRdH+0="
       "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc="
     ];
   };
@@ -86,8 +83,8 @@
           x1 = nixpkgs.lib.nixosSystem {
             specialArgs = { inherit inputs; };
             modules = with inputs; [
-              (overlay [ inputs.eilmeldung.overlays.default ])
               (overlay [ inputs.nix-cachyos-kernel.overlays.pinned ])
+              (overlay [ (_final: _prev: { vm-curator = inputs.vm-curator.packages.x86_64-linux.default; }) ])
               nixos-hardware.nixosModules.lenovo-thinkpad-x1-9th-gen
               sops-nix.nixosModules.sops
               disko.nixosModules.disko

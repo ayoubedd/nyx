@@ -8,6 +8,7 @@
     extraPackages = with pkgs; [
       # essentials
       nodejs
+
       gcc
       git
       cargo
@@ -18,6 +19,7 @@
       emmylua-ls
 
       # lsp servers
+      helm-ls
       nixd
       pyright
       eslint_d
@@ -37,6 +39,7 @@
       tailwindcss-language-server
       yaml-language-server
       deno
+      tofu-ls
 
       # formatters
       nixfmt
@@ -45,7 +48,7 @@
       black
       stylua
       rustfmt
-      typescript-go
+      typescript
     ];
   };
 

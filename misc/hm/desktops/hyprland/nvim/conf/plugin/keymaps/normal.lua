@@ -43,9 +43,6 @@ set("n", "<leader>sb", "<cmd>Telescope buffers<cr>", { desc = "Find buffers" })
 set("n", "<leader>sg", "<cmd>Telescope live_grep<cr>", { desc = "Live grep" })
 set("n", "<leader>sr", "<cmd>Telescope registers<cr>", { desc = "Search registers" })
 
-set("n", "<leader>s/", "<Plug>(leap-forward)", { desc = "Leap backward" })
-set("n", "<leader>s?", "<Plug>(leap-backward)", { desc = "Leap backward" })
-
 -- LSP Keymaps
 set("n", "<leader>li", ":LspInfo<cr>", { desc = "Connected Language Servers", noremap = true, silent = true })
 set(

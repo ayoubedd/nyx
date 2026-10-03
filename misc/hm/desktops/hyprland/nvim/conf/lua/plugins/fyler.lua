@@ -1,5 +1,6 @@
 return {
 	"FylerOrg/fyler.nvim",
+  enabled = false,
 	opts = {
 		-- Whether to skip confirmation for "simple" mutations.
 		-- A simple mutation has at most:

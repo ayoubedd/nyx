@@ -6,21 +6,21 @@
   ...
 }:
 
-let
-  kernel = pkgs.cachyosKernels.linux-cachyos-bore-lto-x86_64-v4.override {
-    hzTicks = "300";
-    tickrate = "idle";
-    acpiCall = true;
-    bbr3 = true;
-    lto = "full";
-    processorOpt = "x86_64-v4";
-    ccHarder = true;
-    hugepage = "always";
-    preemptType = "voluntary";
-
-    performanceGovernor = true;
-  };
-in
+# let
+#   kernel = pkgs.cachyosKernels.linux-cachyos-bore-lto-x86_64-v4.override {
+#     hzTicks = "300";
+#     tickrate = "idle";
+#     acpiCall = true;
+#     bbr3 = true;
+#     lto = "full";
+#     processorOpt = "x86_64-v4";
+#     ccHarder = true;
+#     hugepage = "always";
+#     preemptType = "voluntary";
+#
+#     performanceGovernor = true;
+#   };
+# in
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
@@ -44,8 +44,9 @@ in
   ];
 
   # boot.kernelPackages = pkgs.linuxPackages_latest;
-  # boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v4;
-  boot.kernelPackages = pkgs.linuxKernel.packagesFor kernel;
+  boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-bore-lto-x86_64-v4;
+  # boot.kernelPackages = pkgs.linuxKernel.packagesFor kernel;
+
   boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
 
   boot.kernelModules = [

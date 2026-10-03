@@ -8,57 +8,57 @@
       isDefault = true;
       id = 0;
 
-      # containersForce = true;
-      #
-      # containers = {
-      #   Personal = {
-      #     color = "blue";
-      #     icon = "fingerprint";
-      #     id = 1;
-      #   };
-      #
-      #   Work = {
-      #     color = "orange";
-      #     icon = "fingerprint";
-      #     id = 2;
-      #   };
-      #
-      #   "NS0" = {
-      #     color = "red";
-      #     icon = "fingerprint";
-      #     id = 3;
-      #   };
-      #
-      #   "NS1" = {
-      #     color = "red";
-      #     icon = "fingerprint";
-      #     id = 4;
-      #   };
-      #
-      #   "NS2" = {
-      #     color = "red";
-      #     icon = "fingerprint";
-      #     id = 5;
-      #   };
-      #
-      #   "NS3" = {
-      #     color = "red";
-      #     icon = "fingerprint";
-      #     id = 6;
-      #   };
-      #
-      #   "NS4" = {
-      #     color = "red";
-      #     icon = "fingerprint";
-      #     id = 7;
-      #   };
-      #
-      #   "NS5" = {
-      #     color = "red";
-      #     icon = "fingerprint";
-      #     id = 8;
-      #   };
-      # };
+      containersForce = true;
+
+      containers = {
+        Personal = {
+          color = "blue";
+          icon = "fingerprint";
+          id = 1;
+        };
+
+        Work = {
+          color = "orange";
+          icon = "fingerprint";
+          id = 2;
+        };
+
+        "NS0" = {
+          color = "red";
+          icon = "fingerprint";
+          id = 3;
+        };
+
+        "NS1" = {
+          color = "red";
+          icon = "fingerprint";
+          id = 4;
+        };
+
+        "NS2" = {
+          color = "red";
+          icon = "fingerprint";
+          id = 5;
+        };
+
+        "NS3" = {
+          color = "red";
+          icon = "fingerprint";
+          id = 6;
+        };
+
+        "NS4" = {
+          color = "red";
+          icon = "fingerprint";
+          id = 7;
+        };
+
+        "NS5" = {
+          color = "red";
+          icon = "fingerprint";
+          id = 8;
+        };
+      };
 
       extensions = {
         force = true;
@@ -180,8 +180,8 @@
         "devtools.accessibility.enabled" = false;
         "distribution.searchplugins.defaultLocale" = "en-US";
         "dom.battery.enabled" = false;
-        "dom.prefetch_dns_for_anchor_http_document" = true;
-        "dom.prefetch_dns_for_anchor_https_document" = true;
+        # "dom.prefetch_dns_for_anchor_http_document" = true;
+        # "dom.prefetch_dns_for_anchor_https_document" = true;
         "dom.push.enabled" = false;
         "dom.push.userAgentID" = "";
         "dom.security.unexpected_system_load_telemetry_enabled" = false;
@@ -220,10 +220,10 @@
         "network.cookie.sameSite.laxByDefault" = true;
         "network.cookie.sameSite.noneRequiresSecure" = true;
         "network.cookie.sameSite.schemeful" = true;
-        "network.dns.echconfig.enabled" = true;
-        "network.dns.echconfig.fallback_to_origin_when_all_failed" = false;
-        "network.dns.http3_echconfig.enabled" = true;
-        "network.dnsCacheExpiration" = 3600;
+        # "network.dns.echconfig.enabled" = true;
+        # "network.dns.echconfig.fallback_to_origin_when_all_failed" = false;
+        # "network.dns.http3_echconfig.enabled" = true;
+        # "network.dnsCacheExpiration" = 3600;
         "network.http.connection-timeout" = 20;
         "network.http.max-connections" = 1800;
         "network.http.max-persistent-connections-per-server" = 10;
