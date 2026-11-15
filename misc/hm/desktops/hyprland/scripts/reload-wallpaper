@@ -1,9 +1,33 @@
 #!/bin/sh
 
+# Wallpaper for the awww daemon.
+#
+# If a wallpaper is pinned (picked in the quickshell dashboard, see
+# quickshell/config/Wallpaper.qml), show it and exit. Otherwise rotate through
+# ~/Pictures/Wallpapers in random order.
+
 DEFAULT_INTERVAL=$((60 * 15)) # In seconds
+PIN="${XDG_STATE_HOME:-$HOME/.local/state}/nyx/wallpaper"
 
 RESIZE_TYPE="fit"
 export SWWW_TRANSITION_FPS="${SWWW_TRANSITION_FPS:-60}"
+
+# The daemon may still be starting with the session.
+tries=0
+until awww query >/dev/null 2>&1 || [ "$tries" -ge 40 ]; do
+	tries=$((tries + 1))
+	sleep 0.25
+done
+
+if [ -f "$PIN" ]; then
+	img=$(cat "$PIN")
+	if [ -e "$img" ]; then
+		echo "pinned wallpaper: $img"
+		awww img -t grow --transition-duration 2 --transition-pos 0.8,0.8 "$img"
+		exit 0
+	fi
+	echo "pinned wallpaper missing ($img), rotating instead"
+fi
 
 while true; do
 	find "$HOME/Pictures/Wallpapers" -type f \

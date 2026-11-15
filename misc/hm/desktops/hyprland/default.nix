@@ -25,6 +25,7 @@
 
     # Applets
     ./applets
+    ./quickshell
     ./services.nix
 
     ./browsers/librewolf.nix
@@ -51,6 +52,7 @@
     hyprpicker
     slurp
     grim
+    satty # screenshot editor (quickshell Screenshot.qml "Edit")
     wofi-emoji
     jq
     wl-clip-persist

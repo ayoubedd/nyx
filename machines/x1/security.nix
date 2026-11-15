@@ -117,6 +117,21 @@ in
       fprintAuth = false;
     };
 
+    # Quickshell lock screen (misc/hm/desktops/hyprland/quickshell/config/Lock.qml).
+    # Same as hyprlock: YubiKey challenge-response, then password.
+    quickshell-lock = {
+      fprintAuth = false;
+    };
+
+    # Fingerprint-only service, run in parallel with the one above so the
+    # lock screen accepts a finger without blocking the password prompt.
+    quickshell-lock-fprint = {
+      fprintAuth = true;
+      unixAuth = false;
+      yubicoAuth = false;
+      u2fAuth = false;
+    };
+
     sudo = {
       u2fAuth = true;
       nodelay = true;

@@ -10,5 +10,6 @@
     ];
   };
 
-  services.network-manager-applet.enable = true;
+  # Wi-Fi is handled by the quickshell bar (see ./quickshell/default.nix).
+  # services.network-manager-applet.enable = true;
 }

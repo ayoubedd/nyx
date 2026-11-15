@@ -38,4 +38,5 @@ vim.lsp.enable({
 	"nixd",
 	"yamlls",
 	"helm_ls",
+	"qmlls",
 })

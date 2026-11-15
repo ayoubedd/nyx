@@ -66,3 +66,13 @@ hl.window_rule({
 	match = { class = "mpv" },
 	idle_inhibit = "focus",
 })
+
+-- Layer Rules
+-- Frosted-glass blur behind the quickshell control center and notification
+-- popups. ignore_alpha skips the fully transparent parts of the surface.
+hl.layer_rule({
+	name = "quickshell-glass",
+	match = { namespace = "^nyx-(control-center|notifications|osd|polkit|overview|nowplaying)$" },
+	blur = true,
+	ignore_alpha = 0.1,
+})

@@ -17,6 +17,7 @@
       ripgrep
       inotify-tools
       emmylua-ls
+      kdePackages.qtdeclarative # qmlls (quickshell)
 
       # lsp servers
       helm-ls

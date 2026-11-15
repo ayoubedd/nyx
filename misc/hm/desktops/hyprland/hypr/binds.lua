@@ -1,6 +1,6 @@
 require("globals")
 
-hl.bind(mod .. " + SHIFT + C", exec_cmd("hyprpicker | wl-copy"), { locked = true, repeating = true })
+hl.bind(mod .. " + SHIFT + C", exec_cmd("hyprpicker | wl-copy"), { repeating = true })
 
 hl.bind(mod .. " + " .. left, hl.dsp.focus({ direction = "left" }))
 hl.bind(mod .. " + " .. right, hl.dsp.focus({ direction = "right" }))
@@ -15,7 +15,7 @@ hl.bind(mod .. " + q", hl.dsp.window.close())
 hl.bind(mod .. " + SHIFT + q", hl.dsp.window.kill())
 hl.bind(mod .. " + SHIFT + Space", hl.dsp.window.float())
 hl.bind(mod .. " + f", hl.dsp.window.fullscreen({ layout_aware = false }))
-hl.bind(mod .. " + ALT + l", exec_cmd("hyprlock")) -- needs a fix
+hl.bind(mod .. " + ALT + l", exec_cmd("loginctl lock-session")) -- -> hypridle lock_cmd (quickshell lock)
 hl.bind(mod .. " + ALT + s", exec_cmd("vicinae deeplink vicinae://launch/power/suspend")) -- needs a fix
 
 hl.bind(mod .. " + d", exec_cmd("vicinae toggle")) -- needs a fix
@@ -47,7 +47,13 @@ hl.bind(mod .. " + SHIFT + F", exec_cmd("" .. file_manager))
 
 hl.bind("ALT + R", hl.dsp.submap("resize"))
 hl.bind("ALT + M", hl.dsp.submap("move"))
-hl.bind("ALT + S", hl.dsp.submap("snapshot"))
+-- Screenshot overlay (quickshell Screenshot.qml); falls back to slurp+grim if
+-- quickshell isn't running.
+hl.bind("ALT + S", exec_cmd("qs -c nyx ipc call screenshot open || " .. snaparea))
+hl.bind("Print", exec_cmd("qs -c nyx ipc call screenshot open || " .. snaparea))
+
+-- Workspace overview with live window previews (quickshell Overview.qml).
+hl.bind(mod .. " + Tab", exec_cmd("qs -c nyx ipc call overview toggle"))
 hl.bind("ALT + N", hl.dsp.submap("notifications"))
 
 hl.define_submap("resize", function()
@@ -68,17 +74,10 @@ hl.define_submap("move", function()
 	hl.bind("escape", hl.dsp.submap("reset"))
 end)
 
-hl.define_submap("snapshot", "reset", function()
-	-- Set repeating binds for resizing the active window.
-	hl.bind("f", exec_cmd(snapfull))
-	hl.bind("a", exec_cmd(snaparea))
-	hl.bind("escape", hl.dsp.submap("reset"))
-end)
-
 hl.define_submap("notifications", "reset", function()
-	hl.bind("c", exec_cmd("swaync-client -C"))
-	hl.bind("t", exec_cmd("swaync-client -t -sw"))
-	hl.bind("d", exec_cmd("swaync-client --toggle-dnd"))
+	hl.bind("c", exec_cmd("qs -c nyx ipc call notifications clear"))
+	hl.bind("t", exec_cmd("qs -c nyx ipc call notifications toggle"))
+	hl.bind("d", exec_cmd("qs -c nyx ipc call notifications toggleDnd"))
 	hl.bind("escape", hl.dsp.submap("reset"))
 end)
 
@@ -99,8 +98,21 @@ hl.bind(
 	exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
 	{ locked = true, repeating = true }
 )
-hl.bind("XF86MonBrightnessUp", exec_cmd("brightnessctl -s -e4 -n2 set +5%"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", exec_cmd("brightnessctl -s -e4 -n2 set 5%-"), { locked = true, repeating = true })
+-- Linear 5% steps of the full range (no -e exponent curve), so steps are even
+-- and match the percentage shown by the OSD / control center slider.
+-- -n5 is a raw floor (brightnessctl ignores "%" there): ~1% of the x1's 504 max,
+-- so the panel never goes fully black.
+-- `qs ... osd brightness` shows the quickshell OSD (no-op if quickshell isn't running).
+hl.bind(
+	"XF86MonBrightnessUp",
+	exec_cmd("brightnessctl -n5 set +5% && qs -c nyx ipc call osd brightness"),
+	{ locked = true, repeating = true }
+)
+hl.bind(
+	"XF86MonBrightnessDown",
+	exec_cmd("brightnessctl -n5 set 5%- && qs -c nyx ipc call osd brightness"),
+	{ locked = true, repeating = true }
+)
 
 -- Requires playerctl
 hl.bind("XF86AudioNext", exec_cmd("playerctl next"), { locked = true })

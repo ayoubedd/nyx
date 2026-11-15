@@ -5,6 +5,7 @@
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
     font-awesome
+    material-symbols # quickshell icons
     source-han-sans
     source-han-serif
   ];

@@ -10,19 +10,16 @@
   # keyMap = "us";
   # };
 
-  # Services
-  services = {
-    greetd = {
-      enable = true;
-      useTextGreeter = true;
-      settings = {
-        default_session = {
-          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --remember-user-session --asterisks -g 'FREE AS IN FREEDOM'";
-          user = "greeter";
-        };
-      };
-    };
-  };
+  # Login screen: greetd + quickshell greeter (falls back to tuigreet),
+  # see ../../misc/nixos/apps/quickshell_greeter.nix (imported in ./default.nix).
+
+  # Wi-Fi is handled by the quickshell bar. programs.nm-applet (shared
+  # misc/nixos/common/networking.nix) runs nm-applet as a systemd user service,
+  # which the autostart override can't hide, so turn it off here. Keep the
+  # package for nm-connection-editor ("Network settings" in the bar); its XDG
+  # autostart entry is hidden by the home-manager quickshell module.
+  programs.nm-applet.enable = lib.mkForce false;
+  environment.systemPackages = [ pkgs.networkmanagerapplet ];
 
   boot.binfmt.registrations.appimage = {
     wrapInterpreterInShell = false;

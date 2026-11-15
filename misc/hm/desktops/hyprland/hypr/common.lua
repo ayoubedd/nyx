@@ -14,8 +14,14 @@ hl.config({
 	},
 
 	decoration = {
+		-- Only affects translucent surfaces (e.g. the quickshell control center).
 		blur = {
-			enabled = false,
+			enabled = true,
+			size = 14,
+			passes = 4,
+			noise = 0.02,
+			vibrancy = 0.2,
+			popups = false,
 		},
 		shadow = {
 			enabled = false,
@@ -64,6 +70,8 @@ hl.config({
 		font_family = "Noto Sans Mono",
 		mouse_move_enables_dpms = true,
 		key_press_enables_dpms = true,
+		-- Let a restarted quickshell take over the lock if it crashes while locked.
+		allow_session_lock_restore = true,
 	},
 
 	ecosystem = {
