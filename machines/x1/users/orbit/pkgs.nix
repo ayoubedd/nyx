@@ -10,7 +10,7 @@
     zed-editor
 
     # Misc
-    vm-curator
+    # vm-curator
     rustnet
     lsof
     traceroute

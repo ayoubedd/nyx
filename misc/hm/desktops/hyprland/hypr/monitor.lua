@@ -7,6 +7,7 @@ hl.monitor({
 	scale = 2,
 	bitdepth = 8,
 	vrr = 2,
+	cm = "srgb",
 })
 
 hl.gesture({

@@ -15,7 +15,7 @@ hl.bind(mod .. " + q", hl.dsp.window.close())
 hl.bind(mod .. " + SHIFT + q", hl.dsp.window.kill())
 hl.bind(mod .. " + SHIFT + Space", hl.dsp.window.float())
 hl.bind(mod .. " + f", hl.dsp.window.fullscreen({ layout_aware = false }))
-hl.bind(mod .. " + ALT + l", exec_cmd("vicinae deeplink vicinae://launch/power/lock")) -- needs a fix
+hl.bind(mod .. " + ALT + l", exec_cmd("hyprlock")) -- needs a fix
 hl.bind(mod .. " + ALT + s", exec_cmd("vicinae deeplink vicinae://launch/power/suspend")) -- needs a fix
 
 hl.bind(mod .. " + d", exec_cmd("vicinae toggle")) -- needs a fix

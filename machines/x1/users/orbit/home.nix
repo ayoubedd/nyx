@@ -9,7 +9,6 @@
   imports = with inputs; [
     vicinae.homeManagerModules.default
     stylix.homeModules.stylix
-    nur.modules.homeManager.default
     nix-flatpak.homeManagerModules.nix-flatpak
 
     ../../../../modules/hm
@@ -26,6 +25,9 @@
   ];
 
   news.display = "silent";
+
+  # useGlobalPkgs forbids nixpkgs.overlays in HM; overlays are set at the NixOS level
+  stylix.overlays.enable = false;
 
   home.username = "orbit";
   home.homeDirectory = "/home/orbit";

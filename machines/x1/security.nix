@@ -17,7 +17,7 @@ in
   };
 
   systemIdentity = {
-    enable = true;
+    enable = false;
     pcr15 = "704763c32ce8e3bb53283f8dad0bc2f330f5891fdd7282a8a27de09041e2c2a1";
   };
 
@@ -129,7 +129,7 @@ in
   };
 
   services.usbguard = {
-    enable = true;
+    enable = false;
     implicitPolicyTarget = "block";
     IPCAllowedUsers = [
       "root"

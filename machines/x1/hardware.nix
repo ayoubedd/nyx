@@ -82,7 +82,7 @@
     };
 
     measuredBoot = {
-      enable = true;
+      enable = false;
       pcrs = [
         # --- Platform/Firmware Integrity (Highly Static) ---
         0 # Motherboard BIOS/UEFI firmware executable code

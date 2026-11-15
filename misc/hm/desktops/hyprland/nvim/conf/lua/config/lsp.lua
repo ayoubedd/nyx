@@ -37,5 +37,5 @@ vim.lsp.enable({
 	"tofu_ls",
 	"nixd",
 	"yamlls",
-	"helm",
+	"helm_ls",
 })

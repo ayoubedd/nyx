@@ -144,6 +144,7 @@ in
       // gen_default_app "mpv.desktop" [
         "application/ogg"
         "text/vnd.trolltech.linguist"
+        "video/matroska"
         "application/x-ogg"
         "application/mxf"
         "application/sdp"

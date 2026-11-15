@@ -6,6 +6,8 @@
 }:
 {
   imports = [
+    inputs.nur.modules.nixos.default
+
     ../../misc/nixos/common
     ../../misc/nixos/apps/qemu.nix
     ../../misc/nixos/apps/gns3.nix
@@ -36,5 +38,5 @@
     stateVersion = config.system.stateVersion;
   };
 
-  system.stateVersion = "26.05";
+  system.stateVersion = "26.11";
 }

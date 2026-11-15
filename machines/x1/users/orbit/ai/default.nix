@@ -1,6 +1,9 @@
-{ ... }: {
+{ pkgs, ... }: {
   imports = [
     ./claude.nix
-    ./opencode.nix
+    # ./opencode.nix
+    # ./codex.nix
   ];
+
+  home.packages = with pkgs; [ herdr ];
 }

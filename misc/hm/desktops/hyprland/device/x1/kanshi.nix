@@ -4,38 +4,36 @@
     enable = true;
     settings = [
       {
-        profile.name = "undocked";
+        profile.name = "normal";
         profile.outputs = [
           {
             criteria = "eDP-1";
-            adaptiveSync = true;
-            scale = 2.0;
             status = "enable";
           }
         ];
       }
       {
-        profile.name = "docked";
+        profile.name = "usbc-direct-dp-3";
         profile.outputs = [
           {
             criteria = "eDP-1";
             status = "disable";
           }
           {
-            criteria = "DP-2";
+            criteria = "DP-3";
             status = "enable";
           }
         ];
       }
       {
-        profile.name = "hdmi-direct";
+        profile.name = "usbc-direct-dp-6";
         profile.outputs = [
           {
             criteria = "eDP-1";
             status = "disable";
           }
           {
-            criteria = "HDMI-A-1";
+            criteria = "DP-6";
             status = "enable";
           }
         ];
