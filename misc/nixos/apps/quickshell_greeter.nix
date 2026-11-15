@@ -42,8 +42,8 @@ let
   greeterConfig = pkgs.runCommand "nyx-quickshell-greeter" { } ''
     mkdir -p $out
     cp ${./quickshell-greeter}/*.qml $out/
-    cp ${shellConfig + "/Theme.qml"} $out/Theme.qml
-    cp ${shellConfig + "/Icon.qml"} $out/Icon.qml
+    cp ${shellConfig + "/common/Theme.qml"} $out/Theme.qml
+    cp ${shellConfig + "/common/Icon.qml"} $out/Icon.qml
   '';
 
   # Same cursor as the desktop (gtk.cursorTheme / stylix in theming.nix).

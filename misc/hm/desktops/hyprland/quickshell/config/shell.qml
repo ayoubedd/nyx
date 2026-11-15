@@ -5,6 +5,11 @@
 // gtk.iconTheme in ../../theming.nix. Read at startup only (restart, not reload).
 //@ pragma IconTheme Colloid-Grey-Dark
 import Quickshell
+import qs.common
+import qs.bar
+import qs.notifications
+import qs.lock
+import qs.overlays
 
 ShellRoot {
     Bar {}
