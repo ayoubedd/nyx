@@ -13,7 +13,11 @@ Item {
         return Math.max(0, Math.min(1, v));
     }
 
-    width: parent ? parent.width : 0
+    // No width binding of its own: the parent decides (a Column sets
+    // `width: parent.width`, a RowLayout uses Layout.fillWidth). Binding
+    // width here fought RowLayouts and made the slider overflow until the
+    // next relayout.
+    implicitWidth: 120
     implicitHeight: 26
 
     Rectangle {

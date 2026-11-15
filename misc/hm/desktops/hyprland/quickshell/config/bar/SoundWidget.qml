@@ -34,94 +34,67 @@ BarButton {
         contentWidth: 340
         // The sliders show the level; don't also pop the OSD.
         suppressOsd: true
+        contentSpacing: 8
 
-        // ---- output ----
-        DropdownHeader {
+        // Collapse the device pickers when the menu closes.
+        onShownChanged: if (!shown) {
+            outputCard.expanded = false;
+            inputCard.expanded = false;
+        }
+
+        SoundSection {
+            id: outputCard
             title: "Output"
-            showToggle: false
-        }
-
-        VolumeRow {
-            x: 8
-            width: parent.width - 16
             node: Audio.sink
+            devices: Audio.outputs
         }
 
-        Repeater {
-            model: Audio.outputs
-
-            MenuItem {
-                required property var modelData
-                icon: Audio.deviceIcon(modelData)
-                label: Audio.deviceName(modelData)
-                highlighted: modelData === Audio.sink
-                onClicked: Audio.makeDefault(modelData)
-            }
-        }
-
-        Separator {}
-
-        // ---- input ----
-        DropdownHeader {
+        SoundSection {
+            id: inputCard
             title: "Input"
-            showToggle: false
-        }
-
-        VolumeRow {
-            x: 8
-            width: parent.width - 16
-            visible: !!Audio.source
             node: Audio.source
-            icon: (Audio.source?.audio?.muted ?? false) ? "mic_off" : "mic"
+            devices: Audio.inputs
+            isInput: true
         }
 
-        Repeater {
-            model: Audio.inputs
-
-            MenuItem {
-                required property var modelData
-                icon: Audio.deviceIcon(modelData)
-                label: Audio.deviceName(modelData)
-                highlighted: modelData === Audio.source
-                onClicked: Audio.makeDefault(modelData)
-            }
-        }
-
-        // ---- apps ----
-        Separator {
+        // Apps playing audio (only while there are some).
+        Rectangle {
             visible: Audio.apps.length > 0
-        }
-
-        DropdownHeader {
-            visible: Audio.apps.length > 0
-            title: "Apps"
-            showToggle: false
-        }
-
-        Column {
             width: parent.width
-            leftPadding: 8
-            rightPadding: 8
-            bottomPadding: 4
-            spacing: 10
+            implicitHeight: appsColumn.implicitHeight + 24
+            radius: 14
+            color: Theme.surface
 
-            Repeater {
-                model: Audio.apps
+            Column {
+                id: appsColumn
+                x: 12
+                y: 12
+                width: parent.width - 24
+                spacing: 10
 
-                AppVolume {
-                    required property var modelData
-                    node: modelData
-                    width: parent.width - 16
+                Text {
+                    text: "Apps"
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize - 1
+                    font.weight: Font.DemiBold
+                    color: Theme.foreground
+                }
+
+                Repeater {
+                    model: Audio.apps
+
+                    AppVolume {
+                        required property var modelData
+                        node: modelData
+                        width: appsColumn.width
+                    }
                 }
             }
         }
 
-        Separator {}
-
         MenuItem {
             icon: "settings"
             label: "Sound settings"
-            tint: Theme.foregroundDim
             onClicked: {
                 menu.shown = false;
                 Quickshell.execDetached(["pavucontrol"]);

@@ -63,10 +63,23 @@ let
     export XDG_CACHE_HOME=/tmp/nyx-greeter-cache
     # cage draws no decorations, so Qt would add its own title bar.
     export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-    # Same cursor as the desktop (cage and the greeter both read these).
+    # HiDPI: cage has no output scaling, so on a 4K panel everything would be
+    # tiny. Scale the greeter with Qt instead (renders at full resolution, not
+    # an upscaled image): 2x if a connected display is >= 3000px wide, else 1x.
+    scale=1
+    for status in /sys/class/drm/card*-*/status; do
+      [ "$(cat "$status" 2>/dev/null)" = connected ] || continue
+      width=$(head -n1 "$(dirname "$status")/modes" 2>/dev/null | cut -dx -f1)
+      [ -n "$width" ] && [ "$width" -ge 3000 ] && scale=2
+    done
+    export QT_SCALE_FACTOR=$scale
+    export QT_ENABLE_HIGHDPI_SCALING=1
+
+    # Same cursor as the desktop (cage and the greeter both read these);
+    # cage doesn't scale the cursor either, so size it to match.
     export XCURSOR_PATH=${cursorPackage}/share/icons
     export XCURSOR_THEME=${cursorTheme}
-    export XCURSOR_SIZE=${cursorSize}
+    export XCURSOR_SIZE=$(( ${cursorSize} * scale ))
 
     # The greeter touches this right before handing the session to greetd.
     # cage can crash on its way out after that (segfault in libwayland-server

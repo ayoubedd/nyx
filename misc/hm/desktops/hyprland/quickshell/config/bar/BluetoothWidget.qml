@@ -145,224 +145,250 @@ BarButton {
     Dropdown {
         id: menu
         target: root
-        contentWidth: 300
+        contentWidth: 340
+        contentSpacing: 8
 
         onShownChanged: if (!shown && root.scanning)
             root.setScanning(false)
 
-        DropdownHeader {
-            title: "Bluetooth"
-            checked: root.enabled
-            onToggled: if (root.adapter)
-                root.adapter.enabled = !root.adapter.enabled
-        }
+        // ---- Bluetooth: switch + my devices ----
+        Rectangle {
+            width: parent.width
+            implicitHeight: mineColumn.implicitHeight + 24
+            radius: 14
+            color: Theme.surface
 
-        // ---- My devices ----
-        Repeater {
-            model: root.enabled ? root.paired : []
-
-            MouseArea {
-                id: row
-                required property var modelData
-                readonly property bool busy: modelData.state === BluetoothDeviceState.Connecting || modelData.state === BluetoothDeviceState.Disconnecting
-                readonly property real battery: modelData.battery > 1 ? modelData.battery / 100 : modelData.battery
-
-                width: parent.width
-                implicitHeight: 36
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: modelData.connected ? modelData.disconnect() : modelData.connect()
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: Theme.radius - 4
-                    color: row.containsMouse ? Theme.surface : "transparent"
-                }
+            Column {
+                id: mineColumn
+                x: 12
+                y: 12
+                width: parent.width - 24
+                spacing: 10
 
                 RowLayout {
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
-                    anchors.rightMargin: 6
-                    spacing: 12
-
-                    Icon {
-                        name: root.deviceIcon(row.modelData)
-                        filled: row.modelData.connected
-                        color: row.modelData.connected ? Theme.accent : Theme.foreground
-                    }
+                    width: parent.width
 
                     Text {
                         Layout.fillWidth: true
-                        text: root.label(row.modelData)
-                        elide: Text.ElideRight
+                        text: "Bluetooth"
                         font.family: Theme.font
-                        font.pixelSize: Theme.fontSize
+                        font.pixelSize: Theme.fontSize - 1
+                        font.weight: Font.DemiBold
                         color: Theme.foreground
                     }
 
-                    Text {
-                        visible: text !== "" && !forget.visible
-                        text: row.busy ? "…" : row.modelData.connected && row.modelData.batteryAvailable ? `${Math.round(row.battery * 100)}%` : ""
-                        font.family: Theme.font
-                        font.pixelSize: Theme.fontSize - 2
-                        color: Theme.foregroundDim
-                    }
-
-                    // Forget (unpair), on hover.
-                    PillButton {
-                        id: forget
-                        visible: row.containsMouse || containsMouse
-                        icon: "close"
-                        onClicked: row.modelData.forget()
+                    Toggle {
+                        checked: root.enabled
+                        onToggled: if (root.adapter)
+                            root.adapter.enabled = !root.adapter.enabled
                     }
                 }
-            }
-        }
 
-        // ---- Other devices ----
-        Separator {
-            visible: root.enabled
-        }
-
-        RowLayout {
-            visible: root.enabled
-            width: parent.width
-            height: 36
-
-            Text {
-                Layout.fillWidth: true
-                Layout.leftMargin: 10
-                // Nameless devices aren't listed; their count lives here so it
-                // doesn't add a line.
-                text: root.unnamedCount > 0 ? `Other devices · ${root.unnamedCount} unnamed` : "Other devices"
-                elide: Text.ElideRight
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize - 1
-                font.weight: Font.DemiBold
-                color: Theme.foregroundDim
-            }
-
-            // Scan / Stop.
-            MouseArea {
-                Layout.rightMargin: 6
-                implicitWidth: scanRow.implicitWidth + 18
-                implicitHeight: 26
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: root.setScanning(!root.scanning)
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: height / 2
-                    color: root.scanning ? Theme.accent : parent.containsMouse ? Theme.surfaceHigh : Theme.surface
+                Text {
+                    visible: !root.enabled
+                    text: !root.adapter ? "No Bluetooth adapter" : "Bluetooth is off"
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize - 2
+                    color: Theme.foregroundDim
                 }
 
-                Row {
-                    id: scanRow
-                    anchors.centerIn: parent
-                    spacing: 5
+                Text {
+                    visible: root.enabled && root.paired.length > 0
+                    text: "My devices"
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize - 3
+                    font.weight: Font.DemiBold
+                    color: Theme.foregroundDim
+                }
 
-                    Icon {
-                        anchors.verticalCenter: parent.verticalCenter
-                        name: root.scanning ? "progress_activity" : "radar"
-                        size: 15
-                        color: root.scanning ? Theme.background : Theme.foreground
+                Column {
+                    visible: root.enabled && root.paired.length > 0
+                    width: parent.width
+                    spacing: 4
 
-                        RotationAnimation on rotation {
-                            running: root.scanning
-                            loops: Animation.Infinite
-                            from: 0
-                            to: 360
-                            duration: 1000
+                    Repeater {
+                        model: root.enabled ? root.paired : []
+
+                        BluetoothItem {
+                            required property var modelData
+                            width: mineColumn.width
+                            device: modelData
+                            label: root.label(modelData)
+                            icon: root.deviceIcon(modelData)
+                            onClicked: modelData.connected ? modelData.disconnect() : modelData.connect()
                         }
                     }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: root.scanning ? "Stop" : "Scan"
-                        font.family: Theme.font
-                        font.pixelSize: Theme.fontSize - 2
-                        font.weight: Font.DemiBold
-                        color: root.scanning ? Theme.background : Theme.foreground
-                    }
                 }
             }
         }
 
-        // Discovered devices: a fixed-height scrolling list, so the menu
-        // doesn't change size (and jump around) as devices are found.
-        // ScriptModel keeps rows for devices already listed; new ones are
-        // appended (discovery order, no re-sorting).
-        Item {
+        // ---- Other devices (pairing) ----
+        Rectangle {
             visible: root.enabled
             width: parent.width
-            height: 5 * 36
+            implicitHeight: otherColumn.implicitHeight + 24
+            radius: 14
+            color: Theme.surface
 
-            ListView {
-                id: found
-                anchors.fill: parent
-                clip: true
-                boundsBehavior: Flickable.StopAtBounds
-                model: ScriptModel {
-                    values: root.enabled ? root.nearby : []
-                }
+            Column {
+                id: otherColumn
+                x: 12
+                y: 12
+                width: parent.width - 24
+                spacing: 8
 
-                delegate: MenuItem {
-                    id: row
-                    required property var modelData
+                RowLayout {
+                    width: parent.width
 
-                    width: found.width
-                    icon: root.deviceIcon(modelData)
-                    label: root.label(modelData)
-                    detail: modelData.pairing ? "Pairing…" : root.failedAddress === modelData.address ? "Pairing failed" : "Pair"
-                    onClicked: if (!modelData.pairing)
-                        root.pair(modelData)
+                    Text {
+                        Layout.fillWidth: true
+                        // Nameless devices aren't listed; their count lives here.
+                        text: root.unnamedCount > 0 ? `Other devices · ${root.unnamedCount} unnamed` : "Other devices"
+                        elide: Text.ElideRight
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSize - 1
+                        font.weight: Font.DemiBold
+                        color: Theme.foreground
+                    }
 
-                    // Pairing ended without success -> show the failure.
-                    // (Success is handled by root.onPairedChanged.)
-                    Connections {
-                        target: row.modelData
-                        function onPairingChanged() {
-                            if (!row.modelData.pairing && !row.modelData.paired) {
-                                root.failedAddress = row.modelData.address;
-                                if (root.pendingAddress === row.modelData.address)
-                                    root.pendingAddress = "";
-                                clearFailed.restart();
+                    // Scan / Stop.
+                    MouseArea {
+                        id: scanButton
+                        implicitWidth: scanRow.implicitWidth + 18
+                        implicitHeight: 24
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.setScanning(!root.scanning)
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: height / 2
+                            color: root.scanning ? Theme.accent : scanButton.containsMouse ? Theme.muted : Theme.surfaceHigh
+
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: Theme.animDuration
+                                }
+                            }
+                        }
+
+                        Row {
+                            id: scanRow
+                            anchors.centerIn: parent
+                            spacing: 5
+
+                            Icon {
+                                anchors.verticalCenter: parent.verticalCenter
+                                name: root.scanning ? "progress_activity" : "radar"
+                                size: 14
+                                color: root.scanning ? Theme.background : Theme.foreground
+
+                                RotationAnimation on rotation {
+                                    running: root.scanning
+                                    loops: Animation.Infinite
+                                    from: 0
+                                    to: 360
+                                    duration: 1000
+                                }
+                            }
+
+                            Text {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: root.scanning ? "Stop" : "Scan"
+                                font.family: Theme.font
+                                font.pixelSize: Theme.fontSize - 2
+                                font.weight: Font.DemiBold
+                                color: root.scanning ? Theme.background : Theme.foreground
                             }
                         }
                     }
                 }
-            }
 
-            // Thin scroll indicator when there's more than fits.
-            Rectangle {
-                visible: found.contentHeight > found.height
-                anchors.right: parent.right
-                anchors.rightMargin: 1
-                y: found.height * found.visibleArea.yPosition
-                width: 3
-                height: Math.max(16, found.height * found.visibleArea.heightRatio)
-                radius: 1.5
-                color: Theme.muted
-            }
+                // Fixed-height scrolling list, so the menu doesn't change size
+                // (and jump around) as devices are found. ScriptModel keeps
+                // rows for devices already listed; new ones are appended.
+                Item {
+                    width: parent.width
+                    height: 4 * 44
 
-            // Placeholder inside the same area (no height change).
-            Text {
-                visible: found.count === 0
-                anchors.centerIn: parent
-                text: root.scanning ? "Looking for devices…" : "Scan to find devices nearby"
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize - 2
-                color: Theme.foregroundDim
+                    ListView {
+                        id: found
+                        anchors.fill: parent
+                        spacing: 4
+                        clip: true
+                        boundsBehavior: Flickable.StopAtBounds
+                        model: ScriptModel {
+                            values: root.enabled ? root.nearby : []
+                        }
+
+                        delegate: BluetoothItem {
+                            id: nearbyRow
+                            required property var modelData
+                            width: found.width - 6
+                            x: 6
+                            device: modelData
+                            paired: false
+                            label: root.label(modelData)
+                            icon: root.deviceIcon(modelData)
+                            failed: root.failedAddress === modelData.address
+                            onClicked: if (!modelData.pairing)
+                                root.pair(modelData)
+
+                            // Pairing ended without success -> show the failure.
+                            // (Success is handled by root.onPairedChanged.)
+                            Connections {
+                                target: nearbyRow.modelData
+                                function onPairingChanged() {
+                                    if (!nearbyRow.modelData.pairing && !nearbyRow.modelData.paired) {
+                                        root.failedAddress = nearbyRow.modelData.address;
+                                        if (root.pendingAddress === nearbyRow.modelData.address)
+                                            root.pendingAddress = "";
+                                        clearFailed.restart();
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Thin scroll indicator when there's more than fits.
+                    Rectangle {
+                        visible: found.contentHeight > found.height
+                        anchors.right: parent.right
+                        y: found.height * found.visibleArea.yPosition
+                        width: 3
+                        height: Math.max(16, found.height * found.visibleArea.heightRatio)
+                        radius: 1.5
+                        color: Theme.muted
+                    }
+
+                    // Placeholder inside the same area (no height change).
+                    Column {
+                        visible: found.count === 0
+                        anchors.centerIn: parent
+                        spacing: 6
+
+                        Icon {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            name: root.scanning ? "bluetooth_searching" : "radar"
+                            size: 26
+                            color: Theme.foregroundDim
+                        }
+
+                        Text {
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            text: root.scanning ? "Looking for devices…" : "Scan to find devices nearby"
+                            font.family: Theme.font
+                            font.pixelSize: Theme.fontSize - 2
+                            color: Theme.foregroundDim
+                        }
+                    }
+                }
             }
         }
-
-        Separator {}
 
         MenuItem {
             icon: "settings"
             label: "Bluetooth settings"
-            tint: Theme.foregroundDim
             onClicked: {
                 menu.shown = false;
                 Quickshell.execDetached(["blueman-manager"]);

@@ -228,6 +228,7 @@ PanelWindow {
                     }
 
                     Slider {
+                        width: parent.width
                         visible: root.brightness >= 0
                         icon: "brightness_6"
                         value: root.brightness
@@ -239,6 +240,7 @@ PanelWindow {
 
                     // Warmth, only while night light is on (left = neutral, right = warmest).
                     Slider {
+                        width: parent.width
                         visible: NightLight.on
                         icon: "nightlight"
                         value: NightLight.warmth
@@ -256,6 +258,7 @@ PanelWindow {
                     }
 
                     Slider {
+                        width: parent.width
                         icon: (root.sink?.audio.muted ?? false) ? "volume_off" : "volume_up"
                         value: root.sink?.audio.volume ?? 0
                         onMoved: v => {

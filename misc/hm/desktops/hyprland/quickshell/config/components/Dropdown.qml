@@ -28,6 +28,8 @@ PanelWindow {
     property bool suppressOsd: false
     // Slide down from the top edge when opening, back up when closing.
     property bool slide: false
+    // Gap between rows (compact menus use 0).
+    property alias contentSpacing: column.spacing
 
     // Logical open state.
     property bool shown: false

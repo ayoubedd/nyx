@@ -8,7 +8,9 @@ hl.config({
 	},
 
 	general = {
-		gaps_out = 2,
+		-- Windows are 2 * gaps_in apart, so the top (bar side) gets the same
+		-- 4px; the screen edges keep 2.
+		gaps_out = { top = 4, right = 2, bottom = 2, left = 2 },
 		gaps_in = 2,
 		layout = "dwindle",
 	},
