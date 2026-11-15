@@ -13,6 +13,13 @@
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
       inputs.nixpkgs.follows = "nixpkgs";
+      # lanzaboote's pinned rust-overlay uses the deprecated stdenv.isLinux /
+      # stdenv.isDarwin (eval warnings); a current one uses hostPlatform.*.
+      inputs.rust-overlay.follows = "rust-overlay";
+    };
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     sops-nix = {
       url = "github:Mic92/sops-nix";
