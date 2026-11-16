@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Networking
 import qs.common
+import qs.services
 import qs.components
 
 // Bar network icon + menu (cards, like the sound menu):
@@ -63,6 +64,15 @@ BarButton {
         return `Wi-Fi: ${current.name} · ${Math.round(strength(current) * 100)}%`;
     }
     onClicked: menu.toggle()
+
+    // qs -c nyx ipc call bar toggle network
+    Connections {
+        target: Ui
+        function onMenuRequested(name, screen) {
+            if (name === "network" && (root.QsWindow.window?.screen?.name ?? "") === screen)
+                menu.toggle();
+        }
+    }
 
     Dropdown {
         id: menu

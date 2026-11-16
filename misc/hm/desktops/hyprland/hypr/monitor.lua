@@ -26,10 +26,8 @@ hl.on("hyprland.start", function()
 	)
 	hl.exec_cmd("systemctl --user restart xdg-desktop-portal.service")
 	hl.exec_cmd("sleep 3 & uwsm app -- pactl set-sink-mute @DEFAULT_SINK@ 1")
-	hl.exec_cmd("sleep 3 & uwsm app -- usbguard-notifier")
 	hl.exec_cmd("uwsm app -- " .. browser)
 	hl.exec_cmd("uwsm app -- " .. terminal)
-	hl.exec_cmd("bash -c hypr-powersave")
 end)
 
 -- HDR support

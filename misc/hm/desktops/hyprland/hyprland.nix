@@ -11,12 +11,10 @@ let
   systemctl = "${pkgs.systemd}/bin/systemctl";
   pidof = "${pkgs.procps}/bin/pidof";
   qs = "${config.programs.quickshell.package}/bin/qs";
+  dpmsOn = "${hyprctl} dispatch 'hl.dsp.dpms({ action = \"enable\" })'";
+  dpmsOff = "${hyprctl} dispatch 'hl.dsp.dpms({ action = \"disable\" })'";
 in
 {
-  home.packages = with pkgs; [
-    usbguard-notifier
-  ];
-
   wayland.windowManager.hyprland = {
     enable = true;
     package = null;
@@ -35,7 +33,10 @@ in
         # Quickshell lock screen; falls back to hyprlock if quickshell isn't running.
         lock_cmd = "${qs} -c nyx ipc call lock lock || ${pidof} hyprlock || ${hyprlock}";
         before_sleep_cmd = "${loginctl} lock-session"; # lock before suspend.
-        after_sleep_cmd = "${hyprctl} dispatch dpms on"; # to avoid having to press a key twice to turn on the display.
+        # Hyprland 0.55+ takes Lua for `dispatch` (the old `dispatch dpms on`
+        # fails), and invalid dpms actions are silently ignored, so keep these
+        # exactly "enable" / "disable".
+        after_sleep_cmd = "${dpmsOn}"; # to avoid having to press a key twice to turn on the display.
       };
 
       listener = [
@@ -55,8 +56,8 @@ in
         }
         {
           timeout = 330; # 5.5min
-          on-timeout = "${hyprctl} dispatch dpms off"; # screen off when timeout has passed
-          on-resume = "${hyprctl} dispatch dpms on"; # screen on when activity is detected after timeout has fired.
+          on-timeout = "${dpmsOff}"; # screen off when timeout has passed
+          on-resume = "${dpmsOn}"; # screen on when activity is detected after timeout has fired.
         }
         {
           timeout = 1800; # 30min

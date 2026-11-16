@@ -84,53 +84,44 @@ Item {
         }
     }
 
+    // One card per kind of access in use (same card style as the sound,
+    // Wi-Fi and Bluetooth menus).
     Dropdown {
         id: menu
         target: button
-        contentWidth: 260
+        contentWidth: 320
+        contentSpacing: 8
 
-        DropdownHeader {
-            title: "In use"
-            showToggle: false
-        }
+        PrivacySection {
+            visible: Privacy.mic
+            title: "Microphone"
+            icon: Audio.source?.audio?.muted ? "mic_off" : "mic"
+            tint: Theme.privacyMic
+            detail: Audio.source?.audio?.muted ? "Muted" : Audio.source ? Audio.deviceName(Audio.source) : ""
+            apps: Privacy.micApps
 
-        Repeater {
-            model: Privacy.micApps
-
-            MenuItem {
-                required property string modelData
-                icon: "mic"
-                label: modelData
-                detail: "Microphone"
-                tint: Theme.privacyMic
-                cursorShape: Qt.ArrowCursor
+            // Mute / unmute the input for everyone at once.
+            PillButton {
+                readonly property bool muted: Audio.source?.audio?.muted ?? false
+                text: muted ? "Unmute" : "Mute"
+                onClicked: Audio.toggleMute(Audio.source)
             }
         }
 
-        Repeater {
-            model: Privacy.cameraApps
-
-            MenuItem {
-                required property string modelData
-                icon: "videocam"
-                label: modelData
-                detail: "Camera"
-                tint: Theme.privacyCamera
-                cursorShape: Qt.ArrowCursor
-            }
+        PrivacySection {
+            visible: Privacy.camera
+            title: "Camera"
+            icon: "videocam"
+            tint: Theme.privacyCamera
+            apps: Privacy.cameraApps
         }
 
-        Repeater {
-            model: Privacy.screenApps
-
-            MenuItem {
-                required property string modelData
-                icon: "screen_share"
-                label: modelData
-                detail: "Screen"
-                tint: Theme.privacyScreen
-                cursorShape: Qt.ArrowCursor
-            }
+        PrivacySection {
+            visible: Privacy.screen
+            title: "Screen sharing"
+            icon: "screen_share"
+            tint: Theme.privacyScreen
+            apps: Privacy.screenApps
         }
     }
 

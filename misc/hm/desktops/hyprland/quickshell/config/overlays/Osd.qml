@@ -8,21 +8,35 @@ import Quickshell.Services.Pipewire
 import qs.common
 import qs.services
 
-// On-screen display for volume, microphone mute and brightness.
+// On-screen display for volume, microphone mute, brightness, keyboard
+// backlight and power profile changes.
 //
-// Volume/mic come straight from PipeWire, so any change shows it (keys, the
-// control center, wpctl, a headset connecting). Brightness has no reliable
-// change event, so the brightness keys call:
-//   qs -c nyx ipc call osd brightness
+// Sources:
+//   volume / mic     PipeWire (any change: keys, control center, wpctl,
+//                    a headset connecting)
+//   brightness       the brightness keys call `qs -c nyx ipc call osd brightness`
+//                    (no reliable change event)
+//   kbd backlight    UPower's KbdBacklight signals (Fn+Space included)
+//   power profile    tuned's profile_changed signal (any switch: automatic on
+//                    plug/unplug, the battery menu, the launcher, tuned-adm)
+// The two D-Bus signals come from one `dbus-monitor` (broadcast signals need
+// no privileges), so nothing polls.
 //
 // Click-through, no keyboard focus, hidden while the control center is open.
 Scope {
     id: root
 
-    property string kind: "" // "volume" | "mic" | "brightness"
+    // "volume" | "mic" | "brightness" | "kbd" | "profile"
+    property string kind: ""
     property bool shown: false
     property string device: "" // set when the output device just changed
     property real brightness: 0
+    property int kbdLevel: 0
+    property int kbdMax: 2
+    property string profile: "" // tuned profile id
+
+    // Kinds drawn with a level bar (the rest are a title line).
+    readonly property bool hasLevel: kind === "volume" || kind === "brightness" || kind === "kbd"
 
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var source: Pipewire.defaultAudioSource
@@ -100,6 +114,65 @@ Scope {
         }
     }
 
+    // ---- keyboard backlight + power profile (D-Bus signals) ----------------
+
+    // dbus-monitor prints "signal ... member=X" then one line per argument.
+    property string pendingSignal: ""
+
+    Process {
+        id: signals
+        running: true
+        command: ["dbus-monitor", "--system", "type='signal',interface='org.freedesktop.UPower.KbdBacklight',member='BrightnessChanged'", "type='signal',interface='com.redhat.tuned.control',member='profile_changed'"]
+        stdout: SplitParser {
+            onRead: line => {
+                if (line.startsWith("signal ")) {
+                    root.pendingSignal = line.includes("member=BrightnessChanged") ? "kbd" : line.includes("member=profile_changed") ? "profile" : "";
+                    return;
+                }
+                const v = line.trim();
+                if (root.pendingSignal === "kbd") {
+                    const m = v.match(/^int32 (-?\d+)/);
+                    if (m) {
+                        root.kbdLevel = parseInt(m[1]);
+                        root.show("kbd");
+                    }
+                    root.pendingSignal = "";
+                } else if (root.pendingSignal === "profile") {
+                    const m = v.match(/^string "(.*)"$/); // first arg: profile name
+                    if (m) {
+                        root.profile = m[1];
+                        TunedProfiles.refresh();
+                        root.show("profile");
+                    }
+                    root.pendingSignal = "";
+                }
+            }
+        }
+        // dbus-monitor exits if the bus restarts; reconnect.
+        onExited: signalsRetry.restart()
+    }
+
+    Timer {
+        id: signalsRetry
+        interval: 5000
+        onTriggered: signals.running = true
+    }
+
+    Process {
+        id: readKbdMax
+        running: true
+        command: ["busctl", "--system", "call", "org.freedesktop.UPower", "/org/freedesktop/UPower/KbdBacklight", "org.freedesktop.UPower.KbdBacklight", "GetMaxBrightness"]
+        stdout: SplitParser {
+            onRead: line => {
+                const m = line.match(/^i (\d+)/);
+                if (m && parseInt(m[1]) > 0)
+                    root.kbdMax = parseInt(m[1]);
+            }
+        }
+    }
+
+    readonly property var profileInfo: TunedProfiles.profiles.find(p => p.id === profile) ?? null
+
     IpcHandler {
         target: "osd"
 
@@ -136,9 +209,58 @@ Scope {
         Rectangle {
             id: card
 
-            readonly property bool isMic: root.kind === "mic"
-            readonly property bool muted: root.kind === "volume" ? root.volumeMuted : root.kind === "mic" ? root.micMuted : false
-            readonly property real level: root.kind === "volume" ? root.volume : root.kind === "brightness" ? root.brightness : 0
+            readonly property bool muted: root.kind === "volume" ? root.volumeMuted : root.kind === "mic" ? root.micMuted : root.kind === "kbd" ? root.kbdLevel <= 0 : false
+            readonly property real level: root.kind === "volume" ? root.volume : root.kind === "brightness" ? root.brightness : root.kind === "kbd" ? root.kbdLevel / Math.max(1, root.kbdMax) : 0
+
+            readonly property string icon: {
+                switch (root.kind) {
+                case "mic":
+                    return root.micMuted ? "mic_off" : "mic";
+                case "brightness":
+                    return root.brightness < 0.34 ? "brightness_low" : root.brightness < 0.67 ? "brightness_medium" : "brightness_high";
+                case "kbd":
+                    return "keyboard";
+                case "profile":
+                    return root.profileInfo?.icon ?? "bolt";
+                default:
+                    if (root.volumeMuted || root.volume <= 0)
+                        return "volume_off";
+                    return root.volume < 0.34 ? "volume_mute" : root.volume < 0.67 ? "volume_down" : "volume_up";
+                }
+            }
+
+            // Main line (empty for plain volume/brightness).
+            readonly property string title: {
+                switch (root.kind) {
+                case "mic":
+                    return root.micMuted ? "Microphone muted" : "Microphone on";
+                case "kbd":
+                    return "Keyboard backlight";
+                case "profile":
+                    return root.profileInfo?.label ?? root.profile;
+                case "volume":
+                    return root.device;
+                default:
+                    return "";
+                }
+            }
+            readonly property bool titleIsHeading: root.kind !== "volume"
+
+            readonly property string subtitle: root.kind === "profile" ? (TunedProfiles.autoProfile === root.profile ? "Power profile · Automatic" : "Power profile") : ""
+
+            // Right-hand value.
+            readonly property string value: {
+                if (root.kind === "volume" || root.kind === "brightness")
+                    return muted ? "Muted" : `${Math.round(level * 100)}%`;
+                if (root.kind === "kbd") {
+                    if (root.kbdLevel <= 0)
+                        return "Off";
+                    if (root.kbdMax === 2)
+                        return root.kbdLevel === 1 ? "Low" : "High";
+                    return `${root.kbdLevel}/${root.kbdMax}`;
+                }
+                return "";
+            }
 
             width: parent.width
             implicitHeight: content.implicitHeight + 28
@@ -175,39 +297,42 @@ Scope {
 
                 Icon {
                     size: 24
-                    filled: true
+                    filled: !card.muted
                     color: card.muted ? Theme.foregroundDim : Theme.foreground
-                    name: {
-                        if (root.kind === "mic")
-                            return root.micMuted ? "mic_off" : "mic";
-                        if (root.kind === "brightness")
-                            return root.brightness < 0.34 ? "brightness_low" : root.brightness < 0.67 ? "brightness_medium" : "brightness_high";
-                        if (root.volumeMuted || root.volume <= 0)
-                            return "volume_off";
-                        return root.volume < 0.34 ? "volume_mute" : root.volume < 0.67 ? "volume_down" : "volume_up";
-                    }
+                    name: card.icon
                 }
 
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 6
+                    spacing: root.hasLevel ? 6 : 1
 
-                    // Device name after an output switch, or the mic state.
+                    // Heading (mic, backlight, profile) or the
+                    // device name after an output switch (volume, dim).
                     Text {
                         Layout.fillWidth: true
                         visible: text !== ""
-                        text: card.isMic ? (root.micMuted ? "Microphone muted" : "Microphone on") : root.kind === "volume" ? root.device : ""
+                        text: card.title
                         elide: Text.ElideRight
                         font.family: Theme.font
-                        font.pixelSize: card.isMic ? Theme.fontSize : Theme.fontSize - 2
-                        font.weight: card.isMic ? Font.DemiBold : Font.Normal
-                        color: card.isMic ? Theme.foreground : Theme.foregroundDim
+                        font.pixelSize: card.titleIsHeading ? Theme.fontSize : Theme.fontSize - 2
+                        font.weight: card.titleIsHeading ? Font.DemiBold : Font.Normal
+                        color: card.titleIsHeading ? Theme.foreground : Theme.foregroundDim
                     }
 
-                    // Level bar (not for the mic).
+                    Text {
+                        Layout.fillWidth: true
+                        visible: text !== ""
+                        text: card.subtitle
+                        elide: Text.ElideRight
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSize - 3
+                        color: Theme.foregroundDim
+                    }
+
+                    // Level bar (volume, brightness, keyboard backlight).
                     Rectangle {
                         Layout.fillWidth: true
-                        visible: !card.isMic
+                        visible: root.hasLevel
                         implicitHeight: 6
                         radius: 3
                         color: Theme.surfaceHigh
@@ -228,10 +353,10 @@ Scope {
                 }
 
                 Text {
-                    visible: !card.isMic
+                    visible: card.value !== ""
                     Layout.preferredWidth: 38
                     horizontalAlignment: Text.AlignRight
-                    text: card.muted ? "Muted" : `${Math.round(card.level * 100)}%`
+                    text: card.value
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize - 1
                     font.weight: Font.DemiBold

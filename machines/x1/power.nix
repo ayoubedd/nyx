@@ -1,46 +1,36 @@
 { pkgs, ... }:
 let
-  awk = "${pkgs.gawk}/bin/awk";
-  hyprctl = "${pkgs.hyprland}/bin/hyprctl";
-  hypr-powersave = pkgs.writeScriptBin "hypr-powersave" ''
-    #!${pkgs.bash}/bin/bash
-    # 1. Dynamically find the username and UID of the active graphical session
-    USER_NAME=$(stat -c '%U' /dev/dri/card1 2>/dev/null)
+  # The one place that picks the tuned profile from the power source:
+  #   AC      -> x1-balanced
+  #   battery -> x1-battery-balanced
+  #
+  # Runs at boot, when the AC state changes (udev), and after resume. It only
+  # switches when the AC state actually differs from the last one it applied,
+  # so a profile chosen by hand (dashboard Power page / `tuned-adm profile`)
+  # stays until the charger is next plugged in or pulled, and duplicate or
+  # spurious events are no-ops. `--force` applies regardless.
+  #
+  # (Hyprland animations off on battery is done in the session by quickshell:
+  # misc/hm/desktops/hyprland/quickshell/config/services/PowerSaver.qml.)
+  x1-power-profile = pkgs.writeShellScriptBin "x1-power-profile" ''
+    set -eu
+    state=/run/x1-power-profile
+    online=$(cat /sys/class/power_supply/AC/online 2>/dev/null || echo 1)
+    last=$(cat "$state" 2>/dev/null || echo none)
 
-    if [ -z "$USER_NAME" ] || [ "$USER_NAME" = "root" ]; then
-      USER_NAME=$(who | ${awk} '{print $1}' | head -n1)
+    if [ "''${1:-}" != "--force" ] && [ "$online" = "$last" ]; then
+      echo "AC online=$online unchanged, keeping the current profile"
+      exit 0
     fi
 
-    if [ -z "$USER_NAME" ]; then
-      USER_NAME=$(id -nu 1000)
-    fi
-
-    USER_ID=$(id -u "$USER_NAME")
-    XDG_RUNTIME_DIR="/run/user/$USER_ID"
-
-    # 2. Extract the active Hyprland instance signature from the runtime directory
-    HYPR_SIG=$(ls -t "$XDG_RUNTIME_DIR/hypr/" 2>/dev/null | grep -E '^[a-f0-9]+_[0-9]+_[0-9]+$' | head -n1)
-
-    if [ -z "$HYPR_SIG" ]; then
-      HYPR_SIG=$(ls -t "$XDG_RUNTIME_DIR/hypr/" 2>/dev/null | grep -v "\.sock" | head -n1)
-    fi
-
-    if [ -z "$HYPR_SIG" ]; then
-      echo "No active Hyprland instance signature found."
-      exit 0 # Exit with 0 so the systemd service doesn't report a "failed" state if no one is logged in
-    fi
-
-    # 3. Check the AC status (0 = battery, 1 = plugged in)
-    STATUS=$(cat /sys/class/power_supply/AC/online)
-
-    # Note: We explicitly path to hyprctl from pkgs here or assume it's in the environment.
-    # To be perfectly safe inside systemd, let's use the absolute path if available,
-    # but since it's a user bin, it's safer to just run it as the user.
-    if [ "$STATUS" -eq 0 ]; then
-      env XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" HYPRLAND_INSTANCE_SIGNATURE="$HYPR_SIG" ${hyprctl} eval 'hl.config({ animations = { enabled = false } })'
+    if [ "$online" = 1 ]; then
+      profile=x1-balanced
     else
-      env XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" HYPRLAND_INSTANCE_SIGNATURE="$HYPR_SIG" ${hyprctl} eval 'hl.config({ animations = { enabled = true } })'
+      profile=x1-battery-balanced
     fi
+    ${pkgs.tuned}/bin/tuned-adm profile "$profile"
+    echo "$online" > "$state"
+    echo "AC online=$online -> $profile"
   '';
 in
 {
@@ -91,23 +81,18 @@ in
     enable = true;
 
     settings = {
-      dynamic_tuning = true;
+      # Off: with dynamic tuning, tuned's cpu plugin keeps a 100us PM QoS
+      # latency request (/dev/cpu_dma_latency) whenever load is above its
+      # threshold. This CPU's deep idle states take 253us (C7s) and 1048us
+      # (C10) to exit, so they were forbidden and cores idled ~94% in C1,
+      # keeping the package out of PC8/PC10 (several watts at idle).
+      dynamic_tuning = false;
       reapply_sysctl = false;
     };
 
-    ppdSettings = {
-      main = {
-        default = "balanced";
-      };
-      battery = {
-        balanced = "x1-battery-balanced";
-      };
-      profiles = {
-        balanced = "x1-balanced";
-        performance = "x1-performance";
-        power-saver = "x1-powersave";
-      };
-    };
+    # No tuned-ppd: it switched profiles on battery events too and fought
+    # with manual choices. x1-power-profile (above) owns AC-based switching.
+    ppdSupport = false;
 
     profiles = {
       common = {
@@ -118,9 +103,14 @@ in
           # disable wake-on-lan
           "/sys/class/net/wlp0s20f3/device/power/wakeup" = "disabled";
 
-          # Battery thresholds
-          "/sys/class/power_supply/BAT0/charge_control_start_threshold" = 80;
-          "/sys/class/power_supply/BAT0/charge_control_end_threshold" = 100;
+          # Battery thresholds: stop charging at 85%, resume below 75%.
+          # Keeps the (already worn, ~71% health) battery out of the
+          # high-voltage range that ages it fastest. For a long trip, charge
+          # to full once with:
+          #   echo 100 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
+          # (reset to 85 by the next tuned profile switch / reboot).
+          "/sys/class/power_supply/BAT0/charge_control_start_threshold" = 75;
+          "/sys/class/power_supply/BAT0/charge_control_end_threshold" = 85;
 
           # Active governor
           "/sys/devices/system/cpu/intel_pstate/status" = "active";
@@ -371,30 +361,29 @@ in
 
   };
 
-  services.acpid = {
-    enable = true;
-    handlers.power_profile_switch = {
-      # ac_adapter ACPI0003:00 00000080 00000000 # unplugging
-      # ac_adapter ACPI0003:00 00000080 00000001 # plug-in
-      action = /* sh */ ''
-        vals=($1)  # space separated string to array of multiple values
-
-        ${hypr-powersave}/bin/hypr-powersave
-        case ''${vals[3]} in
-            00000000)
-                ${pkgs.tuned}/bin/tuned-adm profile x1-battery-balanced
-                ;;
-            00000001)
-                ${pkgs.tuned}/bin/tuned-adm profile x1-balanced
-                ;;
-            *)
-                echo unknown >> /tmp/acpi.log
-                ;;
-        esac
-      '';
-      event = "ac_adapter/*";
+  # AC-based profile switching (replaces the acpid handler: ThinkPad firmware
+  # also raises ac_adapter events for thermal/lap-detect changes, and acpid
+  # never ran at boot, so booting on battery kept the AC profile).
+  systemd.services.x1-power-profile = {
+    description = "Select the tuned profile for the current power source";
+    after = [ "tuned.service" ];
+    requires = [ "tuned.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${x1-power-profile}/bin/x1-power-profile";
     };
   };
+
+  # Charger plugged / unplugged.
+  services.udev.extraRules = ''
+    SUBSYSTEM=="power_supply", KERNEL=="AC", ACTION=="change", RUN+="${pkgs.systemd}/bin/systemctl start --no-block x1-power-profile.service"
+  '';
+
+  # Plugged / unplugged while asleep (udev may not report it).
+  powerManagement.resumeCommands = ''
+    ${pkgs.systemd}/bin/systemctl start --no-block x1-power-profile.service
+  '';
 
   services.throttled = {
     enable = true;
@@ -417,7 +406,9 @@ in
 
       [BATTERY]
       Update_Rate_s: 5
-      PL1_Tdp_W: 15
+      # Lower sustained limit unplugged: long loads (builds, video calls)
+      # trade a little speed for less heat and drain. Bursts stay at 25 W.
+      PL1_Tdp_W: 12
       PL1_Duration_s: 28
       PL2_Tdp_W: 25
       PL2_Duration_S: 0.002
@@ -425,5 +416,6 @@ in
     '';
   };
 
-  environment.systemPackages = [ hypr-powersave ];
+  # `sudo x1-power-profile --force` re-applies the automatic choice.
+  environment.systemPackages = [ x1-power-profile ];
 }

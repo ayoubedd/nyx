@@ -23,6 +23,19 @@ Variants {
         implicitHeight: Theme.barHeight
         color: Theme.background
 
+        // Empty bar space closes whatever is open. Menus count the bar as
+        // "inside" (so clicking another bar button switches menus), which
+        // means a click on bare bar never closed them. Declared first, so
+        // every widget sits on top and keeps its own clicks.
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+            onClicked: {
+                Ui.closeAll();
+                Notifs.centerOpen = false;
+            }
+        }
+
         Workspaces {
             anchors.left: parent.left
             anchors.leftMargin: 14
@@ -64,12 +77,39 @@ Variants {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 2
 
-            TrayWidget {}
-            PrivacyWidget {}
-            CaffeineWidget {}
-            BatteryWidget {
-                onClicked: clock.showTab(2) // dashboard Power tab
+            // Left to right: speed, recording, keep-awake, privacy, tray apps
+            // | system: battery, sound, network, bluetooth, notifications.
+            NetSpeedWidget {}
+            RecordingWidget {
+                id: recording
             }
+            CaffeineWidget {
+                id: caffeine
+            }
+            PrivacyWidget {
+                id: privacy
+            }
+            TrayWidget {
+                id: tray
+            }
+
+            // Divider between app/status items and the system controls; only
+            // while there are status items (tray, privacy, keep-awake,
+            // recording) to set apart.
+            Item {
+                visible: tray.visible || privacy.visible || caffeine.visible || recording.visible
+                implicitWidth: 13
+                implicitHeight: 26
+
+                Rectangle {
+                    anchors.centerIn: parent
+                    width: 1
+                    height: 14
+                    color: Theme.muted
+                }
+            }
+
+            BatteryWidget {} // battery + power profile menu
             SoundWidget {} // volume + output/input/app sound menu
             NetworkWidget {}
             BluetoothWidget {}

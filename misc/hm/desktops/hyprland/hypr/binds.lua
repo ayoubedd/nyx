@@ -16,16 +16,15 @@ hl.bind(mod .. " + SHIFT + q", hl.dsp.window.kill())
 hl.bind(mod .. " + SHIFT + Space", hl.dsp.window.float())
 hl.bind(mod .. " + f", hl.dsp.window.fullscreen({ layout_aware = false }))
 hl.bind(mod .. " + ALT + l", exec_cmd("loginctl lock-session")) -- -> hypridle lock_cmd (quickshell lock)
-hl.bind(mod .. " + ALT + s", exec_cmd("vicinae deeplink vicinae://launch/power/suspend")) -- needs a fix
+hl.bind(mod .. " + ALT + s", hl.dsp.exec_cmd("systemctl suspend"))
 
-hl.bind(mod .. " + d", exec_cmd("vicinae toggle")) -- needs a fix
-hl.bind(mod .. " + p", exec_cmd("vicinae deeplink vicinae://launch/clipboard/history"))
-hl.bind(mod .. " + w", exec_cmd("vicinae deeplink vicinae://launch/wm/switch-windows"))
-hl.bind(mod .. " + e", exec_cmd("vicinae deeplink vicinae://launch/core/search-emojis"))
-hl.bind(
-	mod .. " + s",
-	exec_cmd("vicinae deeplink vicinae://launch/@rastsislaux/store.vicinae.pulseaudio/outputDevices")
-)
+-- Launcher (quickshell launcher/Launcher.qml).
+hl.bind(mod .. " + d", hl.dsp.exec_cmd("qs -c nyx ipc call launcher toggle"))
+hl.bind(mod .. " + p", hl.dsp.exec_cmd("qs -c nyx ipc call launcher clipboard"))
+hl.bind(mod .. " + w", hl.dsp.exec_cmd("qs -c nyx ipc call launcher windows"))
+hl.bind(mod .. " + e", hl.dsp.exec_cmd("qs -c nyx ipc call launcher emoji"))
+-- Bar sound menu (outputs, inputs, per-app volume).
+hl.bind(mod .. " + s", hl.dsp.exec_cmd("qs -c nyx ipc call bar toggle sound"))
 
 for i = 1, 10 do
 	 local magic_workspaces = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" }

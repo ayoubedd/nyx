@@ -6,10 +6,12 @@
 //@ pragma IconTheme Colloid-Grey-Dark
 import Quickshell
 import qs.common
+import qs.services
 import qs.bar
 import qs.notifications
 import qs.lock
 import qs.overlays
+import qs.launcher
 
 ShellRoot {
     Bar {}
@@ -21,4 +23,7 @@ ShellRoot {
     Screenshot {}
     Overview {}
     NowPlayingToast {}
+    Launcher {}
+    PowerSaver {}
+    UsbPrompt {}
 }

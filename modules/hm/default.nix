@@ -1,4 +1,5 @@
 { ... }:
 {
-  imports = [ ./nwg-piotr ];
+  # Custom home-manager modules go here.
+  imports = [ ];
 }

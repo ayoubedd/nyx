@@ -48,12 +48,10 @@
   home.packages = with pkgs; [
     # lo-pkgs.realod-failed-services
     wl-clipboard
-    wl-color-picker
     hyprpicker
     slurp
     grim
     satty # screenshot editor (quickshell Screenshot.qml "Edit")
-    wofi-emoji
     jq
     wl-clip-persist
     brightnessctl

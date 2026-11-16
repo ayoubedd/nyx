@@ -12,75 +12,15 @@ ColumnLayout {
 
     property bool active: false
 
-    // tuned profiles (machines/x1/power.nix). Switching goes through
-    // `tuned-adm`, which polkit allows for active sessions without a password.
-    readonly property var profiles: [
-        {
-            id: "x1-powersave",
-            icon: "eco",
-            label: "Power saver",
-            detail: "Lowest power, quiet"
-        },
-        {
-            id: "x1-battery-balanced",
-            icon: "battery_5_bar",
-            label: "Battery balanced",
-            detail: "Balanced, tuned for battery"
-        },
-        {
-            id: "x1-balanced",
-            icon: "balance",
-            label: "Balanced",
-            detail: "Everyday default"
-        },
-        {
-            id: "x1-performance",
-            icon: "speed",
-            label: "Performance",
-            detail: "Max speed, more heat"
-        }
-    ]
-
-    property string current: ""
-
     // Last timed keep-awake choice made here (to highlight its chip).
     property int caffeineChoice: -1
 
-    function setProfile(id) {
-        current = id; // optimistic
-        setProc.command = ["tuned-adm", "profile", id];
-        setProc.running = true;
-    }
-
     spacing: 12
 
-    onActiveChanged: if (active)
-        readProc.running = true
-
-    Process {
-        id: readProc
-        command: ["tuned-adm", "active"]
-        stdout: SplitParser {
-            onRead: line => {
-                const m = line.match(/Current active profile:\s*(\S+)/);
-                if (m)
-                    root.current = m[1];
-            }
-        }
-    }
-
-    Process {
-        id: setProc
-        onExited: readProc.running = true
-    }
-
-    // Pick up changes made elsewhere (e.g. tuned-ppd switching on unplug).
-    Timer {
-        running: root.active
-        interval: 5000
-        repeat: true
-        onTriggered: readProc.running = true
-    }
+    // Profiles: services/TunedProfiles.qml (polls only while shown).
+    onActiveChanged: TunedProfiles.watch(active)
+    Component.onDestruction: if (active)
+        TunedProfiles.watch(false)
 
     // ---- battery ----
     Rectangle {
@@ -147,10 +87,61 @@ ColumnLayout {
     }
 
     // ---- tuned profiles ----
-    SectionLabel {
+    RowLayout {
+        Layout.fillWidth: true
         Layout.topMargin: 4
-        Layout.leftMargin: 2
-        text: "Power profile"
+
+        SectionLabel {
+            Layout.fillWidth: true
+            Layout.leftMargin: 2
+            text: "Power profile"
+        }
+
+        // Automatic = whatever the power source calls for; picking a profile
+        // below overrides it until the next plug/unplug.
+        MouseArea {
+            id: autoChip
+            implicitWidth: autoRow.implicitWidth + 18
+            implicitHeight: 26
+            hoverEnabled: true
+            cursorShape: Qt.PointingHandCursor
+            onClicked: if (!TunedProfiles.automatic)
+                TunedProfiles.setAutomatic()
+
+            Rectangle {
+                anchors.fill: parent
+                radius: height / 2
+                color: TunedProfiles.automatic ? Theme.accent : autoChip.containsMouse ? Theme.surfaceHigh : Theme.surface
+
+                Behavior on color {
+                    ColorAnimation {
+                        duration: Theme.animDuration
+                    }
+                }
+            }
+
+            Row {
+                id: autoRow
+                anchors.centerIn: parent
+                spacing: 5
+
+                Icon {
+                    anchors.verticalCenter: parent.verticalCenter
+                    name: "auto_mode"
+                    size: 15
+                    color: TunedProfiles.automatic ? Theme.background : Theme.foreground
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Automatic"
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize - 2
+                    font.weight: TunedProfiles.automatic ? Font.DemiBold : Font.Normal
+                    color: TunedProfiles.automatic ? Theme.background : Theme.foreground
+                }
+            }
+        }
     }
 
     GridLayout {
@@ -160,12 +151,12 @@ ColumnLayout {
         columnSpacing: 8
 
         Repeater {
-            model: root.profiles
+            model: TunedProfiles.profiles
 
             MouseArea {
                 id: profile
                 required property var modelData
-                readonly property bool selected: root.current === modelData.id
+                readonly property bool selected: TunedProfiles.current === modelData.id
 
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
@@ -173,7 +164,7 @@ ColumnLayout {
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
                 onClicked: if (!selected)
-                    root.setProfile(modelData.id)
+                    TunedProfiles.set(modelData.id)
 
                 Rectangle {
                     anchors.fill: parent

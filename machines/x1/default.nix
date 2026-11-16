@@ -14,9 +14,7 @@
     ../../misc/nixos/apps/docker.nix
     ../../misc/nixos/apps/thunar.nix
     ../../misc/nixos/apps/quickshell_greeter.nix
-    # Polkit prompts come from the quickshell bar (PolkitDialog.qml); only one
-    # agent can register per session, so polkit-gnome stays off.
-    # ../../misc/nixos/apps/polkit_gnome_agent.nix
+    # Polkit prompts come from quickshell (overlays/PolkitDialog.qml).
 
     ./hardware.nix
     ./misc.nix

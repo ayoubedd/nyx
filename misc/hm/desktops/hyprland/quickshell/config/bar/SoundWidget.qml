@@ -24,6 +24,15 @@ BarButton {
             menu.toggle();
     }
 
+    // qs -c nyx ipc call bar toggle sound
+    Connections {
+        target: Ui
+        function onMenuRequested(name, screen) {
+            if (name === "sound" && (root.QsWindow.window?.screen?.name ?? "") === screen)
+                menu.toggle();
+        }
+    }
+
     WheelHandler {
         onWheel: event => Audio.setVolume(Audio.sink, Audio.volume + (event.angleDelta.y > 0 ? 0.05 : -0.05))
     }

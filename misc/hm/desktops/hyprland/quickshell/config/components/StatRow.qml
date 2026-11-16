@@ -39,7 +39,9 @@ Rectangle {
 
                 Text {
                     Layout.fillWidth: true
+                    Layout.minimumWidth: 0
                     text: root.label
+                    elide: Text.ElideRight
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize - 1
                     color: Theme.foreground

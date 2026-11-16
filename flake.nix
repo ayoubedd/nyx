@@ -51,10 +51,6 @@
       url = "github:NixOS/nixos-hardware/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    vicinae = {
-      url = "github:vicinaehq/vicinae";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     vm-curator = {
       url = "github:mroboff/vm-curator";
       inputs.nixpkgs.follows = "nixpkgs";

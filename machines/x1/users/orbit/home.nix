@@ -7,7 +7,6 @@
 {
 
   imports = with inputs; [
-    vicinae.homeManagerModules.default
     stylix.homeModules.stylix
     nix-flatpak.homeManagerModules.nix-flatpak
 

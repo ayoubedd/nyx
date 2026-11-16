@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Bluetooth
 import qs.common
+import qs.services
 import qs.components
 
 // Bar Bluetooth icon + menu.
@@ -112,7 +113,11 @@ BarButton {
     }
 
     icon: !enabled ? "bluetooth_disabled" : anyConnected ? "bluetooth_connected" : "bluetooth"
-    iconColor: enabled ? Theme.foreground : Theme.foregroundDim
+    // A connected device low on battery: red icon + its level.
+    readonly property bool deviceLow: BluetoothBattery.low.length > 0
+    iconColor: deviceLow ? Theme.urgent : enabled ? Theme.foreground : Theme.foregroundDim
+    label: deviceLow ? `${BluetoothBattery.percent(BluetoothBattery.lowest)}%` : ""
+    labelColor: Theme.urgent
     active: menu.shown
     tooltip: {
         if (!adapter)
@@ -126,6 +131,15 @@ BarButton {
         return connected.length ? `Bluetooth: ${connected.join(", ")}` : "Bluetooth: on · nothing connected";
     }
     onClicked: menu.toggle()
+
+    // qs -c nyx ipc call bar toggle bluetooth
+    Connections {
+        target: Ui
+        function onMenuRequested(name, screen) {
+            if (name === "bluetooth" && (root.QsWindow.window?.screen?.name ?? "") === screen)
+                menu.toggle();
+        }
+    }
 
     onEnabledChanged: if (!enabled)
         scanTimeout.stop()

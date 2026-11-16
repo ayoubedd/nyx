@@ -20,7 +20,7 @@ hl.config({
 		blur = {
 			enabled = true,
 			size = 14,
-			passes = 4,
+			passes = 4, -- on battery quickshell drops this to 2 (services/PowerSaver.qml)
 			noise = 0.02,
 			vibrancy = 0.2,
 			popups = false,

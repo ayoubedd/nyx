@@ -12,14 +12,16 @@ import qs.services
 // Opening freezes every monitor first (grim per output), then shows those
 // frames as an overlay to select from, so the result is exactly what was on
 // screen. Modes: region (drag), window (hover + click), screen (click).
-// Actions: copy, save (~/Pictures/Screenshots, also copied), edit (satty).
+// Actions: copy, save (~/Pictures/Screenshots, also copied), edit (satty),
+// record (a video of the same area/window/screen: services/Recorder.qml).
 // Cropping is done from the frozen frame at full resolution (ImageMagick).
 //
 //   qs -c nyx ipc call screenshot open      (region mode)
 //   qs -c nyx ipc call screenshot window
 //   qs -c nyx ipc call screenshot screen
 //
-// Keys: R/W/S switch mode · Enter copy · Ctrl+S save · E edit · Esc close
+// Keys: R/W/S switch mode · Enter copy · Ctrl+S save · E edit · V record
+//       · A toggle recording sound · Esc close
 Scope {
     id: root
 
@@ -33,9 +35,10 @@ Scope {
     property var clients: [] // { x, y, w, h (logical, global), ws, floating, order }
     property var selection: null // { screen, x, y, w, h } logical, screen-local
     property real stamp: 0 // cache-buster for the frozen images
+    property bool recordAudio: false // desktop sound in recordings
 
     function open(m) {
-        if (active || capturing)
+        if (active || capturing || Recorder.recording)
             return;
         Ui.closeAll();
         Notifs.centerOpen = false;
@@ -88,7 +91,38 @@ Scope {
         };
     }
 
+    // Record the selection as a video. Whole screens record by output name;
+    // areas/windows by global logical geometry, rounded to even sizes (H.264
+    // needs them). Starts once the overlay is gone so it isn't in the video.
+    function record() {
+        const s = selection;
+        const mon = s ? monitors[s.screen] : null;
+        if (!mon || s.w < 16 || s.h < 16)
+            return;
+        const even = v => 2 * Math.floor(v / 2);
+        const target = mode === "screen" ? {
+            output: s.screen
+        } : {
+            geometry: `${Math.round(mon.x + s.x)},${Math.round(mon.y + s.y)} ${even(s.w)}x${even(s.h)}`
+        };
+        const audio = recordAudio;
+        close();
+        startRecording.target = target;
+        startRecording.audio = audio;
+        startRecording.restart();
+    }
+
+    Timer {
+        id: startRecording
+        property var target: null
+        property bool audio: false
+        interval: 300
+        onTriggered: Recorder.start(target, audio)
+    }
+
     function finish(action) {
+        if (action === "record")
+            return record();
         const s = selection;
         const mon = s ? monitors[s.screen] : null;
         if (!mon || s.w < 2 || s.h < 2)
@@ -395,6 +429,10 @@ Scope {
                         root.finish("save");
                     else if (event.key === Qt.Key_E)
                         root.finish("edit");
+                    else if (event.key === Qt.Key_V)
+                        root.finish("record");
+                    else if (event.key === Qt.Key_A)
+                        root.recordAudio = !root.recordAudio;
                     else if (event.key === Qt.Key_R)
                         root.setMode("region");
                     else if (event.key === Qt.Key_W)
@@ -479,6 +517,30 @@ Scope {
                         icon: "edit"
                         label: "Edit"
                         onClicked: root.finish("edit")
+                    }
+
+                    Rectangle {
+                        visible: !!root.selection
+                        Layout.leftMargin: 6
+                        Layout.rightMargin: 6
+                        implicitWidth: 1
+                        implicitHeight: 24
+                        color: Theme.surfaceHigh
+                    }
+
+                    // Video of the same selection.
+                    ShotButton {
+                        visible: !!root.selection
+                        icon: "radio_button_checked"
+                        label: "Record"
+                        onClicked: root.finish("record")
+                    }
+                    ShotButton {
+                        visible: !!root.selection
+                        icon: root.recordAudio ? "volume_up" : "volume_off"
+                        label: "Sound"
+                        selected: root.recordAudio
+                        onClicked: root.recordAudio = !root.recordAudio
                     }
 
                     ShotButton {

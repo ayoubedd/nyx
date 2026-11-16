@@ -39,7 +39,6 @@
     enable = true;
     polarity = "dark";
 
-    targets.wofi.enable = false;
     # rofi isn't used; stylix's rofi module still sets the renamed
     # programs.rofi.font (eval warning).
     targets.rofi.enable = false;

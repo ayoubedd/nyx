@@ -2,6 +2,8 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
+import Quickshell.Hyprland
 import qs.components
 
 // Shared UI state: which bar window (dropdown) is open, and the bar windows
@@ -24,6 +26,19 @@ Singleton {
         if (active)
             active.shown = false;
         active = null;
+    }
+
+    // Ask the bar on `screen` to toggle one of its menus (the widgets listen).
+    signal menuRequested(string name, string screen)
+
+    // qs -c nyx ipc call bar toggle <sound|network|bluetooth|battery>
+    // Opens the menu on the focused monitor's bar.
+    IpcHandler {
+        target: "bar"
+
+        function toggle(name: string): void {
+            root.menuRequested(name, Hyprland.focusedMonitor?.name ?? "");
+        }
     }
 
     function registerBar(bar) {

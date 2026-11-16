@@ -2,8 +2,9 @@ import QtQuick
 import Quickshell.Services.SystemTray
 import qs.common
 
-// System tray (StatusNotifierItem) icons, with a divider after them.
-// Collapses to nothing when no app has a tray icon.
+// System tray (StatusNotifierItem) icons. Collapses to nothing when no app
+// has a tray icon. (The divider after it lives in Bar.qml, shared with the
+// other status items.)
 Item {
     id: root
 
@@ -32,19 +33,6 @@ Item {
             TrayItem {
                 required property var modelData
                 item: modelData
-            }
-        }
-
-        // Divider between the tray and the shell's own widgets.
-        Item {
-            width: 11
-            height: 26
-
-            Rectangle {
-                anchors.centerIn: parent
-                width: 1
-                height: 14
-                color: Theme.muted
             }
         }
     }
