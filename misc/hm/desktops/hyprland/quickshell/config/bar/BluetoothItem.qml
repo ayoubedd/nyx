@@ -17,6 +17,7 @@ MouseArea {
     property string label
     property string icon: "bluetooth"
     property bool failed: false
+    property bool allowForget: true // hover ✕ (off in the bar's quick menu)
 
     readonly property bool busy: device.state === BluetoothDeviceState.Connecting || device.state === BluetoothDeviceState.Disconnecting
     readonly property real battery: device.battery > 1 ? device.battery / 100 : device.battery
@@ -119,7 +120,7 @@ MouseArea {
         // Forget (paired devices, on hover).
         MouseArea {
             id: forget
-            visible: root.paired && (root.containsMouse || containsMouse) && !root.busy
+            visible: root.allowForget && root.paired && (root.containsMouse || containsMouse) && !root.busy
             implicitWidth: 24
             implicitHeight: 24
             hoverEnabled: true

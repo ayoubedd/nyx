@@ -5,6 +5,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Services.Pipewire
+import Quickshell.Bluetooth
 import qs.common
 import qs.services
 
@@ -26,7 +27,7 @@ import qs.services
 Scope {
     id: root
 
-    // "volume" | "mic" | "brightness" | "kbd" | "profile"
+    // "volume" | "mic" | "brightness" | "kbd" | "profile" | "device"
     property string kind: ""
     property bool shown: false
     property string device: "" // set when the output device just changed
@@ -34,9 +35,13 @@ Scope {
     property int kbdLevel: 0
     property int kbdMax: 2
     property string profile: "" // tuned profile id
+    // "device": a Bluetooth device that just connected, with its battery.
+    property string deviceName: ""
+    property string deviceIcon: "bluetooth"
+    property real deviceLevel: 0
 
     // Kinds drawn with a level bar (the rest are a title line).
-    readonly property bool hasLevel: kind === "volume" || kind === "brightness" || kind === "kbd"
+    readonly property bool hasLevel: kind === "volume" || kind === "brightness" || kind === "kbd" || kind === "device"
 
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property var source: Pipewire.defaultAudioSource
@@ -59,6 +64,51 @@ Scope {
         objects: [root.sink, root.source]
     }
 
+    // ---- Bluetooth device connected: its battery -------------------------
+    // Once per connection, when its battery level first becomes known
+    // (BlueZ reports it a few seconds after connecting).
+    // Addresses already announced (or connected before startup). Kept per
+    // connection, not per battery report, so a level that briefly drops out
+    // and comes back doesn't pop it again; forgotten on disconnect.
+    property var seenDevices: []
+    // BlueZ enumerates devices and their batteries over D-Bus a moment
+    // after startup: everything connected by then counts as already seen.
+    property bool btSettled: false
+    readonly property var connectedAddrs: (Bluetooth.defaultAdapter?.devices.values ?? []).filter(d => d.connected).map(d => d.address)
+    onConnectedAddrsChanged: if (btSettled)
+        seenDevices = seenDevices.filter(a => connectedAddrs.includes(a))
+
+    Timer {
+        interval: 6000
+        running: true
+        onTriggered: {
+            root.seenDevices = root.connectedAddrs;
+            root.btSettled = true;
+        }
+    }
+
+    function deviceGlyph(d) {
+        const i = d?.icon ?? "";
+        return i.includes("audio") || i.includes("headset") || i.includes("headphone") ? "headphones" : i.includes("mouse") ? "mouse" : i.includes("keyboard") ? "keyboard" : i.includes("phone") ? "smartphone" : i.includes("game") ? "stadia_controller" : "bluetooth";
+    }
+
+    Connections {
+        target: BluetoothBattery
+        function onDevicesChanged() {
+            if (!root.btSettled)
+                return;
+            const fresh = BluetoothBattery.devices.filter(d => !root.seenDevices.includes(d.address));
+            if (fresh.length === 0)
+                return;
+            root.seenDevices = root.seenDevices.concat(fresh.map(d => d.address));
+            const d = fresh[0];
+            root.deviceName = BluetoothBattery.name(d);
+            root.deviceIcon = root.deviceGlyph(d);
+            root.deviceLevel = BluetoothBattery.level(d);
+            root.show("device");
+        }
+    }
+
     Timer {
         interval: 2000
         running: true
@@ -67,7 +117,7 @@ Scope {
 
     Timer {
         id: hideTimer
-        interval: 1500
+        interval: root.kind === "device" ? 3000 : 1500
         onTriggered: {
             root.shown = false;
             root.device = "";
@@ -210,7 +260,7 @@ Scope {
             id: card
 
             readonly property bool muted: root.kind === "volume" ? root.volumeMuted : root.kind === "mic" ? root.micMuted : root.kind === "kbd" ? root.kbdLevel <= 0 : false
-            readonly property real level: root.kind === "volume" ? root.volume : root.kind === "brightness" ? root.brightness : root.kind === "kbd" ? root.kbdLevel / Math.max(1, root.kbdMax) : 0
+            readonly property real level: root.kind === "volume" ? root.volume : root.kind === "brightness" ? root.brightness : root.kind === "kbd" ? root.kbdLevel / Math.max(1, root.kbdMax) : root.kind === "device" ? root.deviceLevel : 0
 
             readonly property string icon: {
                 switch (root.kind) {
@@ -222,6 +272,8 @@ Scope {
                     return "keyboard";
                 case "profile":
                     return root.profileInfo?.icon ?? "bolt";
+                case "device":
+                    return root.deviceIcon;
                 default:
                     if (root.volumeMuted || root.volume <= 0)
                         return "volume_off";
@@ -238,6 +290,8 @@ Scope {
                     return "Keyboard backlight";
                 case "profile":
                     return root.profileInfo?.label ?? root.profile;
+                case "device":
+                    return root.deviceName;
                 case "volume":
                     return root.device;
                 default:
@@ -252,6 +306,8 @@ Scope {
             readonly property string value: {
                 if (root.kind === "volume" || root.kind === "brightness")
                     return muted ? "Muted" : `${Math.round(level * 100)}%`;
+                if (root.kind === "device")
+                    return `${Math.round(level * 100)}%`;
                 if (root.kind === "kbd") {
                     if (root.kbdLevel <= 0)
                         return "Off";
@@ -272,7 +328,7 @@ Scope {
             opacity: root.shown ? 1 : 0
             Behavior on opacity {
                 NumberAnimation {
-                    duration: 200
+                    duration: Theme.ms(200)
                 }
             }
 
@@ -280,7 +336,7 @@ Scope {
                 y: root.shown ? 0 : 12
                 Behavior on y {
                     NumberAnimation {
-                        duration: 220
+                        duration: Theme.ms(220)
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -345,7 +401,7 @@ Scope {
 
                             Behavior on width {
                                 NumberAnimation {
-                                    duration: 120
+                                    duration: Theme.ms(120)
                                 }
                             }
                         }

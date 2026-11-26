@@ -91,15 +91,17 @@ Scope {
 
             width: parent.width
             height: parent.height
-            // Slides down from under the bar, back up to hide.
-            y: root.shown ? 0 : -height - 8
+            // Slides down from under the bar, back up to hide. Uses the
+            // window's fixed implicitHeight, not `height` (which follows the
+            // window as it maps/unmaps and looped back into win.visible).
+            y: root.shown ? 0 : -win.implicitHeight - 8
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: root.shown = false
 
             Behavior on y {
                 NumberAnimation {
-                    duration: 260
+                    duration: Theme.ms(260)
                     easing.type: root.shown ? Easing.OutCubic : Easing.InCubic
                 }
             }

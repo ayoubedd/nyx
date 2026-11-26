@@ -22,11 +22,14 @@ set("n", "<leader>c", "<cmd>bd<cr>", { desc = "Force quit" }) -- Force quite
 set("n", "<cr>", "", {
 	expr = true,
 	desc = "Toggle search highlight",
+	-- An expr map must return the keys to run: "" swallows <CR> to clear the
+	-- highlight; otherwise <CR> passes through (quickfix jumps, cursor down).
 	callback = function()
-		---@diagnostic disable-next-line: undefined-field
-		if vim.opt.hlsearch:get() then
-			vim.cmd.nohl()
+		if vim.v.hlsearch == 1 then
+			vim.cmd.nohlsearch()
+			return ""
 		end
+		return "<CR>"
 	end,
 })
 
@@ -94,27 +97,21 @@ set(
 set("n", "<leader>ld", ":Telescope lsp_definitions<cr>", { desc = "Go To Definition", noremap = true, silent = true })
 set("n", "<leader>lR", ":Telescope lsp_references<cr>", { desc = "References", noremap = true, silent = true })
 
--- LSP_Saga
-set("n", "gd", ":lua vim.lsp.buf.definition()<cr>", { desc = "Goto Definition", noremap = true, silent = true })
-set("n", "<leader>lr", ":lua vim.lsp.buf.rename()<cr>", { desc = "Rename", noremap = true, silent = true })
--- set("n", "<leader>la", ":Lspsaga code_action<cr>", { desc = "Code Action", noremap = true, silent = true })
+-- vim.keymap.set, not `set` (nvim_set_keymap): these take Lua functions.
+local map = vim.keymap.set
+map("n", "gd", vim.lsp.buf.definition, { desc = "Goto Definition" })
+map("n", "<leader>lr", vim.lsp.buf.rename, { desc = "Rename" })
+map({ "n", "x" }, "<leader>la", vim.lsp.buf.code_action, { desc = "Code Action" })
 
-set(
-	"n",
-	"<leader>le",
-	":Lspsaga show_line_diagnostics<cr>",
-	{ desc = "Show Line Diagnostics", noremap = true, silent = true }
-)
-set(
-	"n",
-	"<leader>ln",
-	":Lspsaga diagnostic_jump_next<cr>",
-	{ desc = "Go To Next Diagnostic", noremap = true, silent = true }
-)
-set(
-	"n",
-	"<leader>lp",
-	":Lspsaga diagnostic_jump_prev<cr>",
-	{ desc = "Go To Previous Diagnostic", noremap = true, silent = true }
-)
-set("n", "<leader>lo", ":Lspsaga outline<cr>", { desc = "LSP Saga outline", noremap = true, silent = true })
+-- Diagnostics (built in; floats are rounded with the source, see config/lsp.lua)
+map("n", "<leader>le", vim.diagnostic.open_float, { desc = "Show Line Diagnostics" })
+map("n", "<leader>ln", function()
+	vim.diagnostic.jump({ count = 1, float = true })
+end, { desc = "Go To Next Diagnostic" })
+map("n", "<leader>lp", function()
+	vim.diagnostic.jump({ count = -1, float = true })
+end, { desc = "Go To Previous Diagnostic" })
+map("n", "<leader>lo", "<cmd>Telescope lsp_document_symbols<cr>", { desc = "Document Symbols" })
+map("n", "<leader>lh", function()
+	vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = 0 }), { bufnr = 0 })
+end, { desc = "Toggle Inlay Hints" })

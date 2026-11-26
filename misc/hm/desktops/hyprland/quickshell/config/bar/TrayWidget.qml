@@ -17,7 +17,7 @@ Item {
 
     Behavior on implicitWidth {
         NumberAnimation {
-            duration: 200
+            duration: Theme.ms(200)
             easing.type: Easing.OutCubic
         }
     }

@@ -82,6 +82,14 @@ run-iso:
 sh:
   nix develop --command $SHELL
 
+# Re-enroll the LUKS TPM2 key against the pcrlock policy (run after a rebuild,
+# or when boot asks for the passphrase, e.g. after a BIOS/firmware update)
+tpm-enroll device="/dev/disk/by-partlabel/disk-disk1-root":
+  sudo systemd-cryptenroll '{{ device }}' \
+    --wipe-slot=tpm2 \
+    --tpm2-device=auto \
+    --tpm2-pcrlock=/var/lib/systemd/pcrlock.json
+
 # Create hashed password
 mkpasswd:
   mkpasswd -R 10000 -m sha-512

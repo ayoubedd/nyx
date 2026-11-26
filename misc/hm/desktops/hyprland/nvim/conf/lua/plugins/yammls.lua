@@ -5,8 +5,9 @@ return {
       kubernetes_version = "v1.32.2",
       lsp = {
         clients = {
-          yaml = "yaml",
-          helm = "helm",
+          -- The names the clients are registered under (vim.lsp.enable).
+          yaml = "yamlls",
+          helm = "helm_ls",
         },
       },
       schema_stores = {
@@ -28,5 +29,11 @@ return {
         "viaduct.ai",
       },
     })
+    -- Keep only the per-buffer schema association. Its "deactivate the other
+    -- server" step stops the whole client (every buffer, deprecated
+    -- vim.lsp.stop_client) and guesses helm from any `templates/` path, so
+    -- opening a chart's values.yaml killed helm_ls everywhere. Filetype
+    -- detection (config/lsp.lua) already keeps yamlls and helm_ls apart.
+    require("nvim-k8s-lsp").deactivate_other_lsp = function() end
   end,
 }

@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Services.UPower
+import qs.common
 
 // Session-side battery saving while on battery:
 //   - Hyprland animations off
@@ -16,6 +17,11 @@ Scope {
 
     readonly property bool onBattery: UPower.onBattery
 
+    // Quickshell's own animations (menus, popups, sliders, OSD…) are off
+    // on battery and with the Power saver profile (Theme.ms() returns 0).
+    readonly property bool reduceMotion: onBattery || TunedProfiles.current === "x1-powersave"
+    onReduceMotionChanged: Theme.reduceMotion = reduceMotion
+
     // Plugged-in values: keep in sync with hypr/common.lua (decoration.blur).
     readonly property int blurPassesAc: 4
     readonly property int blurPassesBattery: 2
@@ -29,7 +35,10 @@ Scope {
     }
 
     onOnBatteryChanged: apply()
-    Component.onCompleted: apply()
+    Component.onCompleted: {
+        Theme.reduceMotion = reduceMotion;
+        apply();
+    }
 
     Connections {
         target: Hyprland

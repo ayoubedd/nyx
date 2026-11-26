@@ -20,13 +20,13 @@ Item {
 
     Behavior on implicitWidth {
         NumberAnimation {
-            duration: 260
+            duration: Theme.ms(260)
             easing.type: Easing.OutCubic
         }
     }
     Behavior on opacity {
         NumberAnimation {
-            duration: 200
+            duration: Theme.ms(200)
         }
     }
 

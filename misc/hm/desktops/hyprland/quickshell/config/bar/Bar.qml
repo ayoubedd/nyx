@@ -36,15 +36,35 @@ Variants {
             }
         }
 
-        Workspaces {
+        // Workspaces, then the keybind-mode pill while a submap is active.
+        Row {
             anchors.left: parent.left
             anchors.leftMargin: 14
             anchors.verticalCenter: parent.verticalCenter
+            spacing: 8
+
+            Workspaces {
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            SubmapWidget {
+                anchors.verticalCenter: parent.verticalCenter
+            }
+        }
+
+        // Timer / Pomodoro / stopwatch pill, right next to the clock (it
+        // doesn't shift the clock off center).
+        TimerWidget {
+            anchors.left: centerPill.right
+            anchors.leftMargin: 6
+            anchors.verticalCenter: parent.verticalCenter
+            onOpenTab: clock.showTab(2) // dashboard Timer tab
         }
 
         // Clock + now-playing as one centered pill. The player part slides
         // open while something plays and the whole pill re-centers.
         Rectangle {
+            id: centerPill
             anchors.centerIn: parent
             width: centerRow.implicitWidth
             height: 26
@@ -53,7 +73,7 @@ Variants {
 
             Behavior on color {
                 ColorAnimation {
-                    duration: 200
+                    duration: Theme.ms(200)
                 }
             }
 
@@ -80,11 +100,20 @@ Variants {
             // Left to right: speed, recording, keep-awake, privacy, tray apps
             // | system: battery, sound, network, bluetooth, notifications.
             NetSpeedWidget {}
+            // Only under sustained CPU / memory load.
+            LoadWidget {
+                id: load
+                onOpenSystem: clock.showTab(3) // dashboard System tab
+            }
             RecordingWidget {
                 id: recording
             }
             CaffeineWidget {
                 id: caffeine
+            }
+            // Mounted USB drives / SD cards: eject.
+            EjectWidget {
+                id: eject
             }
             PrivacyWidget {
                 id: privacy
@@ -97,7 +126,7 @@ Variants {
             // while there are status items (tray, privacy, keep-awake,
             // recording) to set apart.
             Item {
-                visible: tray.visible || privacy.visible || caffeine.visible || recording.visible
+                visible: tray.visible || privacy.visible || caffeine.visible || recording.visible || load.visible || eject.visible
                 implicitWidth: 13
                 implicitHeight: 26
 

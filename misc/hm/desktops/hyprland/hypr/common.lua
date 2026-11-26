@@ -3,6 +3,16 @@ hl.config({
 		preserve_split = true,
 	},
 
+	render = {
+		-- Don't switch a monitor to HDR / wide gamut when a fullscreen app asks
+		-- for it (default 1). The displays run 8-bit, so the switch failed:
+		-- mpv (gpu-next) playing 10-bit HDR video fullscreen went black with
+		-- "wide color gamut is enabled but the display is not in 10-bit mode".
+		-- mpv tone-maps HDR to SDR itself instead. (For real HDR output, see
+		-- the commented 10-bit monitor rule in monitor.lua.)
+		cm_auto_hdr = 0,
+	},
+
 	scrolling = {
 		column_width = 0.49,
 	},
@@ -35,7 +45,9 @@ hl.config({
 
 	cursor = {
 		hide_on_key_press = true,
-		no_hardware_cursors = true,
+		-- no_hardware_cursors left at its default (2 = auto): the Iris Xe
+		-- (i915) cursor plane works, and a software cursor makes every mouse
+		-- move recomposite the screen.
 	},
 
 	input = {
@@ -74,6 +86,11 @@ hl.config({
 		key_press_enables_dpms = true,
 		-- Let a restarted quickshell take over the lock if it crashes while locked.
 		allow_session_lock_restore = true,
+		-- Switching windows while one is fullscreen (Alt+Tab, Super+arrows,
+		-- clicking a notification...): the newly focused window takes over
+		-- fullscreen and the previous one goes back to tiling, so you stay in
+		-- fullscreen mode instead of dropping out of it.
+		on_focus_under_fullscreen = 1,
 	},
 
 	ecosystem = {
@@ -82,5 +99,8 @@ hl.config({
 	},
 	binds = {
 		hide_special_on_workspace_change = true,
+		-- Super+arrows move between windows even while one is fullscreen
+		-- (otherwise they only jump between monitors).
+		movefocus_cycles_fullscreen = true,
 	},
 })

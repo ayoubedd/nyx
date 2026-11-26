@@ -34,7 +34,7 @@ Item {
             Behavior on width {
                 enabled: !drag.pressed
                 NumberAnimation {
-                    duration: 100
+                    duration: Theme.ms(100)
                 }
             }
         }

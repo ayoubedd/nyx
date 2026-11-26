@@ -17,8 +17,11 @@ Column {
     property bool askPassword: false
     property string error: ""
 
-    readonly property bool secured: network.security !== WifiSecurityType.Open
-    readonly property bool busy: network.stateChanging
+    // network turns null when the ScriptModel drops a network that went out of
+    // range, a moment before this delegate is destroyed; bindings must cope.
+    readonly property bool secured: (network?.security ?? WifiSecurityType.Open) !== WifiSecurityType.Open
+    readonly property bool busy: network?.stateChanging ?? false
+    readonly property bool known: network?.known ?? false
 
     function securityName(t) {
         switch (t) {
@@ -130,7 +133,7 @@ Column {
 
                 Text {
                     Layout.fillWidth: true
-                    text: root.network.name
+                    text: root.network?.name ?? ""
                     elide: Text.ElideRight
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize - 1
@@ -140,7 +143,7 @@ Column {
 
                 Text {
                     Layout.fillWidth: true
-                    text: root.busy ? "Connecting…" : root.error ? root.error : [root.network.known ? "Saved" : "", root.securityName(root.network.security)].filter(s => s).join(" · ")
+                    text: root.busy ? "Connecting…" : root.error ? root.error : [root.known ? "Saved" : "", root.securityName(root.network?.security)].filter(s => s).join(" · ")
                     elide: Text.ElideRight
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize - 3
@@ -151,7 +154,7 @@ Column {
             // Forget (saved networks, on hover).
             MouseArea {
                 id: forget
-                visible: root.network.known && row.containsMouse && !root.busy
+                visible: root.known && row.containsMouse && !root.busy
                 implicitWidth: 24
                 implicitHeight: 24
                 hoverEnabled: true

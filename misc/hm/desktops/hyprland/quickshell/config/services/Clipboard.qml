@@ -68,18 +68,149 @@ Singleton {
 
     function remove(entry) {
         entries = entries.filter(e => e.id !== entry.id);
-        Quickshell.execDetached(["sh", "-c", `printf '%s\\n' "$1" | cliphist delete`, "sh", entry.line]);
+        if (entry.isImage) {
+            const t = Object.assign({}, thumbs);
+            delete t[entry.id];
+            thumbs = t;
+        }
+        Quickshell.execDetached(["sh", "-c", `printf '%s\\n' "$1" | cliphist delete; rm -f "$2"`, "sh", entry.line, entry.isImage ? imagePath(entry) : ""]);
     }
 
+    // Clears the history only; pinned entries stay. The decoded images go
+    // too: cliphist restarts ids at 1 after a wipe, so a stale "1.png"
+    // would otherwise show up as the next image's thumbnail.
     function wipe() {
         entries = [];
-        Quickshell.execDetached(["cliphist", "wipe"]);
+        thumbs = {};
+        thumbQueue = [];
+        Quickshell.execDetached(["sh", "-c", `cliphist wipe; rm -rf "$1"`, "sh", cacheDir]);
     }
 
-    // Decoded image file for an entry (written on demand by ClipboardPreview).
+    // Decoded image file for an entry (written on demand by ClipboardPreview
+    // and the list thumbnails).
     function imagePath(entry) {
         return `${cacheDir}/${entry.id}.${entry.imageType === "jpeg" ? "jpg" : entry.imageType || "png"}`;
     }
+
+    // ---- list thumbnails --------------------------------------------------
+    // Rows ask for their image (requestThumb) when they're created, so only
+    // what's on screen is decoded, one at a time. thumbs: entry id -> file.
+    property var thumbs: ({})
+    property var thumbQueue: []
+
+    function requestThumb(entry) {
+        if (!entry?.isImage || thumbs[entry.id] || thumbQueue.some(e => e.id === entry.id))
+            return;
+        thumbQueue = [...thumbQueue, entry];
+        nextThumb();
+    }
+
+    function nextThumb() {
+        if (thumbDecoder.running || thumbQueue.length === 0)
+            return;
+        const e = thumbQueue[0];
+        thumbQueue = thumbQueue.slice(1);
+        thumbDecoder.entry = e;
+        thumbDecoder.target = imagePath(e);
+        thumbDecoder.running = true;
+    }
+
+    Process {
+        id: thumbDecoder
+        property var entry: null
+        property string target
+        command: ["sh", "-c", `mkdir -p "$(dirname "$2")" && { [ -s "$2" ] || printf '%s\\n' "$1" | cliphist decode > "$2"; }`, "sh", entry?.line ?? "", target]
+        onExited: code => {
+            if (code === 0 && entry) {
+                const t = Object.assign({}, root.thumbs);
+                t[entry.id] = target;
+                root.thumbs = t;
+            }
+            root.nextThumb();
+        }
+    }
+
+    // ---- pinned entries ---------------------------------------------------
+    // A pin is a copy of the entry's raw bytes (+ mime type and preview) in
+    // $XDG_RUNTIME_DIR/nyx-clipboard-pins: RAM like the history, but outside
+    // cliphist, so clearing the history keeps them. Gone after a reboot.
+    // pins: [{ pinned, id, file, type, isImage, preview, imageInfo }]
+    readonly property string pinsDir: `${Quickshell.env("XDG_RUNTIME_DIR") || "/tmp"}/nyx-clipboard-pins`
+    property var pins: []
+
+    function pin(entry) {
+        const type = entry.isImage ? `image/${entry.imageType === "jpg" ? "jpeg" : entry.imageType || "png"}` : "text/plain;charset=utf-8";
+        pinQueue = [...pinQueue, ["sh", "-c", `
+            dir=$1; name=$(date +%s%N)
+            mkdir -p -m 700 "$dir"
+            printf '%s\\n' "$2" | cliphist decode > "$dir/$name.data" || exit 1
+            printf '%s' "$3" > "$dir/$name.type"
+            printf '%s' "$4" > "$dir/$name.preview"`, "sh", pinsDir, entry.line, type, entry.isImage ? entry.imageInfo : entry.preview]];
+        nextPin();
+    }
+
+    // Pins run one at a time (a busy Process ignores a new command).
+    property var pinQueue: []
+
+    function nextPin() {
+        if (pinProc.running || pinQueue.length === 0)
+            return;
+        pinProc.command = pinQueue[0];
+        pinQueue = pinQueue.slice(1);
+        pinProc.running = true;
+    }
+
+    function unpin(p) {
+        pins = pins.filter(x => x.id !== p.id);
+        Quickshell.execDetached(["sh", "-c", `rm -f "$1"/"$2".*`, "sh", pinsDir, p.id]);
+    }
+
+    function usePin(p, windowClass, paste) {
+        const keys = paste ? `sleep 0.15; ${pasteKeys(windowClass)}` : "true";
+        Quickshell.execDetached(["sh", "-c", `wl-copy -t "$2" < "$1" && ${keys}`, "sh", p.file, p.type]);
+    }
+
+    function refreshPins() {
+        pinLister.running = true;
+    }
+
+    Process {
+        id: pinProc
+        onExited: {
+            root.refreshPins();
+            root.nextPin();
+        }
+    }
+
+    // Newest first: "<name>\t<type>\t<preview>" per pin.
+    Process {
+        id: pinLister
+        command: ["sh", "-c", `
+            for t in $(ls -r "$1"/*.type 2>/dev/null); do
+                n=$(basename "$t" .type)
+                [ -e "$1/$n.data" ] || continue
+                printf '%s\\t%s\\t%s\\n' "$n" "$(cat "$t")" "$(tr '\\n\\t' '  ' < "$1/$n.preview" 2>/dev/null)"
+            done`, "sh", root.pinsDir]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.pins = text.split("\n").filter(l => l.includes("\t")).map(l => {
+                    const f = l.split("\t");
+                    const isImage = f[1].startsWith("image/");
+                    return {
+                        pinned: true,
+                        id: f[0],
+                        file: `${root.pinsDir}/${f[0]}.data`,
+                        type: f[1],
+                        isImage: isImage,
+                        preview: isImage ? "" : f.slice(2).join("\t"),
+                        imageInfo: isImage ? f.slice(2).join("\t") : ""
+                    };
+                });
+            }
+        }
+    }
+
+    Component.onCompleted: refreshPins()
 
     Process {
         id: lister

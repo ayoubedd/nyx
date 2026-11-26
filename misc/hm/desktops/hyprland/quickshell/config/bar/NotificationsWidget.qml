@@ -9,11 +9,11 @@ BarButton {
     iconColor: Notifs.dnd ? Theme.foregroundDim : Theme.foreground
     badge: Notifs.count > 0 && !Notifs.dnd
     active: Notifs.centerOpen
-    tooltip: (Notifs.count === 0 ? "No notifications" : Notifs.count === 1 ? "1 notification" : `${Notifs.count} notifications`) + (Notifs.dnd ? " · Do Not Disturb" : "")
+    tooltip: (Notifs.count === 0 ? "No notifications" : Notifs.count === 1 ? "1 notification" : `${Notifs.count} notifications`) + (Notifs.dnd ? ` · Do Not Disturb${Notifs.dndManual ? "" : ` (${Notifs.dndReason.toLowerCase()})`}` : "")
 
     onClicked: mouse => {
         if (mouse.button === Qt.RightButton)
-            Notifs.dnd = !Notifs.dnd;
+            Notifs.toggleDnd();
         else
             Notifs.toggleCenter();
     }

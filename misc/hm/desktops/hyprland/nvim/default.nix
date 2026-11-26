@@ -20,27 +20,28 @@
       kdePackages.qtdeclarative # qmlls (quickshell)
 
       # lsp servers
+      # (lua: emmylua-ls above; TypeScript: the `typescript` package's
+      # native tsc server, below; eslint: vscode-langservers-extracted)
       helm-ls
       nixd
       pyright
-      eslint_d
-      pylint
       rust-analyzer
       gopls
       clang-tools
       typos-lsp
       bash-language-server
+      shellcheck # used by bash-language-server
       svelte-language-server
-      typescript-language-server
       vscode-langservers-extracted
       css-variables-language-server
       emmet-ls
       harper
-      lua-language-server
       tailwindcss-language-server
       yaml-language-server
-      deno
       tofu-ls
+      docker-language-server
+      marksman
+      taplo
 
       # formatters
       nixfmt

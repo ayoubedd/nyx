@@ -5,7 +5,6 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
 import Quickshell.Networking
-import Quickshell.Bluetooth
 import qs.common
 import qs.services
 import "search.js" as Search
@@ -95,8 +94,10 @@ Scope {
         query = q ?? "";
         armed = "";
         actionsOpen = false;
-        if (m === "clipboard")
+        if (m === "clipboard") {
             Clipboard.refresh();
+            Clipboard.refreshPins();
+        }
         if (m === "windows" || m === "search")
             Hyprland.refreshToplevels();
         selectFirst();
@@ -142,7 +143,7 @@ Scope {
     // ---- selection ---------------------------------------------------------
 
     // Only built while the launcher is on screen.
-    readonly property var items: !win.visible ? [] : mode === "clipboard" ? clipboardItems() : mode === "emoji" ? emojiItems() : mode === "windows" ? windowItems() : searchItems()
+    readonly property var items: !windowVisible ? [] : mode === "clipboard" ? clipboardItems() : mode === "emoji" ? emojiItems() : mode === "windows" ? windowItems() : searchItems()
     readonly property var selected: items[current] ?? null
     readonly property var selectedActions: selected?.actions ?? []
 
@@ -170,7 +171,9 @@ Scope {
         // Keep the selection in view (the emoji grid does its own).
         if (mode === "emoji")
             return;
-        const view = mode === "clipboard" ? clipList : list;
+        const view = mode === "clipboard" ? clipView : listView;
+        if (!view)
+            return;
         if (current <= 1)
             view.positionViewAtBeginning();
         else
@@ -349,11 +352,16 @@ Scope {
     }
 
     function commands() {
-        const bt = Bluetooth.defaultAdapter;
         return [command("clipboard", "Clipboard History", "content_paste", "Browse and paste copied items", () => setMode("clipboard", ""), {
                 stay: true,
                 label: "Open",
                 keywords: "copy paste history cliphist"
+            }), command("qrclipboard", "Show Clipboard as QR Code", "qr_code", "Scan the copied text with your phone", () => ipc(["qr", "clipboard"]), {
+                label: "Show",
+                keywords: "qr code phone transfer share"
+            }), command("registers", "Clipboard Registers", "inventory_2", "Vim-style a–z registers (Super+')", () => ipc(["registerpanel", "open"]), {
+                label: "Open",
+                keywords: "vim register yank put clipboard"
             }), command("emoji", "Emoji Picker", "mood", "Search and paste emoji", () => setMode("emoji", ""), {
                 stay: true,
                 label: "Open",
@@ -371,10 +379,7 @@ Scope {
             }), command("notifications", "Notification Center", "notifications", "Controls and notifications", () => later(() => Notifs.centerOpen = true), {
                 label: "Open",
                 keywords: "control center"
-            }), toggleCommand("dnd", "Do Not Disturb", "do_not_disturb_on", Notifs.dnd, () => Notifs.dnd = !Notifs.dnd, "dnd focus silence notifications"), toggleCommand("caffeine", "Keep Awake", "coffee", Caffeine.active, () => Caffeine.toggle(), "caffeine sleep idle inhibit"), toggleCommand("nightlight", "Night Light", "nightlight", NightLight.on, () => NightLight.toggle(), "warm blue light hyprsunset"), toggleCommand("wifi", "Wi-Fi", "wifi", Networking.wifiEnabled, () => Networking.wifiEnabled = !Networking.wifiEnabled, "wireless network wlan"), toggleCommand("bluetooth", "Bluetooth", "bluetooth", bt?.enabled ?? false, () => {
-                if (bt)
-                    bt.enabled = !bt.enabled;
-            }, "bt"), command("lock", "Lock Screen", "lock", "", () => Quickshell.execDetached(["loginctl", "lock-session"]), {
+            }), toggleCommand("dnd", "Do Not Disturb", "do_not_disturb_on", Notifs.dnd, () => Notifs.toggleDnd(), "dnd focus silence notifications"), toggleCommand("caffeine", "Keep Awake", "coffee", Caffeine.active, () => Caffeine.toggle(), "caffeine sleep idle inhibit"), toggleCommand("nightlight", "Night Light", "nightlight", NightLight.on, () => NightLight.toggle(), "warm blue light hyprsunset"), toggleCommand("wifi", "Wi-Fi", "wifi", Networking.wifiEnabled, () => Networking.wifiEnabled = !Networking.wifiEnabled, "wireless network wlan"), command("lock", "Lock Screen", "lock", "", () => Quickshell.execDetached(["loginctl", "lock-session"]), {
                 keywords: "screen lock"
             }), command("suspend", "Sleep", "bedtime", "Suspend the computer", () => Quickshell.execDetached(["systemctl", "suspend"]), {
                 keywords: "suspend"
@@ -404,31 +409,21 @@ Scope {
     // ---- windows -----------------------------------------------------------
 
     function address(t) {
-        const a = t?.address ?? "";
-        return a.startsWith("0x") ? a : `0x${a}`;
+        return HyprDispatch.address(t);
     }
 
     function appIdOf(t) {
         return t?.wayland?.appId || t?.lastIpcObject?.class || "";
     }
 
-    readonly property string noWarpScript: `
-        orig=$(hyprctl -j getoption cursor:no_warps | jq -r 'if has("bool") then (if .bool then 1 else 0 end) else (.int // 0) end')
-        hyprctl eval 'hl.config({ cursor = { no_warps = true } })' >/dev/null
-        for d in "$@"; do
-            hyprctl dispatch "$d" >/dev/null
-        done
-        sleep 0.3
-        if [ "$orig" = 1 ]; then v=true; else v=false; fi
-        hyprctl eval "hl.config({ cursor = { no_warps = $v } })" >/dev/null
-    `
-
+    // Focus it, close it, refocus what was focused; without moving the
+    // pointer (services/HyprDispatch.qml).
     function closeWindow(t) {
         const focused = Hyprland.activeToplevel;
         const d = [`hl.dsp.focus({ window = "address:${address(t)}" })`, `hl.dsp.window.close()`];
         if (focused && focused !== t)
             d.push(`hl.dsp.focus({ window = "address:${address(focused)}" })`);
-        Quickshell.execDetached(["sh", "-c", noWarpScript, "sh", ...d]);
+        HyprDispatch.withoutWarps(d);
         refreshWindows.restart();
     }
 
@@ -675,87 +670,152 @@ Scope {
 
     // ---- clipboard ---------------------------------------------------------
 
+    // Pinned entries (kept when the history is cleared), then the history.
+    // ↵ copies (puts it back on the clipboard, nothing typed); Ctrl+↵ also
+    // pastes it into the focused window. Images show a thumbnail.
     function clipboardItems() {
         const words = query.toLowerCase().split(/\s+/).filter(w => w);
-        return Clipboard.entries.filter(e => words.every(w => e.preview.toLowerCase().includes(w))).map(e => {
-            const isLink = !e.isImage && /^\s*https?:\/\/\S+\s*$/.test(e.preview);
-            return {
-                key: `clip:${e.id}`,
-                entry: e,
-                title: e.isImage ? "Image" : e.preview.replace(/\s+/g, " ").trim() || "(whitespace)",
-                subtitle: "",
-                icon: e.isImage ? "image" : isLink ? "link" : "notes",
-                accessory: e.isImage ? e.imageInfo : "",
-                actions: [
-                    {
-                        label: "Paste",
-                        icon: "content_paste",
-                        run: () => Clipboard.use(e, root.targetClass, true)
-                    },
-                    {
-                        label: "Copy",
-                        icon: "content_copy",
-                        run: () => Clipboard.use(e, "", false)
-                    },
-                    {
-                        label: "Delete entry",
-                        icon: "delete",
-                        stay: true,
-                        remove: true,
-                        run: () => Clipboard.remove(e)
-                    },
-                    {
-                        label: "Clear history",
-                        icon: "delete_sweep",
-                        stay: true,
-                        confirm: true,
-                        run: () => Clipboard.wipe()
-                    }
-                ]
-            };
-        });
+        const matches = text => words.every(w => text.toLowerCase().includes(w));
+        const isLink = text => /^\s*https?:\/\/\S+\s*$/.test(text);
+        const clearHistory = {
+            label: "Clear history (keeps pins)",
+            icon: "delete_sweep",
+            stay: true,
+            confirm: true,
+            run: () => Clipboard.wipe()
+        };
+
+        const pinned = Clipboard.pins.filter(p => matches(p.isImage ? "image" : p.preview)).map(p => ({
+                    key: `pin:${p.id}`,
+                    entry: p,
+                    title: p.isImage ? "Image" : p.preview.replace(/\s+/g, " ").trim() || "(whitespace)",
+                    subtitle: "",
+                    icon: p.isImage ? "image" : isLink(p.preview) ? "link" : "notes",
+                    thumbFile: p.isImage ? p.file : "",
+                    accessory: "Pinned",
+                    actions: [
+                        {
+                            label: "Copy",
+                            icon: "content_copy",
+                            run: () => Clipboard.usePin(p, "", false)
+                        },
+                        {
+                            label: "Paste",
+                            icon: "content_paste",
+                            run: () => Clipboard.usePin(p, root.targetClass, true)
+                        },
+                        {
+                            label: "Unpin",
+                            icon: "keep_off",
+                            stay: true,
+                            remove: true,
+                            run: () => Clipboard.unpin(p)
+                        }
+                    ]
+                }));
+
+        const history = Clipboard.entries.filter(e => matches(e.preview)).map(e => ({
+                    key: `clip:${e.id}`,
+                    entry: e,
+                    title: e.isImage ? "Image" : e.preview.replace(/\s+/g, " ").trim() || "(whitespace)",
+                    subtitle: "",
+                    icon: e.isImage ? "image" : isLink(e.preview) ? "link" : "notes",
+                    thumbEntry: e.isImage ? e : null,
+                    accessory: e.isImage ? e.imageInfo : "",
+                    actions: [
+                        {
+                            label: "Copy",
+                            icon: "content_copy",
+                            run: () => Clipboard.use(e, "", false)
+                        },
+                        {
+                            label: "Paste",
+                            icon: "content_paste",
+                            run: () => Clipboard.use(e, root.targetClass, true)
+                        },
+                        {
+                            label: "Pin",
+                            icon: "keep",
+                            stay: true,
+                            run: () => Clipboard.pin(e)
+                        },
+                        // Text only: scan it with a phone (overlays/QrCode.qml).
+                        ...(e.isImage ? [] : [
+                                {
+                                    label: "Show as QR code",
+                                    icon: "qr_code",
+                                    run: () => ipc(["qr", "entry", e.line])
+                                }
+                            ]),
+                        {
+                            label: "Delete entry",
+                            icon: "delete",
+                            stay: true,
+                            remove: true,
+                            run: () => Clipboard.remove(e)
+                        },
+                        clearHistory
+                    ]
+                }));
+
+        if (pinned.length === 0)
+            return history;
+        return [header("Pinned")].concat(pinned, history.length ? [header("History")].concat(history) : []);
     }
 
     // ---- emoji -------------------------------------------------------------
 
+    // Shown and pasted in the default skin tone (LauncherStore.emojiTone)
+    // when the emoji has tones; Ctrl+K also offers each tone. Usage is
+    // recorded on the base emoji, so recents don't split by tone.
     function emojiItem(e, recent) {
+        const shown = Emoji.withTone(e, LauncherStore.emojiTone);
+        const use = (ch, paste) => {
+            LauncherStore.record("emoji", e.char);
+            Clipboard.useText(ch, paste ? root.targetClass : "", paste);
+        };
+        const actions = [
+            {
+                label: "Paste",
+                icon: "content_paste",
+                run: () => use(shown, true)
+            },
+            {
+                label: "Copy",
+                icon: "content_copy",
+                run: () => use(shown, false)
+            }
+        ];
+        if (e.tones)
+            for (let t = 0; t <= 5; t++) {
+                const ch = Emoji.withTone(e, t);
+                if (ch !== shown)
+                    actions.push({
+                        label: `Paste ${ch}  ${Emoji.toneNames[t]}`,
+                        icon: "palette",
+                        run: () => use(ch, true)
+                    });
+            }
+        actions.push({
+            label: "Copy name",
+            icon: "text_fields",
+            run: () => Clipboard.useText(e.name, "", false)
+        });
         return {
             key: `emoji:${e.char}${recent ? ":recent" : ""}`,
-            char: e.char,
+            char: shown,
             name: e.name,
             group: e.group,
             keywords: e.keywords,
             recent: recent,
-            actions: [
-                {
-                    label: "Paste",
-                    icon: "content_paste",
-                    run: () => {
-                        LauncherStore.record("emoji", e.char);
-                        Clipboard.useText(e.char, root.targetClass, true);
-                    }
-                },
-                {
-                    label: "Copy",
-                    icon: "content_copy",
-                    run: () => {
-                        LauncherStore.record("emoji", e.char);
-                        Clipboard.useText(e.char, "", false);
-                    }
-                },
-                {
-                    label: "Copy name",
-                    icon: "text_fields",
-                    run: () => Clipboard.useText(e.name, "", false)
-                }
-            ]
+            actions: actions
         };
     }
 
     function emojiItems() {
         const q = query.trim();
         if (!q) {
-            const recent = LauncherStore.recent("emoji", 2 * emojiView.columns).map(c => Emoji.byChar(c)).filter(e => e);
+            const recent = LauncherStore.recent("emoji", 2 * emojiColumns).map(c => Emoji.byChar(c)).filter(e => e);
             return recent.map(e => emojiItem(e, true)).concat(Emoji.list.map(e => emojiItem(e, false)));
         }
         return Emoji.list.map(e => ({
@@ -806,469 +866,524 @@ Scope {
         }
     }
 
+    // Keybinds (hl.dsp.global("nyx:<name>") in hypr/binds.lua): handled in
+    // this process, no `qs ipc call` spawned per key press.
+    GlobalShortcut {
+        appid: "nyx"
+        name: "launcher"
+        description: "Toggle the launcher"
+        onPressed: root.toggle("search")
+    }
+    GlobalShortcut {
+        appid: "nyx"
+        name: "launcher-clipboard"
+        description: "Clipboard history"
+        onPressed: root.toggle("clipboard")
+    }
+    GlobalShortcut {
+        appid: "nyx"
+        name: "launcher-windows"
+        description: "Switch windows"
+        onPressed: root.toggle("windows")
+    }
+    GlobalShortcut {
+        appid: "nyx"
+        name: "launcher-emoji"
+        description: "Emoji picker"
+        onPressed: root.toggle("emoji")
+    }
+
     // ---- window ------------------------------------------------------------
 
-    PanelWindow {
-        id: win
+    property bool windowVisible: false
+    // Handles into the lazily created window (null / default while closed).
+    property Item listView: null
+    property Item clipView: null
+    property int emojiColumns: 8
 
-        screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-        visible: root.open || box.opacity > 0
+    // The window is only created while it's needed (LazyLoader), so a closed
+    // overlay holds no items, images or textures.
+    // It stays loaded until its fade-out has finished.
+    LazyLoader {
+        active: root.open || root.windowVisible
 
-        // No anchors: the compositor centers the surface on the screen.
-        exclusionMode: ExclusionMode.Ignore
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.namespace: "nyx-launcher"
-        WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-        color: "transparent"
-        implicitWidth: 760
-        implicitHeight: 500
+        PanelWindow {
+            id: win
 
-        HyprlandFocusGrab {
-            windows: [win]
-            active: root.open
-            onCleared: root.close()
-        }
-
-        Connections {
-            target: root
-            function onOpenChanged() {
-                if (root.open)
-                    Qt.callLater(() => input.forceActiveFocus());
+            // Starts false and follows root.open from the next tick, so the
+            // open animation runs on a freshly created window.
+            property bool presented: false
+            Component.onCompleted: {
+                root.windowVisible = visible;
+                Qt.callLater(() => presented = Qt.binding(() => root.open));
             }
-        }
+            onVisibleChanged: root.windowVisible = visible
 
-        Rectangle {
-            id: box
-            anchors.fill: parent
-            radius: 18
-            color: Theme.background
-            border.width: 1
-            border.color: Theme.surfaceHigh
-            opacity: root.open ? 1 : 0
-            scale: root.open ? 1 : 0.97
+            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
+            visible: root.open || box.opacity > 0
 
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 140
-                    easing.type: Easing.OutCubic
+            // No anchors: the compositor centers the surface on the screen.
+            exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.namespace: "nyx-launcher"
+            WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            color: "transparent"
+            implicitWidth: 760
+            implicitHeight: 500
+
+            HyprlandFocusGrab {
+                windows: [win]
+                active: root.open
+                onCleared: root.close()
+            }
+
+            Connections {
+                target: win // presented: also fires on a freshly created window
+                function onPresentedChanged() {
+                    if (win.presented)
+                        Qt.callLater(() => input.forceActiveFocus());
                 }
             }
-            Behavior on scale {
-                NumberAnimation {
-                    duration: 160
-                    easing.type: Easing.OutCubic
-                }
-            }
 
-            ColumnLayout {
+            Rectangle {
+                id: box
                 anchors.fill: parent
-                spacing: 0
+                radius: 18
+                color: Theme.background
+                border.width: 1
+                border.color: Theme.surfaceHigh
+                opacity: win.presented ? 1 : 0
+                scale: win.presented ? 1 : 0.97
 
-                // ---- search bar ----
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 58
-                    Layout.leftMargin: 16
-                    Layout.rightMargin: 16
-                    spacing: 10
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.ms(140)
+                        easing.type: Easing.OutCubic
+                    }
+                }
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: Theme.ms(160)
+                        easing.type: Easing.OutCubic
+                    }
+                }
 
-                    // Current view (click: back to search).
-                    MouseArea {
-                        id: modeChip
-                        implicitWidth: chipRow.implicitWidth + (root.mode === "search" ? 0 : 20)
-                        implicitHeight: 28
-                        hoverEnabled: true
-                        cursorShape: root.mode === "search" ? Qt.ArrowCursor : Qt.PointingHandCursor
-                        onClicked: if (root.mode !== "search")
-                            root.setMode("search", "")
+                ColumnLayout {
+                    anchors.fill: parent
+                    spacing: 0
 
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: 8
-                            visible: root.mode !== "search"
-                            color: modeChip.containsMouse ? Theme.glassTileHover : Theme.glassTile
+                    // ---- search bar ----
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 58
+                        Layout.leftMargin: 16
+                        Layout.rightMargin: 16
+                        spacing: 10
+
+                        // Current view (click: back to search).
+                        MouseArea {
+                            id: modeChip
+                            implicitWidth: chipRow.implicitWidth + (root.mode === "search" ? 0 : 20)
+                            implicitHeight: 28
+                            hoverEnabled: true
+                            cursorShape: root.mode === "search" ? Qt.ArrowCursor : Qt.PointingHandCursor
+                            onClicked: if (root.mode !== "search")
+                                root.setMode("search", "")
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: 8
+                                visible: root.mode !== "search"
+                                color: modeChip.containsMouse ? Theme.glassTileHover : Theme.glassTile
+                            }
+
+                            Row {
+                                id: chipRow
+                                anchors.centerIn: parent
+                                spacing: 6
+
+                                Icon {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    name: root.modeInfo.icon
+                                    size: 20
+                                    color: root.mode === "search" ? Theme.foregroundDim : Theme.foreground
+                                }
+
+                                Text {
+                                    visible: root.mode !== "search"
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: root.modeInfo.label
+                                    font.family: Theme.font
+                                    font.pixelSize: Theme.fontSize - 1
+                                    font.weight: Font.DemiBold
+                                    color: Theme.foreground
+                                }
+                            }
                         }
 
-                        Row {
-                            id: chipRow
-                            anchors.centerIn: parent
-                            spacing: 6
-
-                            Icon {
-                                anchors.verticalCenter: parent.verticalCenter
-                                name: root.modeInfo.icon
-                                size: 20
-                                color: root.mode === "search" ? Theme.foregroundDim : Theme.foreground
-                            }
+                        TextInput {
+                            id: input
+                            Layout.fillWidth: true
+                            text: root.query
+                            onTextChanged: root.query = text
+                            font.family: Theme.font
+                            font.pixelSize: Theme.fontSize + 3
+                            color: Theme.foreground
+                            selectionColor: Theme.accent
+                            selectedTextColor: Theme.background
+                            clip: true
+                            focus: true
 
                             Text {
-                                visible: root.mode !== "search"
+                                visible: !input.text
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: root.modeInfo.label
-                                font.family: Theme.font
-                                font.pixelSize: Theme.fontSize - 1
-                                font.weight: Font.DemiBold
-                                color: Theme.foreground
+                                text: root.modeInfo.placeholder
+                                font: input.font
+                                color: Theme.foregroundDim
                             }
-                        }
-                    }
 
-                    TextInput {
-                        id: input
-                        Layout.fillWidth: true
-                        text: root.query
-                        onTextChanged: root.query = text
-                        font.family: Theme.font
-                        font.pixelSize: Theme.fontSize + 3
-                        color: Theme.foreground
-                        selectionColor: Theme.accent
-                        selectedTextColor: Theme.background
-                        clip: true
-                        focus: true
+                            Keys.onPressed: event => {
+                                const ctrl = event.modifiers & Qt.ControlModifier;
+                                const shift = event.modifiers & Qt.ShiftModifier;
+                                const emoji = root.mode === "emoji";
+                                const cols = emojiView.columns;
 
-                        Text {
-                            visible: !input.text
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: root.modeInfo.placeholder
-                            font: input.font
-                            color: Theme.foregroundDim
-                        }
+                                if (root.actionsOpen) {
+                                    const n = root.selectedActions.length;
+                                    if (event.key === Qt.Key_Down || (ctrl && event.key === Qt.Key_N)) {
+                                        root.actionIndex = Math.min(n - 1, root.actionIndex + 1);
+                                        root.armed = "";
+                                    } else if (event.key === Qt.Key_Up || (ctrl && event.key === Qt.Key_P)) {
+                                        root.actionIndex = Math.max(0, root.actionIndex - 1);
+                                        root.armed = "";
+                                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+                                        root.runAction(root.selected, root.selectedActions[root.actionIndex], true);
+                                    else if (event.key === Qt.Key_Escape || (ctrl && event.key === Qt.Key_K)) {
+                                        root.actionsOpen = false;
+                                        root.armed = "";
+                                    } else
+                                        return;
+                                    event.accepted = true;
+                                    return;
+                                }
 
-                        Keys.onPressed: event => {
-                            const ctrl = event.modifiers & Qt.ControlModifier;
-                            const shift = event.modifiers & Qt.ShiftModifier;
-                            const emoji = root.mode === "emoji";
-                            const cols = emojiView.columns;
-
-                            if (root.actionsOpen) {
-                                const n = root.selectedActions.length;
-                                if (event.key === Qt.Key_Down || (ctrl && event.key === Qt.Key_N)) {
-                                    root.actionIndex = Math.min(n - 1, root.actionIndex + 1);
-                                    root.armed = "";
-                                } else if (event.key === Qt.Key_Up || (ctrl && event.key === Qt.Key_P)) {
-                                    root.actionIndex = Math.max(0, root.actionIndex - 1);
-                                    root.armed = "";
-                                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
-                                    root.runAction(root.selected, root.selectedActions[root.actionIndex], true);
-                                else if (event.key === Qt.Key_Escape || (ctrl && event.key === Qt.Key_K)) {
-                                    root.actionsOpen = false;
-                                    root.armed = "";
-                                } else
+                                if (event.key === Qt.Key_Escape)
+                                    root.back();
+                                else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
+                                    root.runAction(root.selected, root.selectedActions[ctrl ? 1 : 0]);
+                                else if (ctrl && event.key === Qt.Key_K) {
+                                    if (root.selectedActions.length > 0) {
+                                        root.actionIndex = 0;
+                                        root.actionsOpen = true;
+                                    }
+                                } else if (event.key === Qt.Key_Down || (ctrl && event.key === Qt.Key_N))
+                                    root.move(emoji ? cols : 1);
+                                else if (event.key === Qt.Key_Up || (ctrl && event.key === Qt.Key_P))
+                                    root.move(emoji ? -cols : -1);
+                                else if (emoji && event.key === Qt.Key_Right)
+                                    root.move(1);
+                                else if (emoji && event.key === Qt.Key_Left)
+                                    root.move(-1);
+                                else if (event.key === Qt.Key_PageDown)
+                                    root.move(emoji ? cols * 4 : 8);
+                                else if (event.key === Qt.Key_PageUp)
+                                    root.move(emoji ? -cols * 4 : -8);
+                                else if (event.key === Qt.Key_Tab)
+                                    root.cycleMode(1);
+                                else if (event.key === Qt.Key_Backtab)
+                                    root.cycleMode(-1);
+                                else if (shift && event.key === Qt.Key_Delete)
+                                    root.runRemove();
+                                else if (event.key === Qt.Key_Backspace && !input.text && root.mode !== root.openedMode)
+                                    root.back();
+                                else
                                     return;
                                 event.accepted = true;
-                                return;
                             }
+                        }
 
-                            if (event.key === Qt.Key_Escape)
-                                root.back();
-                            else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
-                                root.runAction(root.selected, root.selectedActions[ctrl ? 1 : 0]);
-                            else if (ctrl && event.key === Qt.Key_K) {
-                                if (root.selectedActions.length > 0) {
-                                    root.actionIndex = 0;
-                                    root.actionsOpen = true;
-                                }
-                            } else if (event.key === Qt.Key_Down || (ctrl && event.key === Qt.Key_N))
-                                root.move(emoji ? cols : 1);
-                            else if (event.key === Qt.Key_Up || (ctrl && event.key === Qt.Key_P))
-                                root.move(emoji ? -cols : -1);
-                            else if (emoji && event.key === Qt.Key_Right)
-                                root.move(1);
-                            else if (emoji && event.key === Qt.Key_Left)
-                                root.move(-1);
-                            else if (event.key === Qt.Key_PageDown)
-                                root.move(emoji ? cols * 4 : 8);
-                            else if (event.key === Qt.Key_PageUp)
-                                root.move(emoji ? -cols * 4 : -8);
-                            else if (event.key === Qt.Key_Tab)
-                                root.cycleMode(1);
-                            else if (event.key === Qt.Key_Backtab)
-                                root.cycleMode(-1);
-                            else if (shift && event.key === Qt.Key_Delete)
-                                root.runRemove();
-                            else if (event.key === Qt.Key_Backspace && !input.text && root.mode !== root.openedMode)
-                                root.back();
-                            else
-                                return;
-                            event.accepted = true;
+                        Text {
+                            visible: root.mode === "clipboard" && Clipboard.entries.length > 0
+                            text: `${Clipboard.entries.length} items`
+                            font.family: Theme.font
+                            font.pixelSize: Theme.fontSize - 3
+                            color: Theme.foregroundDim
                         }
                     }
 
-                    Text {
-                        visible: root.mode === "clipboard" && Clipboard.entries.length > 0
-                        text: `${Clipboard.entries.length} items`
-                        font.family: Theme.font
-                        font.pixelSize: Theme.fontSize - 3
-                        color: Theme.foregroundDim
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 1
+                        color: Theme.glassBorder
                     }
-                }
 
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 1
-                    color: Theme.glassBorder
-                }
+                    // ---- content ----
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
 
-                // ---- content ----
-                Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
+                        Component {
+                            id: rowDelegate
 
-                    Component {
-                        id: rowDelegate
+                            ResultRow {
+                                required property var modelData
+                                item: modelData
+                                width: ListView.view.width
+                                selected: index === root.current
+                                notice: root.armed.startsWith(`${modelData.key}/`) ? "Press ↵ again to confirm" : ""
+                                onHovered: i => root.current = i
+                                onActivated: i => {
+                                    root.current = i;
+                                    root.runAction(root.selected, root.selectedActions[0]);
+                                }
+                            }
+                        }
 
-                        ResultRow {
-                            required property var modelData
-                            item: modelData
-                            width: ListView.view.width
-                            selected: index === root.current
-                            notice: root.armed.startsWith(`${modelData.key}/`) ? "Press ↵ again to confirm" : ""
+                        // Search / windows: one list.
+                        ListView {
+                            id: list
+                            Component.onCompleted: root.listView = list
+                            Component.onDestruction: root.listView = null
+                            visible: root.mode === "search" || root.mode === "windows"
+                            anchors.fill: parent
+                            anchors.margins: 8
+                            clip: true
+                            boundsBehavior: Flickable.StopAtBounds
+                            model: visible ? root.items : []
+                            delegate: rowDelegate
+                            currentIndex: root.current
+                            highlightFollowsCurrentItem: false
+                        }
+
+                        // Clipboard: list + preview.
+                        RowLayout {
+                            // Nothing to list: only the empty-state message shows.
+                            visible: root.mode === "clipboard" && root.items.length > 0
+                            anchors.fill: parent
+                            spacing: 0
+
+                            ListView {
+                                id: clipList
+                                Component.onCompleted: root.clipView = clipList
+                                Component.onDestruction: root.clipView = null
+                                Layout.preferredWidth: parent.width * 0.46
+                                Layout.fillHeight: true
+                                Layout.margins: 8
+                                clip: true
+                                boundsBehavior: Flickable.StopAtBounds
+                                model: parent.visible ? root.items : []
+                                delegate: rowDelegate
+                                currentIndex: root.current
+                                highlightFollowsCurrentItem: false
+                            }
+
+                            Rectangle {
+                                Layout.preferredWidth: 1
+                                Layout.fillHeight: true
+                                color: Theme.glassBorder
+                            }
+
+                            ClipboardPreview {
+                                Layout.fillWidth: true
+                                Layout.fillHeight: true
+                                entry: root.mode === "clipboard" ? (root.selected?.entry ?? null) : null
+                            }
+                        }
+
+                        EmojiGrid {
+                            id: emojiView
+                            onColumnsChanged: root.emojiColumns = columns
+                            Component.onCompleted: root.emojiColumns = columns
+                            visible: root.mode === "emoji"
+                            anchors.fill: parent
+                            anchors.margins: 10
+                            model: visible ? root.items : []
+                            current: root.current
+                            browsing: !root.query
                             onHovered: i => root.current = i
                             onActivated: i => {
                                 root.current = i;
                                 root.runAction(root.selected, root.selectedActions[0]);
                             }
                         }
-                    }
 
-                    // Search / windows: one list.
-                    ListView {
-                        id: list
-                        visible: root.mode === "search" || root.mode === "windows"
-                        anchors.fill: parent
-                        anchors.margins: 8
-                        clip: true
-                        boundsBehavior: Flickable.StopAtBounds
-                        model: visible ? root.items : []
-                        delegate: rowDelegate
-                        currentIndex: root.current
-                        highlightFollowsCurrentItem: false
-                    }
-
-                    // Clipboard: list + preview.
-                    RowLayout {
-                        // Nothing to list: only the empty-state message shows.
-                        visible: root.mode === "clipboard" && root.items.length > 0
-                        anchors.fill: parent
-                        spacing: 0
-
-                        ListView {
-                            id: clipList
-                            Layout.preferredWidth: parent.width * 0.46
-                            Layout.fillHeight: true
-                            Layout.margins: 8
-                            clip: true
-                            boundsBehavior: Flickable.StopAtBounds
-                            model: parent.visible ? root.items : []
-                            delegate: rowDelegate
-                            currentIndex: root.current
-                            highlightFollowsCurrentItem: false
+                        Text {
+                            visible: root.emptyText !== ""
+                            anchors.centerIn: parent
+                            width: parent.width - 80
+                            horizontalAlignment: Text.AlignHCenter
+                            wrapMode: Text.WordWrap
+                            text: root.emptyText
+                            font.family: Theme.font
+                            font.pixelSize: Theme.fontSize - 1
+                            color: Theme.foregroundDim
                         }
 
+                        // Ctrl+K: every action of the selected entry.
                         Rectangle {
-                            Layout.preferredWidth: 1
-                            Layout.fillHeight: true
-                            color: Theme.glassBorder
-                        }
+                            id: actionMenu
+                            visible: root.actionsOpen
+                            anchors.right: parent.right
+                            anchors.bottom: parent.bottom
+                            anchors.margins: 10
+                            width: 270
+                            height: actionColumn.implicitHeight + 12
+                            radius: 12
+                            color: Theme.surface
+                            border.width: 1
+                            border.color: Theme.glassBorder
 
-                        ClipboardPreview {
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            entry: root.mode === "clipboard" ? (root.selected?.entry ?? null) : null
+                            Column {
+                                id: actionColumn
+                                x: 6
+                                y: 6
+                                width: parent.width - 12
+
+                                Repeater {
+                                    model: root.actionsOpen ? root.selectedActions : []
+
+                                    MouseArea {
+                                        id: actionRow
+                                        required property var modelData
+                                        required property int index
+
+                                        width: actionColumn.width
+                                        height: 32
+                                        hoverEnabled: true
+                                        cursorShape: Qt.PointingHandCursor
+                                        readonly property bool confirming: root.armed === `${root.selected?.key}/${modelData.label}`
+
+                                        onPositionChanged: if (root.actionIndex !== index) {
+                                            root.actionIndex = index;
+                                            root.armed = "";
+                                        }
+                                        onClicked: root.runAction(root.selected, modelData, true)
+
+                                        Rectangle {
+                                            anchors.fill: parent
+                                            radius: 8
+                                            color: actionRow.index === root.actionIndex ? Theme.surfaceHigh : "transparent"
+                                        }
+
+                                        RowLayout {
+                                            anchors.fill: parent
+                                            anchors.leftMargin: 10
+                                            anchors.rightMargin: 10
+                                            spacing: 10
+
+                                            Icon {
+                                                name: actionRow.modelData.icon ?? "chevron_right"
+                                                size: 16
+                                                color: actionRow.modelData.confirm || actionRow.modelData.remove ? Theme.urgent : Theme.foreground
+                                            }
+
+                                            Text {
+                                                Layout.fillWidth: true
+                                                text: actionRow.confirming ? `${actionRow.modelData.label}?` : actionRow.modelData.label
+                                                elide: Text.ElideRight
+                                                font.family: Theme.font
+                                                font.pixelSize: Theme.fontSize - 1
+                                                color: actionRow.modelData.confirm || actionRow.modelData.remove ? Theme.urgent : Theme.foreground
+                                            }
+
+                                            Text {
+                                                text: actionRow.confirming ? "↵ again to confirm" : actionRow.index === 0 ? "↵" : actionRow.index === 1 ? "Ctrl ↵" : actionRow.modelData.remove ? "Shift Del" : ""
+                                                font.family: Theme.font
+                                                font.pixelSize: Theme.fontSize - 3
+                                                color: Theme.foregroundDim
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    EmojiGrid {
-                        id: emojiView
-                        visible: root.mode === "emoji"
-                        anchors.fill: parent
-                        anchors.margins: 10
-                        model: visible ? root.items : []
-                        current: root.current
-                        browsing: !root.query
-                        onHovered: i => root.current = i
-                        onActivated: i => {
-                            root.current = i;
-                            root.runAction(root.selected, root.selectedActions[0]);
-                        }
-                    }
-
-                    Text {
-                        visible: root.emptyText !== ""
-                        anchors.centerIn: parent
-                        width: parent.width - 80
-                        horizontalAlignment: Text.AlignHCenter
-                        wrapMode: Text.WordWrap
-                        text: root.emptyText
-                        font.family: Theme.font
-                        font.pixelSize: Theme.fontSize - 1
-                        color: Theme.foregroundDim
-                    }
-
-                    // Ctrl+K: every action of the selected entry.
                     Rectangle {
-                        id: actionMenu
-                        visible: root.actionsOpen
-                        anchors.right: parent.right
-                        anchors.bottom: parent.bottom
-                        anchors.margins: 10
-                        width: 270
-                        height: actionColumn.implicitHeight + 12
-                        radius: 12
-                        color: Theme.surface
-                        border.width: 1
-                        border.color: Theme.glassBorder
-
-                        Column {
-                            id: actionColumn
-                            x: 6
-                            y: 6
-                            width: parent.width - 12
-
-                            Repeater {
-                                model: root.actionsOpen ? root.selectedActions : []
-
-                                MouseArea {
-                                    id: actionRow
-                                    required property var modelData
-                                    required property int index
-
-                                    width: actionColumn.width
-                                    height: 32
-                                    hoverEnabled: true
-                                    cursorShape: Qt.PointingHandCursor
-                                    readonly property bool confirming: root.armed === `${root.selected?.key}/${modelData.label}`
-
-                                    onPositionChanged: if (root.actionIndex !== index) {
-                                        root.actionIndex = index;
-                                        root.armed = "";
-                                    }
-                                    onClicked: root.runAction(root.selected, modelData, true)
-
-                                    Rectangle {
-                                        anchors.fill: parent
-                                        radius: 8
-                                        color: actionRow.index === root.actionIndex ? Theme.surfaceHigh : "transparent"
-                                    }
-
-                                    RowLayout {
-                                        anchors.fill: parent
-                                        anchors.leftMargin: 10
-                                        anchors.rightMargin: 10
-                                        spacing: 10
-
-                                        Icon {
-                                            name: actionRow.modelData.icon ?? "chevron_right"
-                                            size: 16
-                                            color: actionRow.modelData.confirm || actionRow.modelData.remove ? Theme.urgent : Theme.foreground
-                                        }
-
-                                        Text {
-                                            Layout.fillWidth: true
-                                            text: actionRow.confirming ? `${actionRow.modelData.label}?` : actionRow.modelData.label
-                                            elide: Text.ElideRight
-                                            font.family: Theme.font
-                                            font.pixelSize: Theme.fontSize - 1
-                                            color: actionRow.modelData.confirm || actionRow.modelData.remove ? Theme.urgent : Theme.foreground
-                                        }
-
-                                        Text {
-                                            text: actionRow.confirming ? "↵ again to confirm" : actionRow.index === 0 ? "↵" : actionRow.index === 1 ? "Ctrl ↵" : actionRow.modelData.remove ? "Shift Del" : ""
-                                            font.family: Theme.font
-                                            font.pixelSize: Theme.fontSize - 3
-                                            color: Theme.foregroundDim
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 1
-                    color: Theme.glassBorder
-                }
-
-                // ---- footer ----
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 42
-                    Layout.leftMargin: 10
-                    Layout.rightMargin: 12
-                    spacing: 4
-
-                    // View tabs.
-                    Repeater {
-                        model: root.modes
-
-                        MouseArea {
-                            id: tab
-                            required property var modelData
-                            readonly property bool active: root.mode === modelData.id
-
-                            implicitWidth: tabRow.implicitWidth + 16
-                            implicitHeight: 26
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.setMode(modelData.id, "")
-
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: 8
-                                color: tab.active ? Theme.glassTileHover : tab.containsMouse ? Theme.glassTile : "transparent"
-                            }
-
-                            Row {
-                                id: tabRow
-                                anchors.centerIn: parent
-                                spacing: 5
-
-                                Icon {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    name: tab.modelData.icon
-                                    filled: tab.active
-                                    size: 14
-                                    color: tab.active ? Theme.foreground : Theme.foregroundDim
-                                }
-
-                                Text {
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: tab.modelData.label
-                                    font.family: Theme.font
-                                    font.pixelSize: Theme.fontSize - 3
-                                    font.weight: tab.active ? Font.DemiBold : Font.Normal
-                                    color: tab.active ? Theme.foreground : Theme.foregroundDim
-                                }
-                            }
-                        }
-                    }
-
-                    Item {
                         Layout.fillWidth: true
-                    }
-
-                    // Primary action + actions menu hint.
-                    Hint {
-                        visible: root.selectedActions.length > 0
-                        label: root.selectedActions[0]?.label ?? ""
-                        keys: "↵"
-                    }
-
-                    Rectangle {
-                        visible: root.selectedActions.length > 1
-                        Layout.preferredWidth: 1
-                        Layout.preferredHeight: 14
-                        Layout.leftMargin: 6
-                        Layout.rightMargin: 6
+                        Layout.preferredHeight: 1
                         color: Theme.glassBorder
                     }
 
-                    Hint {
-                        visible: root.selectedActions.length > 1
-                        label: "Actions"
-                        keys: "Ctrl K"
+                    // ---- footer ----
+                    RowLayout {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 42
+                        Layout.leftMargin: 10
+                        Layout.rightMargin: 12
+                        spacing: 4
+
+                        // View tabs.
+                        Repeater {
+                            model: root.modes
+
+                            MouseArea {
+                                id: tab
+                                required property var modelData
+                                readonly property bool active: root.mode === modelData.id
+
+                                implicitWidth: tabRow.implicitWidth + 16
+                                implicitHeight: 26
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.setMode(modelData.id, "")
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: 8
+                                    color: tab.active ? Theme.glassTileHover : tab.containsMouse ? Theme.glassTile : "transparent"
+                                }
+
+                                Row {
+                                    id: tabRow
+                                    anchors.centerIn: parent
+                                    spacing: 5
+
+                                    Icon {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        name: tab.modelData.icon
+                                        filled: tab.active
+                                        size: 14
+                                        color: tab.active ? Theme.foreground : Theme.foregroundDim
+                                    }
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: tab.modelData.label
+                                        font.family: Theme.font
+                                        font.pixelSize: Theme.fontSize - 3
+                                        font.weight: tab.active ? Font.DemiBold : Font.Normal
+                                        color: tab.active ? Theme.foreground : Theme.foregroundDim
+                                    }
+                                }
+                            }
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
+                        // Primary action + actions menu hint.
+                        Hint {
+                            visible: root.selectedActions.length > 0
+                            label: root.selectedActions[0]?.label ?? ""
+                            keys: "↵"
+                        }
+
+                        Rectangle {
+                            visible: root.selectedActions.length > 1
+                            Layout.preferredWidth: 1
+                            Layout.preferredHeight: 14
+                            Layout.leftMargin: 6
+                            Layout.rightMargin: 6
+                            color: Theme.glassBorder
+                        }
+
+                        Hint {
+                            visible: root.selectedActions.length > 1
+                            label: "Actions"
+                            keys: "Ctrl K"
+                        }
                     }
                 }
             }

@@ -27,10 +27,46 @@ let
       profile=x1-balanced
     else
       profile=x1-battery-balanced
+      # Unplugged after a "charge to full once": the trip has started, so
+      # bring the normal charge limit back.
+      if [ -e /run/x1-charge-full ]; then
+        ${x1-charge-limit}/bin/x1-charge-limit limit
+      fi
     fi
     ${pkgs.tuned}/bin/tuned-adm profile "$profile"
     echo "$online" > "$state"
     echo "AC online=$online -> $profile"
+  '';
+
+  # Battery charge thresholds (ThinkPad). The one place that writes them;
+  # tuned no longer does, so switching profiles can't undo a full charge.
+  #   limit  stop at 85%, resume below 75% (normal: keeps the already worn,
+  #          ~71% health, battery out of the high-voltage range)
+  #   full   charge to 100% once (start 95, so it starts right away even
+  #          when sitting at 84%); restored on the next unplug (above) or
+  #          reboot. Marked by /run/x1-charge-full.
+  # The kernel needs start < end at every step, hence the write order.
+  # Started from the battery menu through x1-charge-{full,limit}.service.
+  x1-charge-limit = pkgs.writeShellScriptBin "x1-charge-limit" ''
+    set -eu
+    bat=/sys/class/power_supply/BAT0
+    case "''${1:-}" in
+      full)
+        echo 100 > "$bat/charge_control_end_threshold"
+        echo 95 > "$bat/charge_control_start_threshold"
+        touch /run/x1-charge-full
+        ;;
+      limit)
+        echo 75 > "$bat/charge_control_start_threshold"
+        echo 85 > "$bat/charge_control_end_threshold"
+        rm -f /run/x1-charge-full
+        ;;
+      *)
+        echo "usage: x1-charge-limit full|limit" >&2
+        exit 2
+        ;;
+    esac
+    echo "charge thresholds: $(cat "$bat/charge_control_start_threshold")-$(cat "$bat/charge_control_end_threshold")%"
   '';
 in
 {
@@ -103,14 +139,8 @@ in
           # disable wake-on-lan
           "/sys/class/net/wlp0s20f3/device/power/wakeup" = "disabled";
 
-          # Battery thresholds: stop charging at 85%, resume below 75%.
-          # Keeps the (already worn, ~71% health) battery out of the
-          # high-voltage range that ages it fastest. For a long trip, charge
-          # to full once with:
-          #   echo 100 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
-          # (reset to 85 by the next tuned profile switch / reboot).
-          "/sys/class/power_supply/BAT0/charge_control_start_threshold" = 75;
-          "/sys/class/power_supply/BAT0/charge_control_end_threshold" = 85;
+          # (Battery charge thresholds: x1-charge-limit, not tuned, so a
+          # profile switch can't cancel "charge to full once".)
 
           # Active governor
           "/sys/devices/system/cpu/intel_pstate/status" = "active";
@@ -361,6 +391,13 @@ in
 
   };
 
+  # ppdSupport = false only stops NixOS wiring tuned-ppd up: the tuned package
+  # still ships the unit and its net.hadess.PowerProfiles D-Bus activation, so
+  # a PowerProfiles call started it, it crashed on the missing
+  # /etc/tuned/ppd.conf, and every `nixos-rebuild switch` exited with status 4.
+  # enable = false masks the unit (/dev/null).
+  systemd.services.tuned-ppd.enable = false;
+
   # AC-based profile switching (replaces the acpid handler: ThinkPad firmware
   # also raises ac_adapter events for thermal/lap-detect changes, and acpid
   # never ran at boot, so booting on battery kept the AC profile).
@@ -383,6 +420,40 @@ in
   # Plugged / unplugged while asleep (udev may not report it).
   powerManagement.resumeCommands = ''
     ${pkgs.systemd}/bin/systemctl start --no-block x1-power-profile.service
+  '';
+
+  # Charge thresholds (x1-charge-limit above): the normal limit at boot, and
+  # the two units the battery menu starts.
+  systemd.services.x1-charge-limit = {
+    description = "Battery charge limit (75-85%)";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${x1-charge-limit}/bin/x1-charge-limit limit";
+    };
+  };
+  systemd.services.x1-charge-full = {
+    description = "Charge the battery to 100% once (until unplugged)";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${x1-charge-limit}/bin/x1-charge-limit full";
+    };
+  };
+
+  # Let the logged-in user (local, active session) start just those two
+  # units from the battery menu, without a password. Nothing else.
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (action.id == "org.freedesktop.systemd1.manage-units" &&
+          subject.local && subject.active && subject.isInGroup("users")) {
+        var unit = action.lookup("unit");
+        var verb = action.lookup("verb");
+        if ((unit == "x1-charge-full.service" || unit == "x1-charge-limit.service") &&
+            (verb == "start" || verb == "restart")) {
+          return polkit.Result.YES;
+        }
+      }
+    });
   '';
 
   services.throttled = {
@@ -417,5 +488,8 @@ in
   };
 
   # `sudo x1-power-profile --force` re-applies the automatic choice.
-  environment.systemPackages = [ x1-power-profile ];
+  environment.systemPackages = [
+    x1-power-profile
+    x1-charge-limit
+  ];
 }

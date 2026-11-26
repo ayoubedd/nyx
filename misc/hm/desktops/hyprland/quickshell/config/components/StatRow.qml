@@ -70,7 +70,7 @@ Rectangle {
 
                     Behavior on width {
                         NumberAnimation {
-                            duration: 400
+                            duration: Theme.ms(400)
                             easing.type: Easing.OutCubic
                         }
                     }

@@ -197,7 +197,6 @@
         "extensions.update.autoUpdateDefault" = false;
         "extensions.update.enabled" = false;
         "extensions.update.url" = false;
-        "extensions.webextensions.restrictedDomains" = "";
         "general.useragent.locale" = "en-US";
         "gfx.canvas.accelerated.cache-items" = 8192;
         "gfx.canvas.accelerated.cache-size" = 512;
@@ -230,10 +229,13 @@
         "network.http.max-urgent-start-excessive-connections-per-host" = 5;
         "network.http.pacing.requests.enabled" = false;
         "network.http.speculative-parallel-limit" = 0;
-        "network.preconnect" = true;
-        "network.predictor.enable-hover-on-ssl" = true;
-        "network.predictor.enable-prefetch" = true;
-        "network.predictor.enabled" = true;
+        # No connections to sites you haven't asked for: no predictor,
+        # link prefetching or preconnecting (also the NetworkPrediction
+        # policy below, which covers DNS prefetch and prefetch-next).
+        "network.preconnect" = false;
+        "network.predictor.enable-hover-on-ssl" = false;
+        "network.predictor.enable-prefetch" = false;
+        "network.predictor.enabled" = false;
         "network.ssl_tokens_cache_capacity" = 10240;
         "network.trr.allow-rfc1918" = false;
         "network.trr.confirmation_telemetry_enabled" = false;
@@ -480,7 +482,7 @@
         Cryptomining = true;
         Locked = true;
       };
-      NetworkPrediction = true;
+      NetworkPrediction = false;
       # NoDefaultBookmarks = true;
       OfferToSaveLogins = false;
       OfferToSaveLoginsDefault = false;

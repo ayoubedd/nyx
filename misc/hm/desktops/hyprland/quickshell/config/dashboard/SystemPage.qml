@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
 import qs.common
+import qs.services
 import qs.components
 
 // CPU / GPU / memory / swap / disk / temperature, polled every 2s while
@@ -417,19 +418,38 @@ ColumnLayout {
         }
     }
 
-    Text {
-        Layout.leftMargin: 4
-        text: {
-            const d = Math.floor(root.uptime / 86400);
-            const h = Math.floor(root.uptime % 86400 / 3600);
-            const m = Math.floor(root.uptime % 3600 / 60);
-            const up = d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m`;
-            const gpu = root.gpuKind === "intel" && root.gpuFreqMax > 0 ? `    GPU max ${root.gpuFreqMax} MHz` : "";
-            return `Up ${up}    Load ${root.load}${gpu}`;
+    RowLayout {
+        Layout.fillWidth: true
+        spacing: 8
+
+        Text {
+            Layout.fillWidth: true
+            Layout.leftMargin: 4
+            text: {
+                const d = Math.floor(root.uptime / 86400);
+                const h = Math.floor(root.uptime % 86400 / 3600);
+                const m = Math.floor(root.uptime % 3600 / 60);
+                const up = d > 0 ? `${d}d ${h}h` : h > 0 ? `${h}h ${m}m` : `${m}m`;
+                const gpu = root.gpuKind === "intel" && root.gpuFreqMax > 0 ? `    GPU max ${root.gpuFreqMax} MHz` : "";
+                return `Up ${up}    Load ${root.load}${gpu}`;
+            }
+            font.family: Theme.font
+            font.pixelSize: Theme.fontSize - 2
+            color: Theme.foregroundDim
         }
-        font.family: Theme.font
-        font.pixelSize: Theme.fontSize - 2
-        color: Theme.foregroundDim
+
+        // Bar pill under heavy load (services/SystemLoad.qml).
+        Text {
+            text: "Load warning in bar"
+            font.family: Theme.font
+            font.pixelSize: Theme.fontSize - 2
+            color: Theme.foregroundDim
+        }
+
+        Toggle {
+            checked: SystemLoad.enabled
+            onToggled: SystemLoad.enabled = !SystemLoad.enabled
+        }
     }
 
     // One process: [icon] name            12%   340 MB   [End]

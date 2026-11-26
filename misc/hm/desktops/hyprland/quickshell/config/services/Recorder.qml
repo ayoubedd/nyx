@@ -33,7 +33,10 @@ Singleton {
         const ts = Qt.formatDateTime(new Date(), "yyyyMMdd_HH'h'mm'm'ss's'");
         file = `${dir}/${ts}.mp4`;
         withAudio = audio;
-        const args = ["wf-recorder", "-y", "-f", file, "-c", "h264_vaapi", "-d", "/dev/dri/renderD128"];
+        // Constant quality QP 17 (encoder default 20; lower = sharper, bigger)
+        // with the driver's best-quality preset (quality=1, slowest; the GPU
+        // still has plenty of headroom). ~1/3 larger files than the default.
+        const args = ["wf-recorder", "-y", "-f", file, "-c", "h264_vaapi", "-d", "/dev/dri/renderD128", "-p", "rc_mode=CQP", "-p", "qp=17", "-p", "quality=1"];
         if (target.output)
             args.push("-o", target.output);
         else
@@ -63,16 +66,20 @@ Singleton {
             proc.signal(2);
     }
 
+    // A failure: critical, so it shows through DND. A saved recording: with
+    // Open / Show in folder.
     function notify(summary, body, open) {
-        // notify-send --wait blocks until the notification is acted on, so the
-        // "Open" button can open the file. Runs detached.
-        const script = open ? `
-            choice=$(notify-send -a "Screen recording" -i video-x-generic -A open=Open -A folder="Show in folder" --wait "$1" "$2")
-            case "$choice" in
-                open) xdg-open "$3" ;;
-                folder) xdg-open "$(dirname "$3")" ;;
-            esac` : `notify-send -a "Screen recording" -u critical "$1" "$2"`;
-        Quickshell.execDetached(["sh", "-c", script, "sh", summary, body, file]);
+        const opts = {
+            icon: "video-x-generic",
+            urgency: open ? "normal" : "critical"
+        };
+        if (!open)
+            return Notifier.send("Screen recording", summary, body, opts);
+        const saved = file; // a new recording may start before it's clicked
+        Notifier.ask("Screen recording", summary, body, opts, {
+            open: "Open",
+            folder: "Show in folder"
+        }, action => Quickshell.execDetached(["xdg-open", action === "open" ? saved : saved.replace(/\/[^/]*$/, "")]));
     }
 
     function duration(s) {
@@ -93,7 +100,8 @@ Singleton {
             const secs = root.elapsed;
             // Died on its own within a couple of seconds = it never recorded.
             if (code !== 0 && Date.now() - root.startedAt < 3000) {
-                root.notify("Recording failed", root.stderrTail || `wf-recorder exited with code ${code}`, false);
+                const missing = code === 127 || /not found/.test(root.stderrTail);
+                root.notify("Recording failed", missing ? "wf-recorder isn't installed. Rebuild (just b) to install it." : root.stderrTail || `wf-recorder exited with code ${code}`, false);
                 return;
             }
             root.notify("Recording saved", `${root.file.replace(Quickshell.env("HOME"), "~")} · ${root.duration(secs)}`, true);

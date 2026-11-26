@@ -208,8 +208,10 @@ in
   security.polkit = {
     enable = true;
     extraConfig = ''
+      // Reboot / power off without a password, but only from the active
+      // local session (not over SSH, or from a session in the background).
       polkit.addRule(function(action, subject) {
-        if ( subject.isInGroup("users") && (
+        if ( subject.local && subject.active && subject.isInGroup("users") && (
          action.id == "org.freedesktop.login1.reboot" ||
          action.id == "org.freedesktop.login1.reboot-multiple-sessions" ||
          action.id == "org.freedesktop.login1.power-off" ||

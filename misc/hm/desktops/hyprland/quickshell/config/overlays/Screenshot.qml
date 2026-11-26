@@ -20,7 +20,11 @@ import qs.services
 //   qs -c nyx ipc call screenshot window
 //   qs -c nyx ipc call screenshot screen
 //
+// Also: text (OCR with tesseract: copies the text in the selection) and QR
+// (zbarimg: copies a QR code / barcode's content; links get "Open").
+//
 // Keys: R/W/S switch mode · Enter copy · Ctrl+S save · E edit · V record
+//       · T copy text · Q scan QR
 //       · A toggle recording sound · Esc close
 Scope {
     id: root
@@ -132,17 +136,16 @@ Scope {
         const ts = Qt.formatDateTime(new Date(), "yyyyMMdd_HH'h'mm'm'ss's'");
         const dest = `${home}/Pictures/Screenshots/${ts}_${mode}.png`;
         close();
-        Quickshell.execDetached(["sh", "-c", finishScript, "sh", action, `${dir}/${s.screen}.png`, geometry, `${dir}/${ts}.png`, dest, dest.replace(home, "~")]);
+        Quickshell.execDetached(["sh", "-c", finishScript, "sh", action, `${dir}/${s.screen}.ppm`, geometry, `${dir}/${ts}.png`, dest, dest.replace(home, "~")]);
     }
 
     // $1 action  $2 frozen frame  $3 crop geometry  $4 temp output  $5 dest  $6 dest for display
     readonly property string finishScript: `
         action=$1 src=$2 geo=$3 out=$4 dest=$5 shown=$6
         magick "$src" -crop "$geo" +repage "$out" || exit 1
+        # Same as Notifier.send (services/Notifier.qml), from this script.
         notify() {
-            busctl --user call org.freedesktop.Notifications /org/freedesktop/Notifications \
-                org.freedesktop.Notifications Notify susssasa{sv}i \
-                Screenshot 0 "$1" "$2" "$3" 0 1 urgency y 0 -1 >/dev/null
+            notify-send -a Screenshot -u low -i "$1" -- "$2" "$3"
         }
         case "$action" in
             copy)
@@ -157,10 +160,40 @@ Scope {
                 mkdir -p "$(dirname "$dest")"
                 satty --filename "$out" --output-filename "$dest" \
                     --copy-command "wl-copy -t image/png" --early-exit ;;
+            ocr)
+                # Small selections are enlarged (tesseract reads screen-size
+                # text much better at ~2x); English, French, Arabic.
+                magick "$out" -resize '2000x2000<' -colorspace Gray "$out.ocr.png"
+                text=$(tesseract "$out.ocr.png" - -l eng+fra+ara 2>/dev/null | sed -e 's/[[:space:]]*$//' | sed -e '/./,$!d')
+                rm -f "$out.ocr.png"
+                if [ -n "$(printf '%s' "$text" | tr -d '[:space:]')" ]; then
+                    printf '%s' "$text" | wl-copy
+                    notify "$out" "Text copied" "$(printf '%s' "$text" | tr '\\n' ' ' | cut -c1-140)"
+                else
+                    notify "$out" "No text found" "Try selecting a tighter area around the text."
+                fi ;;
+            qr)
+                codes=$(zbarimg -q --raw "$out" 2>/dev/null)
+                if [ -z "$codes" ]; then
+                    notify "$out" "No QR code found" "Select an area containing a QR code or barcode."
+                    exit 0
+                fi
+                printf '%s' "$codes" | wl-copy
+                first=$(printf '%s\\n' "$codes" | head -1)
+                case "$first" in
+                    http://*|https://*)
+                        # A link: offer to open it.
+                        choice=$(notify-send -a Screenshot -i "$out" -A open=Open --wait "QR code copied" "$first")
+                        [ "$choice" = open ] && xdg-open "$first" ;;
+                    *)
+                        notify "$out" "QR code copied" "$(printf '%s' "$codes" | tr '\\n' ' ' | cut -c1-140)" ;;
+                esac ;;
         esac
     `
 
-    // Freeze all outputs, then read monitor + window geometry.
+    // Freeze all outputs, then read monitor + window geometry. Frames are raw
+    // PPM (no PNG compression, which was most of the opening delay); they live
+    // in XDG_RUNTIME_DIR (tmpfs) and are overwritten on every capture.
     Process {
         id: capture
         command: ["sh", "-c", `
@@ -169,11 +202,12 @@ Scope {
             find "$dir" -name '*.png' -mmin +60 -delete 2>/dev/null
             mons=$(hyprctl monitors -j)
             for m in $(printf '%s' "$mons" | jq -r '.[].name'); do
-                grim -o "$m" "$dir/$m.png" &
+                grim -t ppm -o "$m" "$dir/$m.ppm" &
             done
+            clients=$(hyprctl clients -j | jq -c .)
             wait
             printf '%s' "$mons" | jq -c .
-            hyprctl clients -j | jq -c .
+            printf '%s\\n' "$clients"
         `, "sh", root.dir]
 
         stdout: StdioCollector {
@@ -230,7 +264,18 @@ Scope {
         }
     }
 
+    // Keybind (hypr/binds.lua: hl.dsp.global("nyx:screenshot")).
+    GlobalShortcut {
+        appid: "nyx"
+        name: "screenshot"
+        description: "Screenshot (region)"
+        onPressed: root.open("region")
+    }
+
     // ---- one overlay per monitor ----
+    // The windows are created once and stay alive (just hidden), so opening
+    // only has to show them. A closed overlay holds no image or texture: the
+    // frozen frame's source is cleared while inactive.
     Variants {
         model: Quickshell.screens
 
@@ -266,11 +311,10 @@ Scope {
                 if (visible && focusedScreen)
                     keys.forceActiveFocus();
             }
-
             // Frozen frame.
             Image {
                 anchors.fill: parent
-                source: root.active ? `file://${root.dir}/${win.name}.png?${root.stamp}` : ""
+                source: root.active ? `file://${root.dir}/${win.name}.ppm?${root.stamp}` : ""
                 cache: false
                 smooth: true
             }
@@ -431,6 +475,10 @@ Scope {
                         root.finish("edit");
                     else if (event.key === Qt.Key_V)
                         root.finish("record");
+                    else if (event.key === Qt.Key_T)
+                        root.finish("ocr");
+                    else if (event.key === Qt.Key_Q)
+                        root.finish("qr");
                     else if (event.key === Qt.Key_A)
                         root.recordAudio = !root.recordAudio;
                     else if (event.key === Qt.Key_R)
@@ -517,6 +565,20 @@ Scope {
                         icon: "edit"
                         label: "Edit"
                         onClicked: root.finish("edit")
+                    }
+
+                    // Read the selection: its text (OCR) or a QR code.
+                    ShotButton {
+                        visible: !!root.selection
+                        icon: "text_fields"
+                        label: "Text"
+                        onClicked: root.finish("ocr")
+                    }
+                    ShotButton {
+                        visible: !!root.selection
+                        icon: "qr_code_scanner"
+                        label: "QR"
+                        onClicked: root.finish("qr")
                     }
 
                     Rectangle {

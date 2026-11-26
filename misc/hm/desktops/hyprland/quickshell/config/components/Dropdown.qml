@@ -101,14 +101,14 @@ PanelWindow {
         Behavior on y {
             enabled: root.slide
             NumberAnimation {
-                duration: 280
+                duration: Theme.ms(280)
                 easing.type: root.shown ? Easing.OutCubic : Easing.InCubic
             }
         }
         Behavior on opacity {
             enabled: root.slide
             NumberAnimation {
-                duration: 240
+                duration: Theme.ms(240)
             }
         }
 

@@ -49,7 +49,9 @@ Singleton {
         return [...new Set(links.map(g => appName(g.target)))];
     }
 
-    readonly property var micApps: apps(activeLinks.filter(g => mediaClass(g.source) === "Audio/Source" && mediaClass(g.target).startsWith("Stream/Input/Audio") && !mediaClass(g.target).includes("Internal")))
+    // (The noise-suppression filter's own capture stream is skipped: the app
+    // reading the filtered mic shows up through the filter's source instead.)
+    readonly property var micApps: apps(activeLinks.filter(g => mediaClass(g.source) === "Audio/Source" && mediaClass(g.target).startsWith("Stream/Input/Audio") && !mediaClass(g.target).includes("Internal") && g.target.name !== "capture.nyx_rnnoise"))
     // Camera through PipeWire, plus apps holding /dev/video* themselves.
     readonly property var pipewireCameraApps: apps(activeLinks.filter(g => mediaClass(g.source) === "Video/Source" && isCamera(g.source)))
     property var deviceCameraApps: []

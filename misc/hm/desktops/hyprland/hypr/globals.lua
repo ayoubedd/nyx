@@ -16,3 +16,11 @@ snaparea =
 function exec_cmd(cmd)
 	return hl.dsp.exec_cmd("uwsm app -- " .. cmd)
 end
+
+-- Trigger a quickshell GlobalShortcut (appid "nyx"). Handled inside the
+-- running shell, so nothing is spawned per key press (unlike
+-- `qs -c nyx ipc call ...`, which starts a whole qs process every time).
+-- Does nothing if quickshell isn't running.
+function nyx(name)
+	return hl.dsp.global("nyx:" .. name)
+end

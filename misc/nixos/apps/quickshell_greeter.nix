@@ -46,6 +46,10 @@ let
     cp ${shellConfig + "/common/Icon.qml"} $out/Icon.qml
   '';
 
+  # Colours and fonts for Theme.qml: the same stylix-generated file the
+  # desktop reads from ~/.config/nyx (theming.nix), straight from the store.
+  themeJson = config.home-manager.users.${defaultUser}.xdg.configFile."nyx/theme.json".source;
+
   # Same cursor as the desktop (gtk.cursorTheme / stylix in theming.nix).
   cursorPackage = pkgs.volantes-cursors;
   cursorTheme = "volantes_cursors";
@@ -60,6 +64,7 @@ let
     export NYX_GREETER_SESSIONS_DIR=${sessionsDir}
     export NYX_GREETER_STATE=${stateDir}
     export NYX_GREETER_WALLPAPER=${wallpaper}
+    export NYX_THEME=${themeJson}
     export XDG_CACHE_HOME=/tmp/nyx-greeter-cache
     # cage draws no decorations, so Qt would add its own title bar.
     export QT_WAYLAND_DISABLE_WINDOWDECORATION=1

@@ -35,8 +35,10 @@ MouseArea {
             radius: 4
             color: Theme.background
 
+            // Still (solid) while power saving; finishes its pulse at 1.
             SequentialAnimation on opacity {
-                running: Recorder.recording
+                running: Recorder.recording && !Theme.reduceMotion
+                alwaysRunToEnd: true
                 loops: Animation.Infinite
                 NumberAnimation {
                     to: 0.3

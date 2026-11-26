@@ -20,8 +20,10 @@ PanelWindow {
     readonly property bool open: Notifs.centerOpen
 
     screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-    // Stay mapped until the slide-out animation finishes.
-    visible: open || content.x < width
+    // Stay mapped until the slide-out animation finishes. Compared against the
+    // fixed implicitWidth: the window's width changes as it maps and unmaps,
+    // which looped back into `visible`.
+    visible: open || content.x < implicitWidth
 
     anchors {
         top: true
@@ -88,20 +90,34 @@ PanelWindow {
         id: content
 
         width: parent.width
-        height: Math.min(column.implicitHeight + 2 * padding, parent.height)
-        x: root.open ? 0 : width + 16
+        // Tall enough for the detail view too while one is open.
+        height: Math.min(Math.max(column.implicitHeight, root.showingDetail ? detailView.implicitHeight : 0) + 2 * padding, parent.height)
+        x: root.open ? 0 : root.implicitWidth + 16
         radius: 20
         color: Theme.glass
         border.width: 1
         border.color: Theme.glassBorder
+        clip: true
 
         readonly property int padding: 10
         focus: root.open
-        Keys.onEscapePressed: Notifs.centerOpen = false
+        // Esc backs out of a detail view first, then closes the center.
+        Keys.onEscapePressed: {
+            if (Notifs.centerDetail)
+                Notifs.centerDetail = "";
+            else
+                Notifs.centerOpen = false;
+        }
 
         Behavior on x {
             NumberAnimation {
-                duration: 240
+                duration: Theme.ms(240)
+                easing.type: Easing.OutCubic
+            }
+        }
+        Behavior on height {
+            NumberAnimation {
+                duration: Theme.ms(220)
                 easing.type: Easing.OutCubic
             }
         }
@@ -112,6 +128,24 @@ PanelWindow {
             contentHeight: column.implicitHeight
             boundsBehavior: Flickable.StopAtBounds
             clip: true
+            // Pushed aside and faded while a detail view covers it.
+            opacity: root.showingDetail ? 0 : 1
+            enabled: !root.showingDetail
+            transform: Translate {
+                x: root.showingDetail ? -40 : 0
+                Behavior on x {
+                    NumberAnimation {
+                        duration: Theme.ms(240)
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Theme.ms(200)
+                }
+            }
 
             Column {
                 id: column
@@ -133,7 +167,10 @@ PanelWindow {
                             title: "Wi-Fi"
                             subtitle: !Networking.wifiEnabled ? "Off" : root.wifiNetwork?.name ?? "Not connected"
                             checked: Networking.wifiEnabled
-                            onClicked: Networking.wifiEnabled = !Networking.wifiEnabled
+                            // Icon: on/off. Rest: details (WifiDetail.qml).
+                            hasDetail: true
+                            onIconClicked: Networking.wifiEnabled = !Networking.wifiEnabled
+                            onClicked: Notifs.centerDetail = "wifi"
                         }
 
                         ControlToggle {
@@ -141,8 +178,11 @@ PanelWindow {
                             title: "Bluetooth"
                             subtitle: !(root.btAdapter?.enabled ?? false) ? "Off" : root.btConnected.length ? root.btConnected[0].name : "On"
                             checked: root.btAdapter?.enabled ?? false
-                            onClicked: if (root.btAdapter)
+                            // Icon: on/off. Rest: devices (BluetoothDetail.qml).
+                            hasDetail: true
+                            onIconClicked: if (root.btAdapter)
                                 root.btAdapter.enabled = !root.btAdapter.enabled
+                            onClicked: Notifs.centerDetail = "bluetooth"
                         }
                     }
 
@@ -154,17 +194,23 @@ PanelWindow {
                         ControlToggle {
                             icon: "do_not_disturb_on"
                             title: "Do Not Disturb"
-                            subtitle: Notifs.dnd ? "On" : "Off"
+                            subtitle: Notifs.dnd ? Notifs.dndReason : Notifs.dndScheduleOn ? `Off · from ${Notifs.clockText(Notifs.dndFrom)}` : "Off"
                             checked: Notifs.dnd
-                            onClicked: Notifs.dnd = !Notifs.dnd
+                            // Icon: on/off. Rest: schedule + screen sharing.
+                            hasDetail: true
+                            onIconClicked: Notifs.toggleDnd()
+                            onClicked: Notifs.centerDetail = "dnd"
                         }
 
+                        // Icon: on/off. Rest of the tile: duration options.
                         ControlToggle {
                             icon: "coffee"
                             title: "Keep Awake"
-                            subtitle: Caffeine.active ? Caffeine.remainingText : "Off"
-                            checked: Caffeine.active
-                            onClicked: Caffeine.toggle()
+                            subtitle: Caffeine.active ? Caffeine.remainingText : Caffeine.autoActive ? `Auto · ${Caffeine.autoReason || "ending soon"}` : "Off"
+                            checked: Caffeine.inhibiting
+                            hasDetail: true
+                            onIconClicked: Caffeine.toggle()
+                            onClicked: Notifs.centerDetail = "caffeine"
                         }
                     }
                 }
@@ -177,12 +223,35 @@ PanelWindow {
                     RowLayout {
                         width: parent.width
 
-                        SectionLabel {
+                        // "Display ›": scale / resolution (DisplayDetail.qml).
+                        MouseArea {
+                            id: displayHeading
                             Layout.fillWidth: true
-                            text: "Display"
+                            implicitHeight: 24
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: Notifs.centerDetail = "display"
+
+                            Row {
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 2
+
+                                SectionLabel {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: "Display"
+                                    color: displayHeading.containsMouse ? Theme.foreground : Theme.foregroundDim
+                                }
+
+                                Icon {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    name: "chevron_right"
+                                    size: 16
+                                    color: displayHeading.containsMouse ? Theme.foreground : Theme.foregroundDim
+                                }
+                            }
                         }
 
-                        // Night light toggle pill.
+                        // Night light toggle pill (› next to it: schedule etc.).
                         MouseArea {
                             implicitWidth: nightRow.implicitWidth + 18
                             implicitHeight: 24
@@ -225,6 +294,29 @@ PanelWindow {
                                 }
                             }
                         }
+
+                        // Night light options (NightLightDetail.qml).
+                        MouseArea {
+                            id: nightMore
+                            implicitWidth: 24
+                            implicitHeight: 24
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: Notifs.centerDetail = "nightlight"
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: width / 2
+                                color: nightMore.containsMouse ? Theme.glassTileHover : "transparent"
+                            }
+
+                            Icon {
+                                anchors.centerIn: parent
+                                name: "chevron_right"
+                                size: 16
+                                color: Theme.foregroundDim
+                            }
+                        }
                     }
 
                     Slider {
@@ -253,8 +345,32 @@ PanelWindow {
                     visible: root.sink?.audio != null
                     spacing: 8
 
-                    SectionLabel {
-                        text: "Sound"
+                    // "Sound ›": devices, balance, meters… (SoundDetail.qml).
+                    MouseArea {
+                        id: soundHeading
+                        width: parent.width
+                        implicitHeight: 22
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: Notifs.centerDetail = "sound"
+
+                        Row {
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: 2
+
+                            SectionLabel {
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: "Sound"
+                                color: soundHeading.containsMouse ? Theme.foreground : Theme.foregroundDim
+                            }
+
+                            Icon {
+                                anchors.verticalCenter: parent.verticalCenter
+                                name: "chevron_right"
+                                size: 16
+                                color: soundHeading.containsMouse ? Theme.foreground : Theme.foregroundDim
+                            }
+                        }
                     }
 
                     Slider {
@@ -268,8 +384,8 @@ PanelWindow {
                     }
                 }
 
-                // ---- power ----
-                PowerActions {
+                // ---- session: lock / sleep / power (detail view) ----
+                SessionTile {
                     width: parent.width
                 }
 
@@ -345,5 +461,163 @@ PanelWindow {
                 }
             }
         }
+
+        // ---- detail view ----
+        // Slides in over the whole center: back button + title + the
+        // control's options (detailPages below). Esc or ← goes back.
+        Item {
+            id: detailView
+
+            readonly property var page: root.detailPages[Notifs.centerDetail] ?? null
+
+            anchors.fill: parent
+            anchors.margins: content.padding
+            implicitHeight: detailHeader.implicitHeight + 12 + detailLoader.implicitHeight
+            visible: opacity > 0
+            opacity: root.showingDetail ? 1 : 0
+            transform: Translate {
+                x: root.showingDetail ? 0 : 60
+                Behavior on x {
+                    NumberAnimation {
+                        duration: Theme.ms(240)
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
+
+            Behavior on opacity {
+                NumberAnimation {
+                    duration: Theme.ms(200)
+                }
+            }
+
+            RowLayout {
+                id: detailHeader
+                width: parent.width
+                spacing: 8
+
+                MouseArea {
+                    id: back
+                    implicitWidth: 32
+                    implicitHeight: 32
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Notifs.centerDetail = ""
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: width / 2
+                        color: back.containsMouse ? Theme.glassTileHover : Theme.glassTile
+                        border.width: 1
+                        border.color: Theme.glassBorder
+                    }
+
+                    Icon {
+                        anchors.centerIn: parent
+                        name: "arrow_back"
+                        size: 18
+                    }
+                }
+
+                Text {
+                    Layout.fillWidth: true
+                    text: detailView.page?.title ?? ""
+                    elide: Text.ElideRight
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize + 2
+                    font.weight: Font.DemiBold
+                    color: Theme.foreground
+                }
+            }
+
+            Loader {
+                id: detailLoader
+                y: detailHeader.implicitHeight + 12
+                width: parent.width
+                // Keep the last page while sliding out.
+                active: !!detailView.page || detailView.visible
+                sourceComponent: detailView.page?.component ?? lastComponent
+                property Component lastComponent: null
+                onSourceComponentChanged: if (sourceComponent)
+                    lastComponent = sourceComponent
+            }
+        }
+    }
+
+    // Detail views, by Notifs.centerDetail key.
+    readonly property bool showingDetail: open && !!detailPages[Notifs.centerDetail]
+    readonly property var detailPages: ({
+            caffeine: {
+                title: "Keep Awake",
+                component: caffeineDetail
+            },
+            power: {
+                title: "Power",
+                component: powerDetail
+            },
+            dnd: {
+                title: "Do Not Disturb",
+                component: dndDetail
+            },
+            nightlight: {
+                title: "Night Light",
+                component: nightLightDetail
+            },
+            display: {
+                title: "Display",
+                component: displayDetail
+            },
+            sound: {
+                title: "Sound",
+                component: soundDetail
+            },
+            wifi: {
+                title: "Wi-Fi",
+                component: wifiDetail
+            },
+            bluetooth: {
+                title: "Bluetooth",
+                component: bluetoothDetail
+            }
+        })
+
+    Component {
+        id: soundDetail
+        SoundDetail {}
+    }
+
+    Component {
+        id: wifiDetail
+        WifiDetail {}
+    }
+
+    Component {
+        id: bluetoothDetail
+        BluetoothDetail {}
+    }
+
+    Component {
+        id: nightLightDetail
+        NightLightDetail {}
+    }
+
+    Component {
+        id: displayDetail
+        DisplayDetail {}
+    }
+
+    Component {
+        id: dndDetail
+        DndDetail {}
+    }
+
+    Component {
+        id: caffeineDetail
+        CaffeineDetail {}
+    }
+
+    Component {
+        id: powerDetail
+        PowerDetail {}
     }
 }

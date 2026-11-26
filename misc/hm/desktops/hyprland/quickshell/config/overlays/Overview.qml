@@ -77,8 +77,7 @@ Scope {
     }
 
     function address(t) {
-        const a = t?.address ?? "";
-        return a.startsWith("0x") ? a : `0x${a}`;
+        return HyprDispatch.address(t);
     }
 
     function goWorkspace(id) {
@@ -204,25 +203,10 @@ Scope {
         refreshLater.restart();
     }
 
-    // Run Hyprland dispatches in order with cursor warping off, so moving /
-    // refocusing windows doesn't yank the mouse pointer to them. One
-    // sequential script, so the option change can't race the dispatches; the
-    // user's own cursor:no_warps value is restored afterwards.
+    // Dispatches without moving the mouse pointer (services/HyprDispatch.qml).
     function dispatchWithoutWarps(dispatches) {
-        if (dispatches.length > 0)
-            Quickshell.execDetached(["sh", "-c", noWarpScript, "sh", ...dispatches]);
+        HyprDispatch.withoutWarps(dispatches);
     }
-
-    readonly property string noWarpScript: `
-        orig=$(hyprctl -j getoption cursor:no_warps | jq -r 'if has("bool") then (if .bool then 1 else 0 end) else (.int // 0) end')
-        hyprctl eval 'hl.config({ cursor = { no_warps = true } })' >/dev/null
-        for d in "$@"; do
-            hyprctl dispatch "$d" >/dev/null
-        done
-        sleep 0.3
-        if [ "$orig" = 1 ]; then v=true; else v=false; fi
-        hyprctl eval "hl.config({ cursor = { no_warps = $v } })" >/dev/null
-    `
 
     // While a workspace is dragged, the grid shows the order it would end up
     // in (tiles slide out of the way); null = the real, sorted order.
@@ -393,904 +377,932 @@ Scope {
         }
     }
 
-    PanelWindow {
-        id: win
+    // Keybind (hypr/binds.lua: hl.dsp.global("nyx:overview")).
+    GlobalShortcut {
+        appid: "nyx"
+        name: "overview"
+        description: "Toggle the workspace overview"
+        onPressed: root.toggle()
+    }
 
-        screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
-        visible: root.open || backdrop.opacity > 0
+    property bool windowVisible: false
 
-        anchors {
-            top: true
-            bottom: true
-            left: true
-            right: true
-        }
-        exclusionMode: ExclusionMode.Ignore
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.namespace: "nyx-overview"
-        WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
-        color: "transparent"
+    // The window is only created while it's needed (LazyLoader), so a closed
+    // overlay holds no items, images or textures.
+    // It stays loaded until its fade-out has finished.
+    LazyLoader {
+        active: root.open || root.windowVisible
 
-        onVisibleChanged: {
-            if (visible) {
-                keys.forceActiveFocus();
-            } else {
-                root.frozenIds = null;
-                root.pending = null;
-                root.animateMoves = true;
+        PanelWindow {
+            id: win
+
+            // Starts false and follows root.open from the next tick, so the
+            // open animation runs on a freshly created window.
+            property bool presented: false
+            Component.onCompleted: {
+                root.windowVisible = visible;
+                if (visible)
+                    keys.forceActiveFocus();
+                Qt.callLater(() => presented = Qt.binding(() => root.open));
             }
-        }
 
-        // Grid geometry (logical px). Tiles use the focused monitor's aspect;
-        // one extra cell for the "+" tile.
-        readonly property var mon: Hyprland.focusedMonitor
-        readonly property real monW: mon ? mon.width / mon.scale : width
-        readonly property real monH: mon ? mon.height / mon.scale : height
-        // Shown tiles (frozen while closing) + the "+" tile.
-        readonly property int count: root.displayIds.length + 1
-        readonly property int cols: count <= 4 ? count : Math.ceil(count / 2)
-        readonly property int rows: Math.ceil(count / cols)
-        readonly property real gap: 24
-        readonly property real tileW: Math.min((width * 0.86 - gap * (cols - 1)) / cols, ((height * 0.78 - gap * (rows - 1)) / rows) * monW / monH, width * 0.4)
-        readonly property real tileH: tileW * monH / monW
+            screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
+            visible: root.open || backdrop.opacity > 0
 
-        // Dimmed backdrop (blurred by the Hyprland layer rule). Click = close.
-        Rectangle {
-            id: backdrop
-            anchors.fill: parent
-            color: Qt.rgba(0, 0, 0, 0.55)
-            opacity: root.open ? 1 : 0
+            anchors {
+                top: true
+                bottom: true
+                left: true
+                right: true
+            }
+            exclusionMode: ExclusionMode.Ignore
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.namespace: "nyx-overview"
+            WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+            color: "transparent"
 
-            // The only animated part of the overview (the tiles just appear /
-            // disappear with it).
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: 200
-                    easing.type: Easing.OutCubic
+            onVisibleChanged: {
+                root.windowVisible = visible;
+                if (visible) {
+                    keys.forceActiveFocus();
+                } else {
+                    root.frozenIds = null;
+                    root.pending = null;
+                    root.animateMoves = true;
                 }
             }
 
-            MouseArea {
+            // Grid geometry (logical px). Tiles use the focused monitor's aspect;
+            // one extra cell for the "+" tile.
+            readonly property var mon: Hyprland.focusedMonitor
+            readonly property real monW: mon ? mon.width / mon.scale : width
+            readonly property real monH: mon ? mon.height / mon.scale : height
+            // Shown tiles (frozen while closing) + the "+" tile.
+            readonly property int count: root.displayIds.length + 1
+            readonly property int cols: count <= 4 ? count : Math.ceil(count / 2)
+            readonly property int rows: Math.ceil(count / cols)
+            readonly property real gap: 24
+            readonly property real tileW: Math.min((width * 0.86 - gap * (cols - 1)) / cols, ((height * 0.78 - gap * (rows - 1)) / rows) * monW / monH, width * 0.4)
+            readonly property real tileH: tileW * monH / monW
+
+            // Dimmed backdrop (blurred by the Hyprland layer rule). Click = close.
+            Rectangle {
+                id: backdrop
                 anchors.fill: parent
-                onClicked: root.close()
-            }
-        }
+                color: Qt.rgba(0, 0, 0, 0.55)
+                opacity: win.presented ? 1 : 0
 
-        // ---- workspace grid ----
-        Grid {
-            id: grid
-            anchors.centerIn: parent
-            columns: win.cols
-            spacing: win.gap
-            // Tiles aren't animated: they appear with the overlay and vanish
-            // the moment it starts closing (only the backdrop fades).
-            visible: root.open
-
-            // Tiles slide to their new places when the (preview) order changes.
-            move: Transition {
-                enabled: root.animateMoves
-                NumberAnimation {
-                    properties: "x,y"
-                    duration: 220
-                    easing.type: Easing.OutCubic
-                }
-            }
-
-            Repeater {
-                id: tiles
-                // ScriptModel turns order changes into moves, so tiles (and
-                // their live previews) are kept and animated, not recreated.
-                model: ScriptModel {
-                    values: root.displayIds
+                // The only animated part of the overview (the tiles just appear /
+                // disappear with it).
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.ms(200)
+                        easing.type: Easing.OutCubic
+                    }
                 }
 
-                // The tile itself is the click target ("go to workspace");
-                // windows on top have their own handlers.
                 MouseArea {
-                    id: tile
+                    anchors.fill: parent
+                    onClicked: root.close()
+                }
+            }
 
-                    required property int modelData
-                    readonly property int wsId: modelData
-                    readonly property bool current: Hyprland.focusedWorkspace?.id === wsId
-                    readonly property bool isSelected: root.selected === wsId
-                    // Window drags highlight the target; workspace drags make
-                    // room instead (see tileGhost.moveTo).
-                    readonly property bool dropTarget: dragGhost.visible && dragGhost.overWs === wsId
-                    readonly property bool beingDragged: tileGhost.visible && tileGhost.fromWs === wsId
+            // ---- workspace grid ----
+            Grid {
+                id: grid
+                anchors.centerIn: parent
+                columns: win.cols
+                spacing: win.gap
+                // Tiles aren't animated: they appear with the overlay and vanish
+                // the moment it starts closing (only the backdrop fades).
+                visible: root.open
 
-                    property point pressAt
-                    property bool dragging: false
+                // Tiles slide to their new places when the (preview) order changes.
+                move: Transition {
+                    enabled: root.animateMoves
+                    NumberAnimation {
+                        properties: "x,y"
+                        duration: Theme.ms(220)
+                        easing.type: Easing.OutCubic
+                    }
+                }
 
-                    // Where a window dropped at (px, py) would go in this
-                    // workspace's left-to-right column order: { index, x },
-                    // x = insertion line in strip content coordinates.
-                    function insertionAt(px, py) {
-                        const p = strip.contentItem.mapFromItem(win.contentItem, px, py);
-                        const cols = root.windowsFor(wsId).filter(t => t !== dragGhost.toplevel).map(t => {
-                            const m = root.monitorOf(t);
-                            const left = (t.lastIpcObject.at[0] - (m?.x ?? 0) - strip.bounds.minX) * strip.s;
-                            const w = t.lastIpcObject.size[0] * strip.s;
+                Repeater {
+                    id: tiles
+                    // ScriptModel turns order changes into moves, so tiles (and
+                    // their live previews) are kept and animated, not recreated.
+                    model: ScriptModel {
+                        values: root.displayIds
+                    }
+
+                    // The tile itself is the click target ("go to workspace");
+                    // windows on top have their own handlers.
+                    MouseArea {
+                        id: tile
+
+                        required property int modelData
+                        readonly property int wsId: modelData
+                        readonly property bool current: Hyprland.focusedWorkspace?.id === wsId
+                        readonly property bool isSelected: root.selected === wsId
+                        // Window drags highlight the target; workspace drags make
+                        // room instead (see tileGhost.moveTo).
+                        readonly property bool dropTarget: dragGhost.visible && dragGhost.overWs === wsId
+                        readonly property bool beingDragged: tileGhost.visible && tileGhost.fromWs === wsId
+
+                        property point pressAt
+                        property bool dragging: false
+
+                        // Where a window dropped at (px, py) would go in this
+                        // workspace's left-to-right column order: { index, x },
+                        // x = insertion line in strip content coordinates.
+                        function insertionAt(px, py) {
+                            const p = strip.contentItem.mapFromItem(win.contentItem, px, py);
+                            const cols = root.windowsFor(wsId).filter(t => t !== dragGhost.toplevel).map(t => {
+                                const m = root.monitorOf(t);
+                                const left = (t.lastIpcObject.at[0] - (m?.x ?? 0) - strip.bounds.minX) * strip.s;
+                                const w = t.lastIpcObject.size[0] * strip.s;
+                                return {
+                                    left: left,
+                                    right: left + w,
+                                    center: left + w / 2
+                                };
+                            }).sort((a, b) => a.left - b.left);
+                            const index = cols.filter(c => c.center < p.x).length;
+                            const x = cols.length === 0 ? 0 : index === 0 ? cols[0].left : index >= cols.length ? cols[cols.length - 1].right : (cols[index - 1].right + cols[index].left) / 2;
                             return {
-                                left: left,
-                                right: left + w,
-                                center: left + w / 2
+                                index: index,
+                                x: x
                             };
-                        }).sort((a, b) => a.left - b.left);
-                        const index = cols.filter(c => c.center < p.x).length;
-                        const x = cols.length === 0 ? 0 : index === 0 ? cols[0].left : index >= cols.length ? cols[cols.length - 1].right : (cols[index - 1].right + cols[index].left) / 2;
-                        return {
-                            index: index,
-                            x: x
-                        };
-                    }
-
-                    // Window preview under a window-level point (topmost first).
-                    function windowAt(px, py) {
-                        const kids = strip.contentItem.children;
-                        for (let i = kids.length - 1; i >= 0; i--) {
-                            const k = kids[i];
-                            if (!k.isWindowItem)
-                                continue;
-                            const q = k.mapFromItem(win.contentItem, px, py);
-                            if (q.x >= 0 && q.y >= 0 && q.x <= k.width && q.y <= k.height)
-                                return k.modelData;
                         }
-                        return null;
+
+                        // Window preview under a window-level point (topmost first).
+                        function windowAt(px, py) {
+                            const kids = strip.contentItem.children;
+                            for (let i = kids.length - 1; i >= 0; i--) {
+                                const k = kids[i];
+                                if (!k.isWindowItem)
+                                    continue;
+                                const q = k.mapFromItem(win.contentItem, px, py);
+                                if (q.x >= 0 && q.y >= 0 && q.x <= k.width && q.y <= k.height)
+                                    return k.modelData;
+                            }
+                            return null;
+                        }
+
+                        width: win.tileW
+                        height: win.tileH + 22
+                        opacity: beingDragged ? 0.35 : 1
+                        hoverEnabled: true
+                        cursorShape: dragging ? Qt.ClosedHandCursor : Qt.PointingHandCursor
+                        onEntered: if (!tileGhost.visible)
+                            root.selected = wsId
+
+                        // Click = go there; drag = move the whole workspace.
+                        onPressed: mouse => {
+                            pressAt = Qt.point(mouse.x, mouse.y);
+                            dragging = false;
+                        }
+                        onPositionChanged: mouse => {
+                            if (!pressed)
+                                return;
+                            if (!dragging && Math.hypot(mouse.x - pressAt.x, mouse.y - pressAt.y) > 8) {
+                                dragging = true;
+                                tileGhost.start(tile);
+                            }
+                            if (dragging) {
+                                const p = mapToItem(win.contentItem, mouse.x, mouse.y);
+                                tileGhost.moveTo(p.x, p.y);
+                            }
+                        }
+                        onReleased: mouse => {
+                            if (dragging) {
+                                dragging = false;
+                                tileGhost.drop();
+                            } else {
+                                root.goWorkspace(wsId);
+                            }
+                        }
+
+                        // Workspace number (dot = current).
+                        Text {
+                            x: 2
+                            text: tile.current ? `${tile.wsId}  •` : tile.wsId
+                            font.family: Theme.font
+                            font.pixelSize: Theme.fontSize
+                            font.weight: Font.DemiBold
+                            color: tile.isSelected ? Theme.accent : Theme.foreground
+                        }
+
+                        // Wallpaper with rounded corners (display only).
+                        ClippingRectangle {
+                            id: screenArea
+                            y: 22
+                            width: win.tileW
+                            height: win.tileH
+                            radius: 10
+                            color: Theme.surface
+
+                            Image {
+                                anchors.fill: parent
+                                source: Wallpaper.current ? `file://${Wallpaper.current}` : ""
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous: true
+                                sourceSize.width: 480
+                                sourceSize.height: 270
+                                opacity: 0.85
+                            }
+                        }
+
+                        // Windows at their real positions, scaled down, in a strip
+                        // that scrolls (mouse wheel) to reach columns that are off
+                        // screen in the scrolling layout. Starts at the real screen.
+                        Flickable {
+                            id: strip
+
+                            readonly property var bounds: root.extentOf(tile.wsId)
+                            readonly property real s: win.tileW / win.monW
+                            readonly property bool scrollsX: contentWidth > width + 1
+                            readonly property bool scrollsY: contentHeight > height + 1
+
+                            // Wheel -> scroll the strip (horizontal first). Also
+                            // called by the window previews, whose MouseAreas would
+                            // otherwise swallow the wheel event.
+                            function scrollBy(angleDelta) {
+                                const d = angleDelta.y !== 0 ? angleDelta.y : angleDelta.x;
+                                const step = d / 120 * width * 0.25;
+                                if (scrollsX)
+                                    contentX = Math.max(0, Math.min(contentWidth - width, contentX - step));
+                                else if (scrollsY)
+                                    contentY = Math.max(0, Math.min(contentHeight - height, contentY - step));
+                            }
+
+                            // Line up with what the monitor shows, instantly.
+                            function showScreen() {
+                                animateScroll = false;
+                                contentX = Math.max(0, Math.min(contentWidth - width, -bounds.minX * s));
+                                contentY = Math.max(0, Math.min(contentHeight - height, -bounds.minY * s));
+                                animateScroll = true;
+                            }
+
+                            x: screenArea.x
+                            y: screenArea.y
+                            width: screenArea.width
+                            height: screenArea.height
+                            clip: true
+                            // Mouse is for clicking / dragging; scroll with the wheel.
+                            interactive: false
+                            contentWidth: (bounds.maxX - bounds.minX) * s
+                            contentHeight: (bounds.maxY - bounds.minY) * s
+
+                            Component.onCompleted: showScreen()
+                            Connections {
+                                target: win // presented: also fires on a freshly created window
+                                function onPresentedChanged() {
+                                    if (win.presented)
+                                        strip.showScreen();
+                                }
+                            }
+
+                            // Smooth wheel scrolling only; showScreen() jumps.
+                            property bool animateScroll: true
+
+                            Behavior on contentX {
+                                enabled: strip.animateScroll
+                                NumberAnimation {
+                                    duration: Theme.ms(120)
+                                }
+                            }
+
+                            WheelHandler {
+                                onWheel: event => strip.scrollBy(event.angleDelta)
+                            }
+
+                            // Insertion line while dragging a window in from
+                            // another workspace.
+                            Rectangle {
+                                z: 5
+                                visible: root.insertHint?.ws === tile.wsId
+                                x: (root.insertHint?.x ?? 0) - width / 2
+                                y: 6
+                                width: 4
+                                height: strip.contentHeight - 12
+                                radius: 2
+                                color: Theme.accent
+                            }
+
+                            // Outline of what the monitor actually shows.
+                            Rectangle {
+                                visible: strip.scrollsX || strip.scrollsY
+                                x: -strip.bounds.minX * strip.s
+                                y: -strip.bounds.minY * strip.s
+                                width: win.monW * strip.s
+                                height: win.monH * strip.s
+                                color: "transparent"
+                                radius: 6
+                                border.width: 1
+                                border.color: Qt.rgba(1, 1, 1, 0.35)
+                            }
+
+                            Repeater {
+                                // ScriptModel keeps the delegate (and its running
+                                // preview) for windows that stay on this workspace.
+                                model: ScriptModel {
+                                    // win.visible (not root.open): previews stay
+                                    // through the fade-out instead of vanishing.
+                                    values: win.visible ? root.windowsFor(tile.wsId) : []
+                                }
+
+                                Item {
+                                    id: winItem
+
+                                    required property var modelData
+                                    readonly property bool isWindowItem: true // for tile.windowAt()
+                                    readonly property bool isSwapTarget: root.swapTarget === modelData
+                                    readonly property bool isSelectedWindow: root.selectedWindow === modelData
+                                    readonly property bool matchesQuery: root.matches(modelData)
+                                    readonly property var ipc: modelData.lastIpcObject
+
+                                    // Faded while dragged, or when it doesn't match the search.
+                                    opacity: dragGhost.toplevel === modelData ? 0.35 : matchesQuery ? 1 : 0.2
+
+                                    Behavior on opacity {
+                                        NumberAnimation {
+                                            duration: Theme.ms(120)
+                                        }
+                                    }
+
+                                    // Keyboard-selected window off to the side of a
+                                    // scrolling workspace: scroll its tile to it.
+                                    onIsSelectedWindowChanged: if (isSelectedWindow && (strip.scrollsX || strip.scrollsY))
+                                        strip.contentX = Math.max(0, Math.min(strip.contentWidth - strip.width, x + width / 2 - strip.width / 2))
+
+                                    // After a move/swap, re-tiling resizes and
+                                    // moves windows, which breaks their capture:
+                                    // restart it once things settle. Previews
+                                    // created mid-move (window changed workspace)
+                                    // restart once the move has landed.
+                                    onWidthChanged: if (root.glide)
+                                        preview.refresh(250)
+                                    onHeightChanged: if (root.glide)
+                                        preview.refresh(250)
+                                    onXChanged: if (root.glide)
+                                        preview.refresh(250)
+                                    onYChanged: if (root.glide)
+                                        preview.refresh(250)
+                                    Component.onCompleted: if (root.glide)
+                                        preview.refresh(600)
+                                    readonly property var wmon: root.monitorOf(modelData)
+                                    readonly property real s: win.tileW / (wmon ? wmon.width / wmon.scale : win.monW)
+
+                                    // Content coordinates: shifted so the strip
+                                    // starts at the left-/top-most window.
+                                    x: (ipc.at[0] - (wmon?.x ?? 0) - strip.bounds.minX) * s
+                                    y: (ipc.at[1] - (wmon?.y ?? 0) - strip.bounds.minY) * s
+                                    width: Math.max(8, ipc.size[0] * s)
+                                    height: Math.max(8, ipc.size[1] * s)
+
+                                    // Glide into the new layout when Hyprland
+                                    // re-tiles after a move (instead of jumping).
+                                    Behavior on x {
+                                        enabled: root.glide
+                                        NumberAnimation {
+                                            duration: Theme.ms(200)
+                                            easing.type: Easing.OutCubic
+                                        }
+                                    }
+                                    Behavior on y {
+                                        enabled: root.glide
+                                        NumberAnimation {
+                                            duration: Theme.ms(200)
+                                            easing.type: Easing.OutCubic
+                                        }
+                                    }
+                                    Behavior on width {
+                                        enabled: root.glide
+                                        NumberAnimation {
+                                            duration: Theme.ms(200)
+                                            easing.type: Easing.OutCubic
+                                        }
+                                    }
+                                    Behavior on height {
+                                        enabled: root.glide
+                                        NumberAnimation {
+                                            duration: Theme.ms(200)
+                                            easing.type: Easing.OutCubic
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        radius: 4
+                                        color: Theme.surfaceHigh
+                                        clip: true
+
+                                        // Live preview. A capture can fail while
+                                        // the window is being moved, and then just
+                                        // stops: restart it (a few times in a row;
+                                        // reset once frames arrive again).
+                                        ScreencopyView {
+                                            id: preview
+
+                                            property bool capturing: true
+                                            property int retries: 0
+
+                                            anchors.fill: parent
+                                            captureSource: win.visible && capturing ? winItem.modelData.wayland : null
+                                            live: true
+                                            paintCursor: false
+                                            constraintSize: Qt.size(width, height)
+
+                                            onStopped: if (win.visible && retries < 5)
+                                                restart.restart()
+                                            onHasContentChanged: if (hasContent)
+                                                retries = 0
+
+                                            Timer {
+                                                id: restart
+                                                interval: 300
+                                                onTriggered: {
+                                                    preview.retries++;
+                                                    preview.capturing = false;
+                                                    Qt.callLater(() => preview.capturing = true);
+                                                }
+                                            }
+
+                                            // Hyprland's capture fails when the
+                                            // window is resized/moved mid-capture,
+                                            // and `stopped` isn't always emitted.
+                                            // So restart once the geometry has
+                                            // settled (debounced), whenever it
+                                            // changes right after a move/swap.
+                                            function refresh(delay) {
+                                                settleRestart.interval = delay;
+                                                settleRestart.restart();
+                                            }
+
+                                            Timer {
+                                                id: settleRestart
+                                                interval: 250
+                                                onTriggered: {
+                                                    preview.capturing = false;
+                                                    Qt.callLater(() => preview.capturing = true);
+                                                }
+                                            }
+                                        }
+
+                                        // No preview yet: app icon.
+                                        IconImage {
+                                            anchors.centerIn: parent
+                                            visible: !preview.hasContent
+                                            implicitSize: Math.min(parent.width, parent.height) * 0.4
+                                            source: root.iconFor(winItem.modelData)
+                                        }
+                                    }
+
+                                    // Hover / swap-target / keyboard-selection outline.
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        radius: 4
+                                        color: winItem.isSwapTarget ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.2) : "transparent"
+                                        border.width: winItem.isSwapTarget || winItem.isSelectedWindow ? 3 : winMouse.containsMouse ? 2 : 1
+                                        border.color: winItem.isSwapTarget || winItem.isSelectedWindow || winMouse.containsMouse ? Theme.accent : Qt.rgba(1, 1, 1, 0.15)
+                                    }
+
+                                    // Click = focus, drag = move to another workspace.
+                                    MouseArea {
+                                        id: winMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        cursorShape: dragging ? Qt.ClosedHandCursor : Qt.PointingHandCursor
+                                        // Middle click closes the window.
+                                        acceptedButtons: Qt.LeftButton | Qt.MiddleButton
+
+                                        property point pressAt
+                                        property bool dragging: false
+
+                                        onEntered: root.selected = tile.wsId
+                                        // Pass the wheel on so the strip scrolls
+                                        // even when the cursor is over a window.
+                                        onWheel: wheel => strip.scrollBy(wheel.angleDelta)
+                                        onPressed: mouse => {
+                                            pressAt = Qt.point(mouse.x, mouse.y);
+                                            dragging = false;
+                                        }
+                                        onPositionChanged: mouse => {
+                                            // Only the left button drags.
+                                            if (!(pressedButtons & Qt.LeftButton))
+                                                return;
+                                            if (!dragging && Math.hypot(mouse.x - pressAt.x, mouse.y - pressAt.y) > 6) {
+                                                dragging = true;
+                                                dragGhost.start(winItem.modelData, winItem.width, winItem.height);
+                                            }
+                                            if (dragging) {
+                                                const p = mapToItem(win.contentItem, mouse.x, mouse.y);
+                                                dragGhost.moveTo(p.x, p.y);
+                                            }
+                                        }
+                                        onReleased: mouse => {
+                                            if (mouse.button === Qt.MiddleButton) {
+                                                root.closeWindow(winItem.modelData);
+                                            } else if (dragging) {
+                                                dragging = false;
+                                                dragGhost.drop(tile.wsId);
+                                            } else {
+                                                root.focusWindow(winItem.modelData);
+                                            }
+                                        }
+
+                                        // ✕ on hover (top-right): close the window.
+                                        MouseArea {
+                                            id: closeButton
+                                            visible: (winMouse.containsMouse || containsMouse) && !winMouse.dragging && winItem.width > 40
+                                            anchors.top: parent.top
+                                            anchors.right: parent.right
+                                            anchors.margins: 4
+                                            width: 20
+                                            height: 20
+                                            hoverEnabled: true
+                                            cursorShape: Qt.PointingHandCursor
+                                            onClicked: root.closeWindow(winItem.modelData)
+
+                                            Rectangle {
+                                                anchors.fill: parent
+                                                radius: width / 2
+                                                color: closeButton.containsMouse ? Theme.urgent : Qt.rgba(0, 0, 0, 0.6)
+                                            }
+
+                                            Icon {
+                                                anchors.centerIn: parent
+                                                name: "close"
+                                                size: 13
+                                                color: "white"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Scroll bar when the workspace is wider than the screen.
+                        Rectangle {
+                            visible: strip.scrollsX
+                            x: screenArea.x + 8
+                            y: screenArea.y + screenArea.height - 8
+                            width: screenArea.width - 16
+                            height: 3
+                            radius: 1.5
+                            color: Qt.rgba(1, 1, 1, 0.15)
+
+                            Rectangle {
+                                x: strip.contentWidth > 0 ? parent.width * strip.contentX / strip.contentWidth : 0
+                                width: strip.contentWidth > 0 ? parent.width * strip.width / strip.contentWidth : 0
+                                height: parent.height
+                                radius: parent.radius
+                                color: Qt.rgba(1, 1, 1, 0.7)
+                            }
+                        }
+
+                        // Selection / drop outline.
+                        Rectangle {
+                            x: screenArea.x
+                            y: screenArea.y
+                            width: screenArea.width
+                            height: screenArea.height
+                            radius: screenArea.radius
+                            color: "transparent"
+                            border.width: tile.dropTarget || tile.isSelected ? 3 : tile.current ? 1 : 0
+                            border.color: tile.dropTarget ? Theme.success : tile.isSelected ? Theme.accent : Qt.rgba(1, 1, 1, 0.4)
+                        }
                     }
+                }
+
+                // "+" tile: first free workspace (click to go, drop a window to move it).
+                MouseArea {
+                    id: newTile
+
+                    readonly property int wsId: root.freeId
+                    readonly property bool isSelected: root.selected === wsId
+                    readonly property bool dropTarget: (dragGhost.visible || tileGhost.visible) && (dragGhost.overWs === wsId || tileGhost.overWs === wsId)
 
                     width: win.tileW
                     height: win.tileH + 22
-                    opacity: beingDragged ? 0.35 : 1
                     hoverEnabled: true
-                    cursorShape: dragging ? Qt.ClosedHandCursor : Qt.PointingHandCursor
-                    onEntered: if (!tileGhost.visible)
-                        root.selected = wsId
+                    cursorShape: Qt.PointingHandCursor
+                    onEntered: root.selected = wsId
+                    onClicked: root.goWorkspace(wsId)
 
-                    // Click = go there; drag = move the whole workspace.
-                    onPressed: mouse => {
-                        pressAt = Qt.point(mouse.x, mouse.y);
-                        dragging = false;
-                    }
-                    onPositionChanged: mouse => {
-                        if (!pressed)
-                            return;
-                        if (!dragging && Math.hypot(mouse.x - pressAt.x, mouse.y - pressAt.y) > 8) {
-                            dragging = true;
-                            tileGhost.start(tile);
-                        }
-                        if (dragging) {
-                            const p = mapToItem(win.contentItem, mouse.x, mouse.y);
-                            tileGhost.moveTo(p.x, p.y);
-                        }
-                    }
-                    onReleased: mouse => {
-                        if (dragging) {
-                            dragging = false;
-                            tileGhost.drop();
-                        } else {
-                            root.goWorkspace(wsId);
-                        }
-                    }
-
-                    // Workspace number (dot = current).
                     Text {
                         x: 2
-                        text: tile.current ? `${tile.wsId}  •` : tile.wsId
+                        text: `${newTile.wsId}`
                         font.family: Theme.font
                         font.pixelSize: Theme.fontSize
                         font.weight: Font.DemiBold
-                        color: tile.isSelected ? Theme.accent : Theme.foreground
+                        color: newTile.isSelected ? Theme.accent : Theme.foregroundDim
                     }
 
-                    // Wallpaper with rounded corners (display only).
-                    ClippingRectangle {
-                        id: screenArea
+                    Rectangle {
                         y: 22
                         width: win.tileW
                         height: win.tileH
                         radius: 10
-                        color: Theme.surface
+                        color: newTile.dropTarget ? Qt.rgba(Theme.success.r, Theme.success.g, Theme.success.b, 0.15) : Qt.rgba(1, 1, 1, newTile.containsMouse ? 0.08 : 0.04)
+                        border.width: newTile.dropTarget || newTile.isSelected ? 3 : 2
+                        border.color: newTile.dropTarget ? Theme.success : newTile.isSelected ? Theme.accent : Qt.rgba(1, 1, 1, 0.25)
 
-                        Image {
-                            anchors.fill: parent
-                            source: Wallpaper.current ? `file://${Wallpaper.current}` : ""
-                            fillMode: Image.PreserveAspectCrop
-                            asynchronous: true
-                            sourceSize.width: 480
-                            sourceSize.height: 270
-                            opacity: 0.85
-                        }
-                    }
+                        Column {
+                            anchors.centerIn: parent
+                            spacing: 4
 
-                    // Windows at their real positions, scaled down, in a strip
-                    // that scrolls (mouse wheel) to reach columns that are off
-                    // screen in the scrolling layout. Starts at the real screen.
-                    Flickable {
-                        id: strip
-
-                        readonly property var bounds: root.extentOf(tile.wsId)
-                        readonly property real s: win.tileW / win.monW
-                        readonly property bool scrollsX: contentWidth > width + 1
-                        readonly property bool scrollsY: contentHeight > height + 1
-
-                        // Wheel -> scroll the strip (horizontal first). Also
-                        // called by the window previews, whose MouseAreas would
-                        // otherwise swallow the wheel event.
-                        function scrollBy(angleDelta) {
-                            const d = angleDelta.y !== 0 ? angleDelta.y : angleDelta.x;
-                            const step = d / 120 * width * 0.25;
-                            if (scrollsX)
-                                contentX = Math.max(0, Math.min(contentWidth - width, contentX - step));
-                            else if (scrollsY)
-                                contentY = Math.max(0, Math.min(contentHeight - height, contentY - step));
-                        }
-
-                        // Line up with what the monitor shows, instantly.
-                        function showScreen() {
-                            animateScroll = false;
-                            contentX = Math.max(0, Math.min(contentWidth - width, -bounds.minX * s));
-                            contentY = Math.max(0, Math.min(contentHeight - height, -bounds.minY * s));
-                            animateScroll = true;
-                        }
-
-                        x: screenArea.x
-                        y: screenArea.y
-                        width: screenArea.width
-                        height: screenArea.height
-                        clip: true
-                        // Mouse is for clicking / dragging; scroll with the wheel.
-                        interactive: false
-                        contentWidth: (bounds.maxX - bounds.minX) * s
-                        contentHeight: (bounds.maxY - bounds.minY) * s
-
-                        Component.onCompleted: showScreen()
-                        Connections {
-                            target: root
-                            function onOpenChanged() {
-                                if (root.open)
-                                    strip.showScreen();
-                            }
-                        }
-
-                        // Smooth wheel scrolling only; showScreen() jumps.
-                        property bool animateScroll: true
-
-                        Behavior on contentX {
-                            enabled: strip.animateScroll
-                            NumberAnimation {
-                                duration: 120
-                            }
-                        }
-
-                        WheelHandler {
-                            onWheel: event => strip.scrollBy(event.angleDelta)
-                        }
-
-                        // Insertion line while dragging a window in from
-                        // another workspace.
-                        Rectangle {
-                            z: 5
-                            visible: root.insertHint?.ws === tile.wsId
-                            x: (root.insertHint?.x ?? 0) - width / 2
-                            y: 6
-                            width: 4
-                            height: strip.contentHeight - 12
-                            radius: 2
-                            color: Theme.accent
-                        }
-
-                        // Outline of what the monitor actually shows.
-                        Rectangle {
-                            visible: strip.scrollsX || strip.scrollsY
-                            x: -strip.bounds.minX * strip.s
-                            y: -strip.bounds.minY * strip.s
-                            width: win.monW * strip.s
-                            height: win.monH * strip.s
-                            color: "transparent"
-                            radius: 6
-                            border.width: 1
-                            border.color: Qt.rgba(1, 1, 1, 0.35)
-                        }
-
-                        Repeater {
-                            // ScriptModel keeps the delegate (and its running
-                            // preview) for windows that stay on this workspace.
-                            model: ScriptModel {
-                                // win.visible (not root.open): previews stay
-                                // through the fade-out instead of vanishing.
-                                values: win.visible ? root.windowsFor(tile.wsId) : []
+                            Icon {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                name: "add"
+                                size: 32
+                                color: Theme.foregroundDim
                             }
 
-                            Item {
-                                id: winItem
-
-                                required property var modelData
-                                readonly property bool isWindowItem: true // for tile.windowAt()
-                                readonly property bool isSwapTarget: root.swapTarget === modelData
-                                readonly property bool isSelectedWindow: root.selectedWindow === modelData
-                                readonly property bool matchesQuery: root.matches(modelData)
-                                readonly property var ipc: modelData.lastIpcObject
-
-                                // Faded while dragged, or when it doesn't match the search.
-                                opacity: dragGhost.toplevel === modelData ? 0.35 : matchesQuery ? 1 : 0.2
-
-                                Behavior on opacity {
-                                    NumberAnimation {
-                                        duration: 120
-                                    }
-                                }
-
-                                // Keyboard-selected window off to the side of a
-                                // scrolling workspace: scroll its tile to it.
-                                onIsSelectedWindowChanged: if (isSelectedWindow && (strip.scrollsX || strip.scrollsY))
-                                    strip.contentX = Math.max(0, Math.min(strip.contentWidth - strip.width, x + width / 2 - strip.width / 2))
-
-                                // After a move/swap, re-tiling resizes and
-                                // moves windows, which breaks their capture:
-                                // restart it once things settle. Previews
-                                // created mid-move (window changed workspace)
-                                // restart once the move has landed.
-                                onWidthChanged: if (root.glide)
-                                    preview.refresh(250)
-                                onHeightChanged: if (root.glide)
-                                    preview.refresh(250)
-                                onXChanged: if (root.glide)
-                                    preview.refresh(250)
-                                onYChanged: if (root.glide)
-                                    preview.refresh(250)
-                                Component.onCompleted: if (root.glide)
-                                    preview.refresh(600)
-                                readonly property var wmon: root.monitorOf(modelData)
-                                readonly property real s: win.tileW / (wmon ? wmon.width / wmon.scale : win.monW)
-
-                                // Content coordinates: shifted so the strip
-                                // starts at the left-/top-most window.
-                                x: (ipc.at[0] - (wmon?.x ?? 0) - strip.bounds.minX) * s
-                                y: (ipc.at[1] - (wmon?.y ?? 0) - strip.bounds.minY) * s
-                                width: Math.max(8, ipc.size[0] * s)
-                                height: Math.max(8, ipc.size[1] * s)
-
-                                // Glide into the new layout when Hyprland
-                                // re-tiles after a move (instead of jumping).
-                                Behavior on x {
-                                    enabled: root.glide
-                                    NumberAnimation {
-                                        duration: 200
-                                        easing.type: Easing.OutCubic
-                                    }
-                                }
-                                Behavior on y {
-                                    enabled: root.glide
-                                    NumberAnimation {
-                                        duration: 200
-                                        easing.type: Easing.OutCubic
-                                    }
-                                }
-                                Behavior on width {
-                                    enabled: root.glide
-                                    NumberAnimation {
-                                        duration: 200
-                                        easing.type: Easing.OutCubic
-                                    }
-                                }
-                                Behavior on height {
-                                    enabled: root.glide
-                                    NumberAnimation {
-                                        duration: 200
-                                        easing.type: Easing.OutCubic
-                                    }
-                                }
-
-                                Rectangle {
-                                    anchors.fill: parent
-                                    radius: 4
-                                    color: Theme.surfaceHigh
-                                    clip: true
-
-                                    // Live preview. A capture can fail while
-                                    // the window is being moved, and then just
-                                    // stops: restart it (a few times in a row;
-                                    // reset once frames arrive again).
-                                    ScreencopyView {
-                                        id: preview
-
-                                        property bool capturing: true
-                                        property int retries: 0
-
-                                        anchors.fill: parent
-                                        captureSource: win.visible && capturing ? winItem.modelData.wayland : null
-                                        live: true
-                                        paintCursor: false
-                                        constraintSize: Qt.size(width, height)
-
-                                        onStopped: if (win.visible && retries < 5)
-                                            restart.restart()
-                                        onHasContentChanged: if (hasContent)
-                                            retries = 0
-
-                                        Timer {
-                                            id: restart
-                                            interval: 300
-                                            onTriggered: {
-                                                preview.retries++;
-                                                preview.capturing = false;
-                                                Qt.callLater(() => preview.capturing = true);
-                                            }
-                                        }
-
-                                        // Hyprland's capture fails when the
-                                        // window is resized/moved mid-capture,
-                                        // and `stopped` isn't always emitted.
-                                        // So restart once the geometry has
-                                        // settled (debounced), whenever it
-                                        // changes right after a move/swap.
-                                        function refresh(delay) {
-                                            settleRestart.interval = delay;
-                                            settleRestart.restart();
-                                        }
-
-                                        Timer {
-                                            id: settleRestart
-                                            interval: 250
-                                            onTriggered: {
-                                                preview.capturing = false;
-                                                Qt.callLater(() => preview.capturing = true);
-                                            }
-                                        }
-                                    }
-
-                                    // No preview yet: app icon.
-                                    IconImage {
-                                        anchors.centerIn: parent
-                                        visible: !preview.hasContent
-                                        implicitSize: Math.min(parent.width, parent.height) * 0.4
-                                        source: root.iconFor(winItem.modelData)
-                                    }
-                                }
-
-                                // Hover / swap-target / keyboard-selection outline.
-                                Rectangle {
-                                    anchors.fill: parent
-                                    radius: 4
-                                    color: winItem.isSwapTarget ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.2) : "transparent"
-                                    border.width: winItem.isSwapTarget || winItem.isSelectedWindow ? 3 : winMouse.containsMouse ? 2 : 1
-                                    border.color: winItem.isSwapTarget || winItem.isSelectedWindow || winMouse.containsMouse ? Theme.accent : Qt.rgba(1, 1, 1, 0.15)
-                                }
-
-                                // Click = focus, drag = move to another workspace.
-                                MouseArea {
-                                    id: winMouse
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    cursorShape: dragging ? Qt.ClosedHandCursor : Qt.PointingHandCursor
-                                    // Middle click closes the window.
-                                    acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-
-                                    property point pressAt
-                                    property bool dragging: false
-
-                                    onEntered: root.selected = tile.wsId
-                                    // Pass the wheel on so the strip scrolls
-                                    // even when the cursor is over a window.
-                                    onWheel: wheel => strip.scrollBy(wheel.angleDelta)
-                                    onPressed: mouse => {
-                                        pressAt = Qt.point(mouse.x, mouse.y);
-                                        dragging = false;
-                                    }
-                                    onPositionChanged: mouse => {
-                                        // Only the left button drags.
-                                        if (!(pressedButtons & Qt.LeftButton))
-                                            return;
-                                        if (!dragging && Math.hypot(mouse.x - pressAt.x, mouse.y - pressAt.y) > 6) {
-                                            dragging = true;
-                                            dragGhost.start(winItem.modelData, winItem.width, winItem.height);
-                                        }
-                                        if (dragging) {
-                                            const p = mapToItem(win.contentItem, mouse.x, mouse.y);
-                                            dragGhost.moveTo(p.x, p.y);
-                                        }
-                                    }
-                                    onReleased: mouse => {
-                                        if (mouse.button === Qt.MiddleButton) {
-                                            root.closeWindow(winItem.modelData);
-                                        } else if (dragging) {
-                                            dragging = false;
-                                            dragGhost.drop(tile.wsId);
-                                        } else {
-                                            root.focusWindow(winItem.modelData);
-                                        }
-                                    }
-
-                                    // ✕ on hover (top-right): close the window.
-                                    MouseArea {
-                                        id: closeButton
-                                        visible: (winMouse.containsMouse || containsMouse) && !winMouse.dragging && winItem.width > 40
-                                        anchors.top: parent.top
-                                        anchors.right: parent.right
-                                        anchors.margins: 4
-                                        width: 20
-                                        height: 20
-                                        hoverEnabled: true
-                                        cursorShape: Qt.PointingHandCursor
-                                        onClicked: root.closeWindow(winItem.modelData)
-
-                                        Rectangle {
-                                            anchors.fill: parent
-                                            radius: width / 2
-                                            color: closeButton.containsMouse ? Theme.urgent : Qt.rgba(0, 0, 0, 0.6)
-                                        }
-
-                                        Icon {
-                                            anchors.centerIn: parent
-                                            name: "close"
-                                            size: 13
-                                            color: "white"
-                                        }
-                                    }
-                                }
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: dragGhost.visible || tileGhost.visible ? "Move to new workspace" : "New workspace"
+                                font.family: Theme.font
+                                font.pixelSize: Theme.fontSize - 1
+                                color: Theme.foregroundDim
                             }
                         }
                     }
-
-                    // Scroll bar when the workspace is wider than the screen.
-                    Rectangle {
-                        visible: strip.scrollsX
-                        x: screenArea.x + 8
-                        y: screenArea.y + screenArea.height - 8
-                        width: screenArea.width - 16
-                        height: 3
-                        radius: 1.5
-                        color: Qt.rgba(1, 1, 1, 0.15)
-
-                        Rectangle {
-                            x: strip.contentWidth > 0 ? parent.width * strip.contentX / strip.contentWidth : 0
-                            width: strip.contentWidth > 0 ? parent.width * strip.width / strip.contentWidth : 0
-                            height: parent.height
-                            radius: parent.radius
-                            color: Qt.rgba(1, 1, 1, 0.7)
-                        }
-                    }
-
-                    // Selection / drop outline.
-                    Rectangle {
-                        x: screenArea.x
-                        y: screenArea.y
-                        width: screenArea.width
-                        height: screenArea.height
-                        radius: screenArea.radius
-                        color: "transparent"
-                        border.width: tile.dropTarget || tile.isSelected ? 3 : tile.current ? 1 : 0
-                        border.color: tile.dropTarget ? Theme.success : tile.isSelected ? Theme.accent : Qt.rgba(1, 1, 1, 0.4)
-                    }
                 }
             }
 
-            // "+" tile: first free workspace (click to go, drop a window to move it).
-            MouseArea {
-                id: newTile
+            // Window being dragged.
+            Rectangle {
+                id: dragGhost
 
-                readonly property int wsId: root.freeId
-                readonly property bool isSelected: root.selected === wsId
-                readonly property bool dropTarget: (dragGhost.visible || tileGhost.visible) && (dragGhost.overWs === wsId || tileGhost.overWs === wsId)
+                property var toplevel: null
+                property int overWs: -1
 
-                width: win.tileW
-                height: win.tileH + 22
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onEntered: root.selected = wsId
-                onClicked: root.goWorkspace(wsId)
-
-                Text {
-                    x: 2
-                    text: `${newTile.wsId}`
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
-                    font.weight: Font.DemiBold
-                    color: newTile.isSelected ? Theme.accent : Theme.foregroundDim
+                function start(t, w, h) {
+                    toplevel = t;
+                    width = Math.max(60, w);
+                    height = Math.max(40, h);
+                    visible = true;
                 }
 
-                Rectangle {
-                    y: 22
-                    width: win.tileW
-                    height: win.tileH
-                    radius: 10
-                    color: newTile.dropTarget ? Qt.rgba(Theme.success.r, Theme.success.g, Theme.success.b, 0.15) : Qt.rgba(1, 1, 1, newTile.containsMouse ? 0.08 : 0.04)
-                    border.width: newTile.dropTarget || newTile.isSelected ? 3 : 2
-                    border.color: newTile.dropTarget ? Theme.success : newTile.isSelected ? Theme.accent : Qt.rgba(1, 1, 1, 0.25)
-
-                    Column {
-                        anchors.centerIn: parent
-                        spacing: 4
-
-                        Icon {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            name: "add"
-                            size: 32
-                            color: Theme.foregroundDim
-                        }
-
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: dragGhost.visible || tileGhost.visible ? "Move to new workspace" : "New workspace"
-                            font.family: Theme.font
-                            font.pixelSize: Theme.fontSize - 1
-                            color: Theme.foregroundDim
-                        }
-                    }
+                function hit(item, px, py) {
+                    const q = item.mapFromItem(win.contentItem, px, py);
+                    return q.x >= 0 && q.y >= 0 && q.x <= item.width && q.y <= item.height;
                 }
-            }
-        }
 
-        // Window being dragged.
-        Rectangle {
-            id: dragGhost
-
-            property var toplevel: null
-            property int overWs: -1
-
-            function start(t, w, h) {
-                toplevel = t;
-                width = Math.max(60, w);
-                height = Math.max(40, h);
-                visible = true;
-            }
-
-            function hit(item, px, py) {
-                const q = item.mapFromItem(win.contentItem, px, py);
-                return q.x >= 0 && q.y >= 0 && q.x <= item.width && q.y <= item.height;
-            }
-
-            // Over another workspace: move there. Over another window of the
-            // same workspace: that window becomes the swap target.
-            function moveTo(px, py) {
-                x = px - width / 2;
-                y = py - height / 2;
-                overWs = -1;
-                let swap = null;
-                let hint = null;
-                for (let i = 0; i < tiles.count; i++) {
-                    const t = tiles.itemAt(i);
-                    if (hit(t, px, py)) {
-                        overWs = t.wsId;
-                        if (t.wsId === toplevel?.workspace?.id) {
-                            const w = t.windowAt(px, py);
-                            if (w && w !== toplevel)
-                                swap = w;
-                        } else {
-                            // Another workspace: show where it would go.
-                            const ins = t.insertionAt(px, py);
-                            hint = {
-                                ws: t.wsId,
-                                index: ins.index,
-                                x: ins.x
-                            };
-                        }
-                        break;
-                    }
-                }
-                if (overWs < 0 && hit(newTile, px, py))
-                    overWs = newTile.wsId;
-                if (overWs > 0)
-                    root.selected = overWs;
-                root.swapTarget = swap;
-                root.insertHint = hint;
-            }
-
-            function drop(fromWs) {
-                if (toplevel && root.swapTarget)
-                    root.swapWindows(toplevel, root.swapTarget);
-                else if (toplevel && overWs > 0 && overWs !== fromWs)
-                    // At the shown insertion point (empty / "+": first).
-                    root.moveWindow(toplevel, overWs, root.insertHint?.ws === overWs ? root.insertHint.index : 0);
-                visible = false;
-                toplevel = null;
-                overWs = -1;
-                root.swapTarget = null;
-                root.insertHint = null;
-            }
-
-            visible: false
-            z: 10
-            radius: 6
-            color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.35)
-            border.width: 2
-            border.color: Theme.accent
-
-            IconImage {
-                anchors.centerIn: parent
-                implicitSize: Math.min(parent.width, parent.height) * 0.5
-                source: root.iconFor(dragGhost.toplevel)
-            }
-        }
-
-        // Workspace being dragged: a live miniature of its tile.
-        ShaderEffectSource {
-            id: tileGhost
-
-            property int fromWs: -1
-            property int overWs: -1
-
-            function start(tileItem) {
-                sourceItem = tileItem;
-                fromWs = tileItem.wsId;
-                width = tileItem.width * 0.6;
-                height = tileItem.height * 0.6;
-                visible = true;
-            }
-
-            // Hovering a slot moves the dragged workspace into it in the
-            // preview, so the tile there slides out of the way.
-            //
-            // Anti-flicker: the target is computed from the grid's fixed slots
-            // (not the tiles, which are mid-animation), and only changes when
-            // the cursor is in the middle 60% of a slot. Near edges and in
-            // gaps the current preview holds.
-            readonly property real deadZone: 0.2
-
-            function moveTo(px, py) {
-                x = px - width / 2;
-                y = py - height / 2;
-
-                const g = grid.mapFromItem(win.contentItem, px, py);
-                const cellW = win.tileW + win.gap;
-                const cellH = win.tileH + 22 + win.gap;
-                const col = Math.floor(g.x / cellW);
-                const row = Math.floor(g.y / cellH);
-                const fx = (g.x - col * cellW) / win.tileW;
-                const fy = (g.y - row * cellH) / (win.tileH + 22);
-                const slot = row * win.cols + col;
-
-                const inside = col >= 0 && col < win.cols && row >= 0 && slot <= root.wsIds.length && fx >= 0 && fx <= 1 && fy >= 0 && fy <= 1;
-                if (!inside)
-                    return;
-                const committed = fx >= deadZone && fx <= 1 - deadZone && fy >= deadZone && fy <= 1 - deadZone;
-
-                // Last slot is the "+" tile.
-                if (slot === root.wsIds.length) {
-                    overWs = root.freeId;
-                    return;
-                }
-                if (overWs === root.freeId)
+                // Over another workspace: move there. Over another window of the
+                // same workspace: that window becomes the swap target.
+                function moveTo(px, py) {
+                    x = px - width / 2;
+                    y = py - height / 2;
                     overWs = -1;
-                if (!committed)
-                    return;
-
-                const current = root.displayIds;
-                if (current.indexOf(fromWs) !== slot) {
-                    const order = current.filter(id => id !== fromWs);
-                    order.splice(slot, 0, fromWs);
-                    root.previewOrder = order;
-                }
-                overWs = current[slot] ?? -1;
-            }
-
-            function drop() {
-                const from = fromWs, to = overWs;
-                visible = false;
-                sourceItem = null;
-                fromWs = -1;
-                overWs = -1;
-                if (from <= 0)
-                    return;
-
-                if (to > 0 && !root.wsIds.includes(to)) {
-                    // Dropped on "+": move it to the first free workspace.
-                    const incoming = {};
-                    incoming[from] = [];
-                    incoming[to] = root.windowsOn(from);
-                    root.animateMoves = false;
-                    root.previewOrder = null;
-                    root.stage(incoming, [...root.wsIds, to]);
-                    reenableMoves.restart();
-                    root.moveContents({
-                        [from]: to
-                    });
-                    root.selected = to;
-                    return;
+                    let swap = null;
+                    let hint = null;
+                    for (let i = 0; i < tiles.count; i++) {
+                        const t = tiles.itemAt(i);
+                        if (hit(t, px, py)) {
+                            overWs = t.wsId;
+                            if (t.wsId === toplevel?.workspace?.id) {
+                                const w = t.windowAt(px, py);
+                                if (w && w !== toplevel)
+                                    swap = w;
+                            } else {
+                                // Another workspace: show where it would go.
+                                const ins = t.insertionAt(px, py);
+                                hint = {
+                                    ws: t.wsId,
+                                    index: ins.index,
+                                    x: ins.x
+                                };
+                            }
+                            break;
+                        }
+                    }
+                    if (overWs < 0 && hit(newTile, px, py))
+                        overWs = newTile.wsId;
+                    if (overWs > 0)
+                        root.selected = overWs;
+                    root.swapTarget = swap;
+                    root.insertHint = hint;
                 }
 
-                const order = root.displayIds;
-                if (order.join() === root.wsIds.join()) {
-                    root.previewOrder = null;
-                    return;
-                }
-                root.selected = root.wsIds[order.indexOf(from)];
-                root.commitOrder(order);
-            }
-
-            visible: false
-            z: 10
-            live: true
-            hideSource: false
-            opacity: 0.9
-        }
-
-        // Search pill: the query, or a hint about typing / Tab.
-        Rectangle {
-            visible: root.open
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: 48
-            width: searchRow.implicitWidth + 32
-            height: 40
-            radius: height / 2
-            color: Qt.rgba(Theme.background.r, Theme.background.g, Theme.background.b, 0.85)
-            border.width: 1
-            border.color: root.query ? Theme.accent : Theme.glassBorder
-
-            Row {
-                id: searchRow
-                anchors.centerIn: parent
-                spacing: 8
-
-                Icon {
-                    anchors.verticalCenter: parent.verticalCenter
-                    name: "search"
-                    size: 18
-                    color: root.query ? Theme.foreground : Theme.foregroundDim
+                function drop(fromWs) {
+                    if (toplevel && root.swapTarget)
+                        root.swapWindows(toplevel, root.swapTarget);
+                    else if (toplevel && overWs > 0 && overWs !== fromWs)
+                        // At the shown insertion point (empty / "+": first).
+                        root.moveWindow(toplevel, overWs, root.insertHint?.ws === overWs ? root.insertHint.index : 0);
+                    visible = false;
+                    toplevel = null;
+                    overWs = -1;
+                    root.swapTarget = null;
+                    root.insertHint = null;
                 }
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: root.query || "Type to search windows · Tab to cycle · Enter to focus"
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
-                    color: root.query ? Theme.foreground : Theme.foregroundDim
-                }
+                visible: false
+                z: 10
+                radius: 6
+                color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.35)
+                border.width: 2
+                border.color: Theme.accent
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: root.query !== ""
-                    text: root.matchingWindows.length === 1 ? "1 match" : `${root.matchingWindows.length} matches`
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize - 2
-                    color: root.matchingWindows.length ? Theme.foregroundDim : Theme.urgent
+                IconImage {
+                    anchors.centerIn: parent
+                    implicitSize: Math.min(parent.width, parent.height) * 0.5
+                    source: root.iconFor(dragGhost.toplevel)
                 }
             }
-        }
 
-        // Keyboard.
-        //   type          search (Backspace edits, Esc clears, Esc again closes)
-        //   Tab/Shift+Tab cycle through (matching) windows
-        //   Enter         focus the selected window, else go to the workspace
-        //   Delete        close the selected window
-        //   arrows        move between workspaces;  1-9 jump (when not searching)
-        Item {
-            id: keys
-            focus: true
-            Keys.onPressed: event => {
-                const ids = [...root.wsIds, root.freeId];
-                const i = Math.max(0, ids.indexOf(root.selected));
-                if (event.key === Qt.Key_Escape) {
-                    if (root.query)
-                        root.query = "";
-                    else
-                        root.close();
-                } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                    if (root.selectedWindow)
-                        root.focusWindow(root.selectedWindow);
-                    else
-                        root.goWorkspace(root.selected);
-                } else if (event.key === Qt.Key_Tab) {
-                    root.cycleWindow(1);
-                } else if (event.key === Qt.Key_Backtab) {
-                    root.cycleWindow(-1);
-                } else if (event.key === Qt.Key_Delete) {
-                    root.closeWindow(root.selectedWindow);
-                } else if (event.key === Qt.Key_Backspace) {
-                    root.query = root.query.slice(0, -1);
-                } else if (!root.query && event.key >= Qt.Key_1 && event.key <= Qt.Key_9 && ids.includes(event.key - Qt.Key_0)) {
-                    root.goWorkspace(event.key - Qt.Key_0);
-                } else if (event.text && event.text.length === 1 && event.text >= " " && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))) {
-                    root.query += event.text;
-                } else if (event.key === Qt.Key_Right || event.key === Qt.Key_Left || event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
-                    // Arrows select workspaces (Enter then goes there).
-                    root.selectedWindow = null;
-                    const step = event.key === Qt.Key_Right ? 1 : event.key === Qt.Key_Left ? -1 : event.key === Qt.Key_Down ? win.cols : -win.cols;
-                    root.selected = ids[Math.max(0, Math.min(ids.length - 1, i + step))];
-                } else {
-                    return;
+            // Workspace being dragged: a live miniature of its tile.
+            ShaderEffectSource {
+                id: tileGhost
+
+                property int fromWs: -1
+                property int overWs: -1
+
+                function start(tileItem) {
+                    sourceItem = tileItem;
+                    fromWs = tileItem.wsId;
+                    width = tileItem.width * 0.6;
+                    height = tileItem.height * 0.6;
+                    visible = true;
                 }
-                event.accepted = true;
+
+                // Hovering a slot moves the dragged workspace into it in the
+                // preview, so the tile there slides out of the way.
+                //
+                // Anti-flicker: the target is computed from the grid's fixed slots
+                // (not the tiles, which are mid-animation), and only changes when
+                // the cursor is in the middle 60% of a slot. Near edges and in
+                // gaps the current preview holds.
+                readonly property real deadZone: 0.2
+
+                function moveTo(px, py) {
+                    x = px - width / 2;
+                    y = py - height / 2;
+
+                    const g = grid.mapFromItem(win.contentItem, px, py);
+                    const cellW = win.tileW + win.gap;
+                    const cellH = win.tileH + 22 + win.gap;
+                    const col = Math.floor(g.x / cellW);
+                    const row = Math.floor(g.y / cellH);
+                    const fx = (g.x - col * cellW) / win.tileW;
+                    const fy = (g.y - row * cellH) / (win.tileH + 22);
+                    const slot = row * win.cols + col;
+
+                    const inside = col >= 0 && col < win.cols && row >= 0 && slot <= root.wsIds.length && fx >= 0 && fx <= 1 && fy >= 0 && fy <= 1;
+                    if (!inside)
+                        return;
+                    const committed = fx >= deadZone && fx <= 1 - deadZone && fy >= deadZone && fy <= 1 - deadZone;
+
+                    // Last slot is the "+" tile.
+                    if (slot === root.wsIds.length) {
+                        overWs = root.freeId;
+                        return;
+                    }
+                    if (overWs === root.freeId)
+                        overWs = -1;
+                    if (!committed)
+                        return;
+
+                    const current = root.displayIds;
+                    if (current.indexOf(fromWs) !== slot) {
+                        const order = current.filter(id => id !== fromWs);
+                        order.splice(slot, 0, fromWs);
+                        root.previewOrder = order;
+                    }
+                    overWs = current[slot] ?? -1;
+                }
+
+                function drop() {
+                    const from = fromWs, to = overWs;
+                    visible = false;
+                    sourceItem = null;
+                    fromWs = -1;
+                    overWs = -1;
+                    if (from <= 0)
+                        return;
+
+                    if (to > 0 && !root.wsIds.includes(to)) {
+                        // Dropped on "+": move it to the first free workspace.
+                        const incoming = {};
+                        incoming[from] = [];
+                        incoming[to] = root.windowsOn(from);
+                        root.animateMoves = false;
+                        root.previewOrder = null;
+                        root.stage(incoming, [...root.wsIds, to]);
+                        reenableMoves.restart();
+                        root.moveContents({
+                            [from]: to
+                        });
+                        root.selected = to;
+                        return;
+                    }
+
+                    const order = root.displayIds;
+                    if (order.join() === root.wsIds.join()) {
+                        root.previewOrder = null;
+                        return;
+                    }
+                    root.selected = root.wsIds[order.indexOf(from)];
+                    root.commitOrder(order);
+                }
+
+                visible: false
+                z: 10
+                live: true
+                hideSource: false
+                opacity: 0.9
+            }
+
+            // Search pill: the query, or a hint about typing / Tab.
+            Rectangle {
+                visible: root.open
+                anchors.horizontalCenter: parent.horizontalCenter
+                y: 48
+                width: searchRow.implicitWidth + 32
+                height: 40
+                radius: height / 2
+                color: Qt.rgba(Theme.background.r, Theme.background.g, Theme.background.b, 0.85)
+                border.width: 1
+                border.color: root.query ? Theme.accent : Theme.glassBorder
+
+                Row {
+                    id: searchRow
+                    anchors.centerIn: parent
+                    spacing: 8
+
+                    Icon {
+                        anchors.verticalCenter: parent.verticalCenter
+                        name: "search"
+                        size: 18
+                        color: root.query ? Theme.foreground : Theme.foregroundDim
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: root.query || "Type to search windows · Tab to cycle · Enter to focus"
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSize
+                        color: root.query ? Theme.foreground : Theme.foregroundDim
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: root.query !== ""
+                        text: root.matchingWindows.length === 1 ? "1 match" : `${root.matchingWindows.length} matches`
+                        font.family: Theme.font
+                        font.pixelSize: Theme.fontSize - 2
+                        color: root.matchingWindows.length ? Theme.foregroundDim : Theme.urgent
+                    }
+                }
+            }
+
+            // Keyboard.
+            //   type          search (Backspace edits, Esc clears, Esc again closes)
+            //   Tab/Shift+Tab cycle through (matching) windows
+            //   Enter         focus the selected window, else go to the workspace
+            //   Delete        close the selected window
+            //   arrows        move between workspaces;  1-9 jump (when not searching)
+            Item {
+                id: keys
+                focus: true
+                Keys.onPressed: event => {
+                    const ids = [...root.wsIds, root.freeId];
+                    const i = Math.max(0, ids.indexOf(root.selected));
+                    if (event.key === Qt.Key_Escape) {
+                        if (root.query)
+                            root.query = "";
+                        else
+                            root.close();
+                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                        if (root.selectedWindow)
+                            root.focusWindow(root.selectedWindow);
+                        else
+                            root.goWorkspace(root.selected);
+                    } else if (event.key === Qt.Key_Tab) {
+                        root.cycleWindow(1);
+                    } else if (event.key === Qt.Key_Backtab) {
+                        root.cycleWindow(-1);
+                    } else if (event.key === Qt.Key_Delete) {
+                        root.closeWindow(root.selectedWindow);
+                    } else if (event.key === Qt.Key_Backspace) {
+                        root.query = root.query.slice(0, -1);
+                    } else if (!root.query && event.key >= Qt.Key_1 && event.key <= Qt.Key_9 && ids.includes(event.key - Qt.Key_0)) {
+                        root.goWorkspace(event.key - Qt.Key_0);
+                    } else if (event.text && event.text.length === 1 && event.text >= " " && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier | Qt.MetaModifier))) {
+                        root.query += event.text;
+                    } else if (event.key === Qt.Key_Right || event.key === Qt.Key_Left || event.key === Qt.Key_Down || event.key === Qt.Key_Up) {
+                        // Arrows select workspaces (Enter then goes there).
+                        root.selectedWindow = null;
+                        const step = event.key === Qt.Key_Right ? 1 : event.key === Qt.Key_Left ? -1 : event.key === Qt.Key_Down ? win.cols : -win.cols;
+                        root.selected = ids[Math.max(0, Math.min(ids.length - 1, i + step))];
+                    } else {
+                        return;
+                    }
+                    event.accepted = true;
+                }
             }
         }
     }

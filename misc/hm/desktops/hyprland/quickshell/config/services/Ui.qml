@@ -14,6 +14,10 @@ Singleton {
     property var active: null // open Dropdown, if any
     property var bars: [] // PanelWindows of the bar, one per screen
 
+    // Session locked (set by lock/Lock.qml). Pollers pause while it's true:
+    // nothing they feed is visible behind the lock screen.
+    property bool locked: false
+
     function open(dropdown) {
         if (active && active !== dropdown)
             active.shown = false;
@@ -39,6 +43,14 @@ Singleton {
         function toggle(name: string): void {
             root.menuRequested(name, Hyprland.focusedMonitor?.name ?? "");
         }
+    }
+
+    // Keybind (hypr/binds.lua: hl.dsp.global("nyx:sound-menu")).
+    GlobalShortcut {
+        appid: "nyx"
+        name: "sound-menu"
+        description: "Toggle the bar's sound menu"
+        onPressed: root.menuRequested("sound", Hyprland.focusedMonitor?.name ?? "")
     }
 
     function registerBar(bar) {

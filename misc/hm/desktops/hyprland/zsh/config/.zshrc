@@ -43,15 +43,16 @@ fi
   autoload -Uz zrecompile
   local -a configs
   
-  # 1. Core dotfiles
-  configs=( "$ZDOTDIR"/.z(shrc|shenv|profile)(N) )
-  configs+=( "$ZDOTDIR/conf.d"/*.zsh(N) )
-  
-  # 2. Zap's core engine files
-  configs+=( "$ZAP_DIR"/zap.zsh(N) )
+  # The dotfiles and conf.d/* are NOT compiled: Home Manager links them to
+  # the nix store, where every file is dated 1970. A .zwc would then always
+  # look newer than its source, so zsh would keep loading the stale compiled
+  # copy after an edit and zrecompile would never rebuild it.
+
+  # 1. Zap's core engine files
+  configs=( "$ZAP_DIR"/zap.zsh(N) )
   configs+=( "$ZAP_DIR"/functions/*(N.) )
 
-  # 3. Lean Plugin Entry Files Only
+  # 2. Lean Plugin Entry Files Only
   # This looks exactly inside each plugin folder for files matching the folder name
   local plugin_dir
   for plugin_dir in "$ZAP_DIR"/plugins/*(N/); do
@@ -68,7 +69,7 @@ fi
     fi
   done
 
-  # 4. Run compile on the refined list
+  # 3. Run compile on the refined list
   local config
   for config in $configs; do
     zrecompile -p -q "$config"

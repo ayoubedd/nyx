@@ -122,7 +122,7 @@ ColumnLayout {
 
                     Behavior on opacity {
                         NumberAnimation {
-                            duration: 200
+                            duration: Theme.ms(200)
                         }
                     }
                 }

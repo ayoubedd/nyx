@@ -29,6 +29,8 @@ Singleton {
     property int humidity: 0
     property real wind: 0 // km/h
     property var daily: [] // [{ date: Date, code, max, min }]
+    property int sunrise: -1 // today, minutes after midnight (-1 = unknown)
+    property int sunset: -1
 
     readonly property string icon: iconFor(code, isDay)
     readonly property string condition: describe(code)
@@ -112,7 +114,7 @@ Singleton {
             [ -n "$loc" ] || { echo "ERR location"; exit 0; }
             echo "LOC $loc"
             set -- $loc
-            curl -fsS --max-time 10 "https://api.open-meteo.com/v1/forecast?latitude=$1&longitude=$2&current=temperature_2m,apparent_temperature,weather_code,is_day,relative_humidity_2m,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto&forecast_days=4" \
+            curl -fsS --max-time 10 "https://api.open-meteo.com/v1/forecast?latitude=$1&longitude=$2&current=temperature_2m,apparent_temperature,weather_code,is_day,relative_humidity_2m,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset&timezone=auto&forecast_days=4" \
                 || echo "ERR forecast"
         `
 
@@ -146,6 +148,14 @@ Singleton {
                                 max: d.daily.temperature_2m_max[i],
                                 min: d.daily.temperature_2m_min[i]
                             }));
+                    // Today's sunrise/sunset (local "YYYY-MM-DDTHH:MM"), as
+                    // minutes after midnight; used by the night light schedule.
+                    const minutes = s => {
+                        const m = /T(\d\d):(\d\d)/.exec(s ?? "");
+                        return m ? Number(m[1]) * 60 + Number(m[2]) : -1;
+                    };
+                    root.sunrise = minutes(d.daily.sunrise?.[0]);
+                    root.sunset = minutes(d.daily.sunset?.[0]);
                     root.error = "";
                     root.ready = true;
                     root.updatedAt = Date.now();
@@ -156,11 +166,15 @@ Singleton {
         }
     }
 
+    // Not while locked; on unlock, fetch only if the last result is stale.
+    // (25 min, not 30: a tick lands just under 30 min after the previous
+    // fetch finished, and must still count.)
     Timer {
-        running: true
+        running: !Ui.locked
         interval: 30 * 60000
         repeat: true
         triggeredOnStart: true
-        onTriggered: root.refresh()
+        onTriggered: if (Date.now() - root.updatedAt > 25 * 60000)
+            root.refresh()
     }
 }

@@ -51,7 +51,7 @@ Scope {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: 200
+                    duration: Theme.ms(200)
                 }
             }
         }
@@ -72,12 +72,12 @@ Scope {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: 180
+                    duration: Theme.ms(180)
                 }
             }
             Behavior on scale {
                 NumberAnimation {
-                    duration: 220
+                    duration: Theme.ms(220)
                     easing.type: Easing.OutCubic
                 }
             }
@@ -159,19 +159,19 @@ Scope {
                             target: shake
                             property: "x"
                             to: -12
-                            duration: 50
+                            duration: Theme.ms(50)
                         }
                         NumberAnimation {
                             target: shake
                             property: "x"
                             to: 12
-                            duration: 80
+                            duration: Theme.ms(80)
                         }
                         NumberAnimation {
                             target: shake
                             property: "x"
                             to: 0
-                            duration: 60
+                            duration: Theme.ms(60)
                         }
                     }
 

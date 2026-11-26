@@ -67,11 +67,18 @@ Singleton {
         onLoaded: root.sample(text())
     }
 
+    // Paused while locked. The first sample after resuming only sets the
+    // baseline (an average over the whole lock would be meaningless).
     Timer {
-        running: true
+        running: !Ui.locked
         repeat: true
         interval: root.interval
         triggeredOnStart: true
         onTriggered: dev.reload()
+        onRunningChanged: if (!running) {
+            root.last = null;
+            root.down = 0;
+            root.up = 0;
+        }
     }
 }

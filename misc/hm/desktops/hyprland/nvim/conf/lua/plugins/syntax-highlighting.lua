@@ -5,14 +5,67 @@ return {
 		build = ":TSUpdate",
 		lazy = false, -- Tree-sitter must load immediately at startup
 		config = function()
-			require("nvim-treesitter").setup({
-				ensure_installed = { "nix", "html", "lua", "c", "vim", "vimdoc", "json" },
-				auto_install = true,
-				highlight = {
-					enable = true,
-					additional_vim_regex_highlighting = false,
-				},
+			-- nvim-treesitter's `main` branch: setup() only takes install_dir,
+			-- parsers are installed with install(), and highlighting is started
+			-- per buffer with vim.treesitter.start() (no `highlight`/`auto_install`).
+			local ts = require("nvim-treesitter")
+
+			-- Installed up front (async; a no-op for parsers already present).
+			ts.install({
+				"bash",
+				"c",
+				"css",
+				"dockerfile",
+				"go",
+				"hcl",
+				"helm",
+				"html",
+				"javascript",
+				"json",
+				"lua",
+				"markdown",
+				"markdown_inline",
+				"nix",
+				"python",
+				"qmljs",
+				"rust",
+				"terraform",
+				"toml",
+				"tsx",
+				"typescript",
+				"vim",
+				"vimdoc",
+				"yaml",
 			})
+
+			-- Languages nvim-treesitter can install (looked up once, lazily).
+			local available
+			local function can_install(lang)
+				if not available then
+					available = {}
+					for _, l in ipairs(ts.get_available()) do
+						available[l] = true
+					end
+				end
+				return available[lang] == true
+			end
+
+			-- Highlighting, plus the opt-in parts on `main`: folds for every
+			-- window showing the buffer, and indent where the language has an
+			-- indents query (otherwise Vim's own indent stays).
+			local function start(buf, lang)
+				if not vim.api.nvim_buf_is_valid(buf) or not pcall(vim.treesitter.start, buf, lang) then
+					return
+				end
+				for _, win in ipairs(vim.fn.win_findbuf(buf)) do
+					vim.wo[win][0].foldmethod = "expr"
+					vim.wo[win][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
+				end
+				if vim.treesitter.query.get(lang, "indents") then
+					vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+				end
+			end
+
 			vim.api.nvim_create_autocmd("FileType", {
 				callback = function(args)
 					-- 1. BAIL OUT if the filetype is a known UI, explorer, or terminal plugin
@@ -42,11 +95,23 @@ return {
 						return
 					end
 
-					-- 4. Only start tree-sitter if a valid text parser exists for the language
 					local lang = vim.treesitter.language.get_lang(args.match)
-					if lang and pcall(vim.treesitter.get_parser, args.buf, lang) then
-						-- vim.treesitter.start(args.buf, lang)
-						pcall(vim.treesitter.start, args.buf, lang)
+					if not lang then
+						return
+					end
+
+					-- 4. Parser present: highlight now. Missing but installable:
+					-- install it (replaces the old auto_install), then highlight.
+					if vim.treesitter.language.add(lang) then
+						start(args.buf, lang)
+					elseif can_install(lang) then
+						ts.install(lang):await(function(err)
+							if not err then
+								vim.schedule(function()
+									start(args.buf, lang)
+								end)
+							end
+						end)
 					end
 				end,
 			})

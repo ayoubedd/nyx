@@ -38,6 +38,11 @@ opt.clipboard = "unnamedplus"
 -- Enable break indent
 opt.breakindent = true
 
+-- Tree-sitter folds (set per window in plugins/syntax-highlighting.lua):
+-- files open fully unfolded; zc/zo/za/zM/zR fold on demand.
+opt.foldlevel = 99
+opt.foldlevelstart = 99
+
 -- Save undo history
 opt.undofile = true
 

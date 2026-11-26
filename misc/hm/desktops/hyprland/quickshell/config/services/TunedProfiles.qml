@@ -70,12 +70,10 @@ Singleton {
             readProc.running = true;
     }
 
-    // Poll (to notice switches made elsewhere) only while something shows
-    // the profile: views call watch(true) when they open, watch(false) when
-    // they close.
-    property int watchers: 0
+    // Switches made elsewhere arrive as tuned's profile_changed D-Bus signal
+    // (overlays/Osd.qml calls refresh() on it), so there's no polling. Views
+    // still call watch(true) when they open, to re-read once just in case.
     function watch(on) {
-        watchers = Math.max(0, watchers + (on ? 1 : -1));
         if (on)
             refresh();
     }
@@ -93,13 +91,6 @@ Singleton {
     Timer {
         id: afterAcChange
         interval: 2500
-        onTriggered: root.refresh()
-    }
-
-    Timer {
-        running: root.watchers > 0
-        interval: 5000
-        repeat: true
         onTriggered: root.refresh()
     }
 

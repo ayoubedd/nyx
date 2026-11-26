@@ -4,8 +4,9 @@ import qs.common
 import qs.services
 import qs.components
 
-// Bar volume icon + sound menu.
-//   click         open the menu (output/input devices, per-app volume)
+// Bar volume icon + quick sound menu (output / input device + volume, app
+// volumes). The rest lives in the notification center's Sound view.
+//   click         open the menu
 //   scroll        change output volume
 //   middle click  mute/unmute output
 BarButton {
@@ -51,62 +52,54 @@ BarButton {
             inputCard.expanded = false;
         }
 
-        SoundSection {
-            id: outputCard
-            title: "Output"
-            node: Audio.sink
-            devices: Audio.outputs
-        }
+        // Output and input in one card.
+        Card {
+            spacing: 12
 
-        SoundSection {
-            id: inputCard
-            title: "Input"
-            node: Audio.source
-            devices: Audio.inputs
-            isInput: true
+            SoundSection {
+                id: outputCard
+                node: Audio.sink
+                devices: Audio.outputs
+            }
+
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: Theme.glassBorder
+            }
+
+            SoundSection {
+                id: inputCard
+                // With noise suppression on, the default input is the
+                // filter; this still shows and controls the real mic.
+                node: NoiseSuppression.active ? NoiseSuppression.micNode : Audio.source
+                devices: Audio.inputs
+                isInput: true
+            }
         }
 
         // Apps playing audio (only while there are some).
-        Rectangle {
+        Card {
+            id: appsColumn
             visible: Audio.apps.length > 0
-            width: parent.width
-            implicitHeight: appsColumn.implicitHeight + 24
-            radius: 14
-            color: Theme.surface
 
-            Column {
-                id: appsColumn
-                x: 12
-                y: 12
-                width: parent.width - 24
-                spacing: 10
+            Repeater {
+                model: Audio.apps
 
-                Text {
-                    text: "Apps"
-                    font.family: Theme.font
-                    font.pixelSize: Theme.fontSize - 1
-                    font.weight: Font.DemiBold
-                    color: Theme.foreground
-                }
-
-                Repeater {
-                    model: Audio.apps
-
-                    AppVolume {
-                        required property var modelData
-                        node: modelData
-                        width: appsColumn.width
-                    }
+                AppVolume {
+                    required property var modelData
+                    node: modelData
+                    width: appsColumn.contentWidth
                 }
             }
         }
 
         MenuItem {
             icon: "settings"
-            label: "Sound settings"
+            label: "Sound settings…"
             onClicked: {
                 menu.shown = false;
-                Quickshell.execDetached(["pavucontrol"]);
+                Notifs.openCenterAt("sound");
             }
         }
     }

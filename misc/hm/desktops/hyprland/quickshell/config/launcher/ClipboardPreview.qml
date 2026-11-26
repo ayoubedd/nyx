@@ -31,6 +31,15 @@ Item {
     function load() {
         textDecoder.running = false;
         imageDecoder.running = false;
+        pinReader.running = false;
+        // Pinned entries are plain files (Clipboard.pins), not in cliphist.
+        if (entry?.pinned) {
+            if (entry.isImage)
+                imageFile = entry.file;
+            else
+                pinReader.running = true;
+            return;
+        }
         if (!entry)
             return;
         if (entry.isImage) {
@@ -38,6 +47,14 @@ Item {
             imageDecoder.running = true;
         } else {
             textDecoder.running = true;
+        }
+    }
+
+    Process {
+        id: pinReader
+        command: ["head", "-c", "20000", root.entry?.file ?? "/dev/null"]
+        stdout: StdioCollector {
+            onStreamFinished: root.fullText = text
         }
     }
 

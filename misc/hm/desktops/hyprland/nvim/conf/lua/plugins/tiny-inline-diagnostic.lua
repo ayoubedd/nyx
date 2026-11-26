@@ -13,7 +13,7 @@ return {
 		event = "LspAttach", -- Or `LspAttach`
 		priority = 1000, -- needs to be loaded in first
 		config = function()
-			vim.diagnostic.config({ virtual_text = false })
+			-- (virtual_text = false and the rest: config/lsp.lua)
 			require("tiny-inline-diagnostic").setup({
 				preset = "minimal",
 			})

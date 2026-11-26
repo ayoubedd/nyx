@@ -35,6 +35,34 @@
     };
   };
 
+  # The stylix palette and fonts for quickshell (common/Theme.qml reads this,
+  # live: a rebuild recolours the bar without a restart; the greeter gets the
+  # same file from the store). Hex with "#".
+  xdg.configFile."nyx/theme.json".text = builtins.toJSON (
+    lib.genAttrs (map (n: "base0${n}") [
+      "0"
+      "1"
+      "2"
+      "3"
+      "4"
+      "5"
+      "6"
+      "7"
+      "8"
+      "9"
+      "A"
+      "B"
+      "C"
+      "D"
+      "E"
+      "F"
+    ]) (name: config.lib.stylix.colors.withHashtag.${name})
+    // {
+      fontSans = config.stylix.fonts.sansSerif.name;
+      fontMono = config.stylix.fonts.monospace.name;
+    }
+  );
+
   stylix = {
     enable = true;
     polarity = "dark";
@@ -45,6 +73,8 @@
     targets.neovim.enable = false;
     targets.hyprlock.enable = false;
     targets.hyprland.enable = false;
+    # Off: kitty keeps its own font (JetBrainsMono NF) and colour mapping;
+    # the colours still come from this scheme (terminals/kitty/default.nix).
     targets.kitty.enable = lib.mkForce false;
 
     cursor.name = "volantes_cursors";

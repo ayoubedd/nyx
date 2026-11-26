@@ -241,13 +241,17 @@ Rectangle {
                 Layout.topMargin: 4
                 spacing: 14
 
+                // Prev/next are smaller than play/pause: center them on its
+                // middle (a Row aligns children at the top).
                 MediaButton {
+                    anchors.verticalCenter: parent.verticalCenter
                     icon: "skip_previous"
                     enabled: root.player?.canGoPrevious ?? false
                     onClicked: root.player.previous()
                 }
 
                 MediaButton {
+                    anchors.verticalCenter: parent.verticalCenter
                     icon: root.player?.isPlaying ? "pause" : "play_arrow"
                     primary: true
                     enabled: root.player?.canTogglePlaying ?? false
@@ -255,6 +259,7 @@ Rectangle {
                 }
 
                 MediaButton {
+                    anchors.verticalCenter: parent.verticalCenter
                     icon: "skip_next"
                     enabled: root.player?.canGoNext ?? false
                     onClicked: root.player.next()

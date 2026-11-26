@@ -1,4 +1,7 @@
-{ ... }: {
+{ pkgs, ... }: {
+  # Chrome for the Claude in Chrome extension
+  home.packages = [ pkgs.google-chrome ];
+
   programs.claude-code = {
     enable = true;
     skills = {

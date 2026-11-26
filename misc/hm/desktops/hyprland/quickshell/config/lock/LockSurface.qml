@@ -31,7 +31,7 @@ Item {
         target: root
         property: "opacity"
         to: 1
-        duration: 350
+        duration: Theme.ms(350)
         easing.type: Easing.OutCubic
     }
 
@@ -83,7 +83,7 @@ Item {
 
         Behavior on opacity {
             NumberAnimation {
-                duration: 350
+                duration: Theme.ms(350)
                 easing.type: Easing.OutCubic
             }
         }
@@ -108,7 +108,7 @@ Item {
 
         Behavior on opacity {
             NumberAnimation {
-                duration: 350
+                duration: Theme.ms(350)
             }
         }
     }
@@ -208,7 +208,7 @@ Item {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: 300
+                    duration: Theme.ms(300)
                 }
             }
 
@@ -218,7 +218,7 @@ Item {
 
                 Behavior on y {
                     NumberAnimation {
-                        duration: 350
+                        duration: Theme.ms(350)
                         easing.type: Easing.OutCubic
                     }
                 }
@@ -231,25 +231,25 @@ Item {
                     target: shake
                     property: "x"
                     to: -14
-                    duration: 50
+                    duration: Theme.ms(50)
                 }
                 NumberAnimation {
                     target: shake
                     property: "x"
                     to: 14
-                    duration: 80
+                    duration: Theme.ms(80)
                 }
                 NumberAnimation {
                     target: shake
                     property: "x"
                     to: -8
-                    duration: 70
+                    duration: Theme.ms(70)
                 }
                 NumberAnimation {
                     target: shake
                     property: "x"
                     to: 0
-                    duration: 60
+                    duration: Theme.ms(60)
                 }
             }
 

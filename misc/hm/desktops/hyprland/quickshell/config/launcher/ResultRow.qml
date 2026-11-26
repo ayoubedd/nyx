@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Widgets
 import qs.common
+import qs.services
 
 // One row of the launcher list: a section header, or a result
 //   [icon]  Title  subtitle                        accessory
@@ -80,8 +81,32 @@ MouseArea {
                 font.pixelSize: 20
             }
 
+            // Image thumbnail (clipboard): a pinned file, or a history entry
+            // decoded on demand (Clipboard.requestThumb, once per row).
+            ClippingRectangle {
+                id: thumb
+                readonly property string file: root.item.thumbFile || (root.item.thumbEntry ? Clipboard.thumbs[root.item.thumbEntry.id] ?? "" : "")
+                visible: thumbImage.status === Image.Ready
+                anchors.fill: parent
+                radius: 6
+                color: Theme.surfaceHigh
+
+                Image {
+                    id: thumbImage
+                    anchors.fill: parent
+                    source: thumb.file ? `file://${thumb.file}` : ""
+                    sourceSize: Qt.size(56, 56)
+                    fillMode: Image.PreserveAspectCrop
+                    asynchronous: true
+                    smooth: true
+                }
+
+                Component.onCompleted: if (root.item.thumbEntry)
+                    Clipboard.requestThumb(root.item.thumbEntry)
+            }
+
             Rectangle {
-                visible: !appIcon.visible && !root.item.emoji
+                visible: !appIcon.visible && !root.item.emoji && !thumb.visible
                 anchors.fill: parent
                 radius: 8
                 color: root.item.tint ?? Theme.surfaceHigh

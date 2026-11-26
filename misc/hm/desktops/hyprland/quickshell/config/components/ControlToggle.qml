@@ -3,6 +3,9 @@ import QtQuick.Layouts
 import qs.common
 
 // Round icon toggle with a title and status line (macOS control style).
+//
+// With `hasDetail`, the round icon toggles (iconClicked) and the rest of the
+// tile opens its detail view (clicked), marked by a chevron.
 MouseArea {
     id: root
 
@@ -11,6 +14,8 @@ MouseArea {
     property string subtitle
     property bool checked: false
     property bool large: false
+    property bool hasDetail: false
+    signal iconClicked
 
     width: parent ? parent.width : 0
     implicitHeight: large ? 72 : 36
@@ -18,6 +23,7 @@ MouseArea {
 
     GridLayout {
         anchors.fill: parent
+        anchors.rightMargin: root.hasDetail ? 18 : 0
         columns: root.large ? 1 : 2
         columnSpacing: 10
         rowSpacing: 6
@@ -41,6 +47,14 @@ MouseArea {
                 filled: root.checked
                 size: 17
                 color: root.checked ? Theme.background : Theme.foreground
+            }
+
+            // Detail tiles: the icon is its own on/off button.
+            MouseArea {
+                anchors.fill: parent
+                enabled: root.hasDetail
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.iconClicked()
             }
         }
 
@@ -68,5 +82,14 @@ MouseArea {
                 color: Theme.foregroundDim
             }
         }
+    }
+
+    Icon {
+        visible: root.hasDetail
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        name: "chevron_right"
+        size: 16
+        color: Theme.foregroundDim
     }
 }

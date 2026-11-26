@@ -48,7 +48,10 @@ Singleton {
     onSnapshotChanged: check()
 
     function notify(summary, body, urgency) {
-        Quickshell.execDetached(["busctl", "--user", "call", "org.freedesktop.Notifications", "/org/freedesktop/Notifications", "org.freedesktop.Notifications", "Notify", "susssasa{sv}i", "Bluetooth", "0", "battery-low", summary, body, "0", "1", "urgency", "y", String(urgency), "-1"]);
+        Notifier.send("Bluetooth", summary, body, {
+            icon: "battery-low",
+            urgency: urgency
+        });
     }
 
     function check() {
@@ -62,10 +65,10 @@ Singleton {
                 w = 100;
             if (p <= warnCritical && w > warnCritical) {
                 w = warnCritical;
-                notify(`${name(d)} battery critically low`, `${p}% remaining. Charge it soon.`, 2);
+                notify(`${name(d)} battery critically low`, `${p}% remaining. Charge it soon.`, "critical");
             } else if (p <= warnLow && w > warnLow) {
                 w = warnLow;
-                notify(`${name(d)} battery low`, `${p}% remaining.`, 1);
+                notify(`${name(d)} battery low`, `${p}% remaining.`, "normal");
             }
             next[d.address] = w;
         }

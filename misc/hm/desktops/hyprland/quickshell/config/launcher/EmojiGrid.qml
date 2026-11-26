@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.common
 import qs.services
+import qs.components
 
 // Emoji view: category chips, the grid, and a details strip for the
 // selected emoji. Keyboard navigation lives in Launcher.qml (it moves
@@ -113,7 +114,9 @@ Item {
 
                 Text {
                     anchors.centerIn: parent
-                    text: cellArea.modelData.char
+                    // `?? ""`: while switching views the grid can briefly get
+                    // the other view's rows (no `char`).
+                    text: cellArea.modelData.char ?? ""
                     font.family: "Noto Color Emoji"
                     font.pixelSize: 28
                 }
@@ -165,6 +168,50 @@ Item {
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize - 3
                     color: Theme.foregroundDim
+                }
+            }
+
+            // Default skin tone (remembered), for emoji that have tones.
+            Row {
+                spacing: 4
+
+                Repeater {
+                    model: Emoji.toneSwatches
+
+                    MouseArea {
+                        id: swatch
+                        required property string modelData
+                        required property int index
+                        readonly property bool active: LauncherStore.emojiTone === index
+
+                        width: 20
+                        height: 20
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: LauncherStore.setEmojiTone(index)
+
+                        Rectangle {
+                            anchors.centerIn: parent
+                            width: swatch.active ? 18 : 14
+                            height: width
+                            radius: width / 2
+                            color: swatch.modelData
+                            border.width: swatch.active ? 2 : swatch.containsMouse ? 1 : 0
+                            border.color: Theme.foreground
+
+                            Behavior on width {
+                                NumberAnimation {
+                                    duration: Theme.ms(120)
+                                }
+                            }
+                        }
+
+                        Tooltip {
+                            target: swatch
+                            text: `Skin tone: ${Emoji.toneNames[swatch.index]}`
+                            show: swatch.containsMouse
+                        }
+                    }
                 }
             }
         }

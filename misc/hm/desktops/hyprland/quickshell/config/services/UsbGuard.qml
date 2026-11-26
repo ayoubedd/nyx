@@ -37,8 +37,20 @@ Singleton {
         dismissed = [...dismissed, dev.id];
     }
 
+    // Actions run one at a time, in order: a busy Process ignores a new
+    // command, so a quick second Allow (another device) would be lost.
+    property var actionQueue: []
+
     function run(cmd) {
-        actionProc.command = cmd;
+        actionQueue = [...actionQueue, cmd];
+        nextAction();
+    }
+
+    function nextAction() {
+        if (actionProc.running || actionQueue.length === 0)
+            return;
+        actionProc.command = actionQueue[0];
+        actionQueue = actionQueue.slice(1);
         actionProc.running = true;
     }
 
@@ -201,7 +213,10 @@ Singleton {
 
     Process {
         id: actionProc
-        onExited: root.refresh()
+        onExited: {
+            root.refresh();
+            root.nextAction();
+        }
     }
 
     Component.onCompleted: refresh()

@@ -34,6 +34,16 @@ Singleton {
         return list.find(e => e.char === c) ?? null;
     }
 
+    // Skin tones: 0 = default (yellow), 1-5 = light -> dark. The chosen
+    // default lives in LauncherStore (emojiTone).
+    readonly property var toneNames: ["Default", "Light", "Medium-light", "Medium", "Medium-dark", "Dark"]
+    readonly property var toneSwatches: ["#ffcc4d", "#f7dece", "#f3d2a2", "#d5ab88", "#af7e57", "#7c533e"]
+
+    // The emoji in the given tone, or as-is when it has none.
+    function withTone(e, tone) {
+        return tone > 0 && e?.tones ? e.tones[tone - 1] : e?.char ?? "";
+    }
+
     FileView {
         path: root.dataFile
         printErrors: false
@@ -47,7 +57,8 @@ Singleton {
                             char: e[0],
                             name: e[1],
                             group: e[2],
-                            keywords: e[3]
+                            keywords: e[3],
+                            tones: e[4] ?? null // 5 skin-tone variants, light -> dark
                         }));
                 root.available = true;
             } catch (err) {

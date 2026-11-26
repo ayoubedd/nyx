@@ -14,6 +14,10 @@ import qs.overlays
 import qs.launcher
 
 ShellRoot {
+    // Singletons are created on first use. These run from startup but are
+    // otherwise only touched from menus, so reference them here.
+    readonly property bool bluetoothAutoOff: BluetoothAutoOff.autoOff
+
     Bar {}
     NotificationPopups {}
     ControlCenter {}
@@ -25,5 +29,12 @@ ShellRoot {
     NowPlayingToast {}
     Launcher {}
     PowerSaver {}
+    MuteLeds {}
+    AutoPause {}
+    BrightnessMemory {}
     UsbPrompt {}
+    RegisterPanel {}
+    AltTab {}
+    QrCode {}
+    IdleFade {}
 }

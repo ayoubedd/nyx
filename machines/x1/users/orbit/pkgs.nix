@@ -29,9 +29,7 @@
     killall
     btop
     wget
-    curl
     axel
-    git
     tree
     bat
     eza
@@ -48,7 +46,6 @@
     exiftool
     nettools
     nftables
-    sof-firmware
     dig
     yt-dlp
     devenv

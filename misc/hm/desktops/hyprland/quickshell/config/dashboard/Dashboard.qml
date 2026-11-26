@@ -26,9 +26,11 @@ Dropdown {
             label: "Calendar"
         },
         {
-            icon: "bolt",
-            label: "Power"
+            icon: "timer",
+            label: "Timer" // TimerPage.qml: timer, stopwatch, Pomodoro
         },
+        // (Battery, power profiles and Keep Awake: the bar's battery menu and
+        // the notification center.)
         {
             icon: "monitoring",
             label: "System"
@@ -85,41 +87,36 @@ Dropdown {
 
             DashPage {
                 active: root.isActive(0)
-                HomePage {
-                    anchors.fill: parent
-                    active: root.isActive(0)
+                page: Component {
+                    HomePage {}
                 }
             }
 
             DashPage {
                 active: root.isActive(1)
-                CalendarPage {
-                    anchors.fill: parent
-                    active: root.isActive(1)
+                page: Component {
+                    CalendarPage {}
                 }
             }
 
             DashPage {
                 active: root.isActive(2)
-                PowerPage {
-                    anchors.fill: parent
-                    active: root.isActive(2)
+                page: Component {
+                    TimerPage {}
                 }
             }
 
             DashPage {
                 active: root.isActive(3)
-                SystemPage {
-                    anchors.fill: parent
-                    active: root.isActive(3)
+                page: Component {
+                    SystemPage {}
                 }
             }
 
             DashPage {
                 active: root.isActive(4)
-                WallpaperPage {
-                    anchors.fill: parent
-                    active: root.isActive(4)
+                page: Component {
+                    WallpaperPage {}
                 }
             }
         }

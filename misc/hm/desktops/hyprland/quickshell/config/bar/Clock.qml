@@ -15,7 +15,8 @@ MouseArea {
     cursorShape: Qt.PointingHandCursor
     onClicked: dashboard.toggle()
 
-    // Open the dashboard on a given tab (0 Home, 1 Calendar, 2 Power, 3 System).
+    // Open the dashboard on a given tab (0 Home, 1 Calendar, 2 Timer, 3 System,
+    // 4 Wallpaper).
     function showTab(index) {
         dashboard.current = index;
         if (!dashboard.shown)

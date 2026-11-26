@@ -15,7 +15,13 @@ Singleton {
     // { "<kind>:<key>": { count, last } }   kind = app | cmd | emoji
     property var usage: ({})
     property var pinned: [] // app ids
+    property int emojiTone: 0 // default skin tone, 0 = yellow (Emoji.qml)
     property bool restored: false
+
+    function setEmojiTone(t) {
+        emojiTone = t;
+        saveTimer.restart();
+    }
 
     function record(kind, key) {
         const id = `${kind}:${key}`;
@@ -87,6 +93,7 @@ Singleton {
             const s = JSON.parse(text);
             usage = s.usage ?? {};
             pinned = s.pinned ?? [];
+            emojiTone = s.emojiTone ?? 0;
         } catch (e) {
             console.warn("launcher: unreadable state file", e);
         }
@@ -100,7 +107,8 @@ Singleton {
             store.setText(JSON.stringify({
                 version: 1,
                 usage: root.usage,
-                pinned: root.pinned
+                pinned: root.pinned,
+                emojiTone: root.emojiTone
             }))
     }
 

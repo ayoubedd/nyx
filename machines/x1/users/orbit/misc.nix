@@ -9,7 +9,11 @@
     settings = {
       "*" = {
         compression = true;
-        forwardAgent = true;
+        # Never forward the agent by default: while you're connected, root (or
+        # anyone who compromised) the remote host could use your keys. Enable
+        # it per trusted host with its own block (forwardAgent = true), or for
+        # one session with `ssh -A`.
+        forwardAgent = false;
         SetEnv = {
           TERM = "xterm-256color";
         };

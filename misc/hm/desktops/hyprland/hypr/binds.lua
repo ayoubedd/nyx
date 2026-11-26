@@ -1,6 +1,6 @@
 require("globals")
 
-hl.bind(mod .. " + SHIFT + C", exec_cmd("hyprpicker | wl-copy"), { repeating = true })
+hl.bind(mod .. " + SHIFT + C", exec_cmd("hyprpicker | wl-copy"))
 
 hl.bind(mod .. " + " .. left, hl.dsp.focus({ direction = "left" }))
 hl.bind(mod .. " + " .. right, hl.dsp.focus({ direction = "right" }))
@@ -19,12 +19,19 @@ hl.bind(mod .. " + ALT + l", exec_cmd("loginctl lock-session")) -- -> hypridle l
 hl.bind(mod .. " + ALT + s", hl.dsp.exec_cmd("systemctl suspend"))
 
 -- Launcher (quickshell launcher/Launcher.qml).
-hl.bind(mod .. " + d", hl.dsp.exec_cmd("qs -c nyx ipc call launcher toggle"))
-hl.bind(mod .. " + p", hl.dsp.exec_cmd("qs -c nyx ipc call launcher clipboard"))
-hl.bind(mod .. " + w", hl.dsp.exec_cmd("qs -c nyx ipc call launcher windows"))
-hl.bind(mod .. " + e", hl.dsp.exec_cmd("qs -c nyx ipc call launcher emoji"))
+-- Shell binds use nyx() (globals.lua): quickshell GlobalShortcuts, no process
+-- spawned per press. `qs -c nyx ipc call ...` still works from scripts.
+hl.bind(mod .. " + d", nyx("launcher"))
+hl.bind(mod .. " + p", nyx("launcher-clipboard"))
+hl.bind(mod .. " + w", nyx("launcher-windows"))
+hl.bind(mod .. " + e", nyx("launcher-emoji"))
+-- Vim-style clipboard registers (quickshell overlays/RegisterPanel.qml):
+-- Super+' opens the panel (a-z put, Shift+a-z store, 1-9 recent);
+-- Super+Shift+' opens it ready to store the current clipboard.
+hl.bind(mod .. " + apostrophe", nyx("registers"))
+hl.bind(mod .. " + SHIFT + apostrophe", nyx("registers-store"))
 -- Bar sound menu (outputs, inputs, per-app volume).
-hl.bind(mod .. " + s", hl.dsp.exec_cmd("qs -c nyx ipc call bar toggle sound"))
+hl.bind(mod .. " + s", nyx("sound-menu"))
 
 for i = 1, 10 do
 	 local magic_workspaces = { "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" }
@@ -46,13 +53,22 @@ hl.bind(mod .. " + SHIFT + F", exec_cmd("" .. file_manager))
 
 hl.bind("ALT + R", hl.dsp.submap("resize"))
 hl.bind("ALT + M", hl.dsp.submap("move"))
--- Screenshot overlay (quickshell Screenshot.qml); falls back to slurp+grim if
--- quickshell isn't running.
-hl.bind("ALT + S", exec_cmd("qs -c nyx ipc call screenshot open || " .. snaparea))
-hl.bind("Print", exec_cmd("qs -c nyx ipc call screenshot open || " .. snaparea))
+-- Screenshot overlay (quickshell Screenshot.qml). Shift+Print is a plain
+-- slurp+grim fallback for when quickshell isn't running.
+hl.bind("ALT + S", nyx("screenshot"))
+hl.bind("Print", nyx("screenshot"))
+hl.bind("SHIFT + Print", exec_cmd(snaparea))
 
 -- Workspace overview with live window previews (quickshell Overview.qml).
-hl.bind(mod .. " + Tab", exec_cmd("qs -c nyx ipc call overview toggle"))
+hl.bind(mod .. " + Tab", nyx("overview"))
+
+-- Alt+Tab window switcher (quickshell overlays/AltTab.qml): hold Alt, tap
+-- Tab / Shift+Tab, release Alt to switch. The release bind is a backup for
+-- the overlay's own key-release handling; non_consuming so Alt still reaches
+-- apps, and a no-op when the switcher isn't open.
+hl.bind("ALT + Tab", nyx("alttab-next"))
+hl.bind("ALT + SHIFT + Tab", nyx("alttab-prev"))
+hl.bind("ALT + Alt_L", nyx("alttab-commit"), { release = true, non_consuming = true })
 hl.bind("ALT + N", hl.dsp.submap("notifications"))
 
 hl.define_submap("resize", function()
@@ -74,9 +90,9 @@ hl.define_submap("move", function()
 end)
 
 hl.define_submap("notifications", "reset", function()
-	hl.bind("c", exec_cmd("qs -c nyx ipc call notifications clear"))
-	hl.bind("t", exec_cmd("qs -c nyx ipc call notifications toggle"))
-	hl.bind("d", exec_cmd("qs -c nyx ipc call notifications toggleDnd"))
+	hl.bind("c", nyx("notifications-clear"))
+	hl.bind("t", nyx("notifications-toggle"))
+	hl.bind("d", nyx("notifications-dnd"))
 	hl.bind("escape", hl.dsp.submap("reset"))
 end)
 
@@ -91,12 +107,9 @@ hl.bind(
 	exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
 	{ locked = true, repeating = true }
 )
-hl.bind("XF86AudioMute", exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true })
-hl.bind(
-	"XF86AudioMicMute",
-	exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
-	{ locked = true, repeating = true }
-)
+-- Toggles: no `repeating`, or holding the key flips mute on and off.
+hl.bind("XF86AudioMute", exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
+hl.bind("XF86AudioMicMute", exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
 -- Linear 5% steps of the full range (no -e exponent curve), so steps are even
 -- and match the percentage shown by the OSD / control center slider.
 -- -n5 is a raw floor (brightnessctl ignores "%" there): ~1% of the x1's 504 max,

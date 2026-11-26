@@ -31,7 +31,9 @@
 
   boot.kernelParams = [
     "nowatchdog"
-    "kernel.nmi_watchdog=0"
+    # NMI watchdog off from the start of boot (sysctl.nix also sets
+    # kernel.nmi_watchdog = 0 once userspace is up).
+    "nmi_watchdog=0"
   ];
 
   boot.initrd.availableKernelModules = [
@@ -82,7 +84,7 @@
     };
 
     measuredBoot = {
-      enable = false;
+      enable = true;
       pcrs = [
         # --- Platform/Firmware Integrity (Highly Static) ---
         0 # Motherboard BIOS/UEFI firmware executable code

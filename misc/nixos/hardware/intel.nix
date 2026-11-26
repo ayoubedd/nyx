@@ -12,8 +12,6 @@
       "i915.enable_dc=4"
       "module_blacklist=xe"
     ];
-
-    blacklistedKernelModules = [ "xe" ];
   };
 
   services.xserver.videoDrivers = [ "modesetting" ];

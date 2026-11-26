@@ -1,46 +1,46 @@
 {
   config,
-  lib,
   pkgs,
   ...
 }:
 let
-  # Text clipboard watcher: `cliphist store` behind a filter that keeps
-  # passwords out of the history.
-  #
-  # - Password managers that mark copies as secret (x-kde-passwordManagerHint,
-  #   e.g. KeePassXC): wl-paste sets CLIPBOARD_STATE=sensitive and cliphist
-  #   already skips those.
-  # - Bitwarden's browser extension can't set that hint (Firefox/LibreWolf
-  #   don't support it), so its copies look like any other text. Skip text
-  #   that is shaped like a generated password / API key: a single 12-128
-  #   character token, no whitespace, not a URL or path, with at least 3 of
-  #   lowercase, uppercase, digits and symbols. Such copies still paste
-  #   normally; they just aren't kept in the history.
-  cliphistStore = pkgs.writeShellScript "cliphist-store-filtered" ''
-    if [ "''${CLIPBOARD_STATE:-data}" = data ]; then
-      tmp=$(mktemp) || exit 1
-      trap 'rm -f "$tmp"' EXIT
-      cat > "$tmp"
-      size=$(wc -c < "$tmp")
-      if [ "$size" -ge 12 ] && [ "$size" -le 130 ] && [ "$(wc -l < "$tmp")" -le 1 ]; then
-        s=$(cat "$tmp")
-        case "$s" in
-          *[[:space:]]* | *://* | /* | '~/'* | ./*) ;;
-          *)
-            classes=0
-            case "$s" in *[a-z]*) classes=$((classes + 1)) ;; esac
-            case "$s" in *[A-Z]*) classes=$((classes + 1)) ;; esac
-            case "$s" in *[0-9]*) classes=$((classes + 1)) ;; esac
-            case "$s" in *[!a-zA-Z0-9]*) classes=$((classes + 1)) ;; esac
-            [ "$classes" -ge 3 ] && exit 0
-            ;;
-        esac
-      fi
-      exec ${lib.getExe pkgs.cliphist} ${lib.escapeShellArgs config.services.cliphist.extraOptions} store < "$tmp"
-    fi
-    # sensitive / clear: cliphist handles these (skip / delete the last entry).
-    exec ${lib.getExe pkgs.cliphist} ${lib.escapeShellArgs config.services.cliphist.extraOptions} store
+  # Mic noise suppression (services/NoiseSuppression.qml): an RNNoise
+  # PipeWire filter reading the given mic and offering a virtual source,
+  # "Noise-suppressed mic" (node nyx_rnnoise_source). It lives exactly as
+  # long as this process (the module is loaded into pw-cli), so quickshell
+  # starts/stops it with the sound menu switch. The capture side is passive:
+  # the real mic only opens while an app records from the virtual one.
+  #   nyx-noise-suppression <mic node.name>
+  nyxNoiseSuppression = pkgs.writeShellScriptBin "nyx-noise-suppression" ''
+    [ -n "''${1:-}" ] || { echo "usage: nyx-noise-suppression <mic node.name>" >&2; exit 2; }
+    exec ${pkgs.pipewire}/bin/pw-cli -m load-module libpipewire-module-filter-chain "{
+      node.description = \"Noise-suppressed mic\"
+      media.name = \"Noise-suppressed mic\"
+      filter.graph = {
+        nodes = [ {
+          type = ladspa
+          name = rnnoise
+          plugin = \"${pkgs.rnnoise-plugin}/lib/ladspa/librnnoise_ladspa.so\"
+          label = noise_suppressor_mono
+          control = {
+            \"VAD Threshold (%)\" = 50.0
+            \"VAD Grace Period (ms)\" = 200
+            \"Retroactive VAD Grace (ms)\" = 0
+          }
+        } ]
+      }
+      capture.props = {
+        node.name = \"capture.nyx_rnnoise\"
+        node.passive = true
+        audio.rate = 48000
+        target.object = \"$1\"
+      }
+      playback.props = {
+        node.name = \"nyx_rnnoise_source\"
+        media.class = Audio/Source
+        audio.rate = 48000
+      }
+    }"
   '';
 
   # Symlink the config straight to the repo checkout (not the nix store) so
@@ -95,10 +95,16 @@ in
     enable = true;
     allowImages = true;
   };
-  # Text watcher through the password filter above (images keep the stock
-  # `wl-paste --type image --watch cliphist store` service).
-  systemd.user.services.cliphist.Service.ExecStart =
-    lib.mkForce "${pkgs.wl-clipboard}/bin/wl-paste --watch ${cliphistStore}";
+  # Clipboard history in RAM only: cliphist's database lives in the runtime
+  # dir (tmpfs, cleared at logout/shutdown; no swap here), never on disk.
+  # cliphist reads CLIPHIST_<FLAG> env vars, so every user of it needs this:
+  # the two watchers, quickshell (launcher, register panel) and shells.
+  # (%t = $XDG_RUNTIME_DIR in systemd units.) Registers live there too
+  # (services/Registers.qml).
+  systemd.user.services.cliphist.Service.Environment = [ "CLIPHIST_DB_PATH=%t/cliphist.db" ];
+  systemd.user.services.cliphist-images.Service.Environment = [ "CLIPHIST_DB_PATH=%t/cliphist.db" ];
+  systemd.user.services.quickshell.Service.Environment = [ "CLIPHIST_DB_PATH=%t/cliphist.db" ];
+  home.sessionVariables.CLIPHIST_DB_PATH = "$XDG_RUNTIME_DIR/cliphist.db";
   home.packages = [
     pkgs.cliphist
     pkgs.wtype
@@ -108,6 +114,18 @@ in
     # Screen recording (services/Recorder.qml) and its "Open" notification.
     pkgs.wf-recorder
     pkgs.libnotify
+    nyxNoiseSuppression
+    # Screenshot tool "Text" (OCR) and "QR" (scan) actions, and the QR code
+    # panel (overlays/QrCode.qml).
+    (pkgs.tesseract.override {
+      enableLanguages = [
+        "eng"
+        "fra"
+        "ara"
+      ];
+    })
+    pkgs.zbar
+    pkgs.qrencode
   ];
   xdg.dataFile."nyx/emoji.json".source =
     pkgs.runCommand "nyx-emoji.json" { nativeBuildInputs = [ pkgs.python3 ]; } ''

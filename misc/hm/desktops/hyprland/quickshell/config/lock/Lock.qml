@@ -16,7 +16,17 @@ Scope {
     id: root
 
     readonly property string flag: `${Quickshell.env("XDG_RUNTIME_DIR")}/nyx-locked`
-    readonly property bool locked: sessionLock.locked
+    // Not a binding on sessionLock.locked: Quickshell 0.3.2's WlSessionLock
+    // never emits lockStateChanged on unlock (session_lock.cpp, unlock() only
+    // emits `if (isLocked())`, which is already false by then), so a binding
+    // stays stuck at true after the first unlock. Re-read it explicitly
+    // instead (reading the property calls its getter, which is accurate).
+    property bool locked: false
+    onLockedChanged: Ui.locked = locked
+
+    function syncLocked() {
+        locked = sessionLock.locked;
+    }
 
     function lock() {
         if (sessionLock.locked)
@@ -25,6 +35,7 @@ Scope {
         Notifs.centerOpen = false;
         lockContext.reset();
         sessionLock.locked = true;
+        syncLocked();
         lockContext.startFingerprint();
         Quickshell.execDetached(["touch", flag]);
     }
@@ -32,11 +43,16 @@ Scope {
     function unlock() {
         lockContext.stopFingerprint();
         sessionLock.locked = false;
+        syncLocked();
         Quickshell.execDetached(["rm", "-f", flag]);
     }
 
     WlSessionLock {
         id: sessionLock
+
+        // Fires when the compositor confirms the lock or ends it (also an
+        // unlock not started by us), unlike lockStateChanged.
+        onSecureChanged: root.syncLocked()
 
         // One surface per monitor.
         WlSessionLockSurface {

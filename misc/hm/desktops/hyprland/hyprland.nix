@@ -13,6 +13,33 @@ let
   qs = "${config.programs.quickshell.package}/bin/qs";
   dpmsOn = "${hyprctl} dispatch 'hl.dsp.dpms({ action = \"enable\" })'";
   dpmsOff = "${hyprctl} dispatch 'hl.dsp.dpms({ action = \"disable\" })'";
+
+  # Keyboard backlight level kept across idle-off and suspend. The firmware
+  # resets it on resume (and brightnessctl -s/-r's single save slot got
+  # overwritten when an idle-off and a suspend overlapped), so one saved
+  # level in $XDG_RUNTIME_DIR: `off` / `save` record it unless already
+  # recorded, `restore` puts it back and forgets it.
+  kbdBacklight = pkgs.writeShellScript "nyx-kbd-backlight" ''
+    kbd=tpacpi::kbd_backlight
+    state="''${XDG_RUNTIME_DIR:-/tmp}/nyx-kbd-level"
+    case "$1" in
+      off)
+        [ -e "$state" ] || ${brightnessctl} -d "$kbd" get > "$state"
+        ${brightnessctl} -qd "$kbd" set 0
+        ;;
+      save)
+        [ -e "$state" ] || ${brightnessctl} -d "$kbd" get > "$state"
+        ;;
+      restore)
+        # After a resume the firmware applies its own level a moment later.
+        [ "$2" = after-sleep ] && sleep 1
+        if [ -e "$state" ]; then
+          ${brightnessctl} -qd "$kbd" set "$(cat "$state")"
+          rm -f "$state"
+        fi
+        ;;
+    esac
+  '';
 in
 {
   wayland.windowManager.hyprland = {
@@ -32,11 +59,13 @@ in
       general = {
         # Quickshell lock screen; falls back to hyprlock if quickshell isn't running.
         lock_cmd = "${qs} -c nyx ipc call lock lock || ${pidof} hyprlock || ${hyprlock}";
-        before_sleep_cmd = "${loginctl} lock-session"; # lock before suspend.
+        # Remember the keyboard backlight, then lock before suspend.
+        before_sleep_cmd = "${kbdBacklight} save; ${loginctl} lock-session";
         # Hyprland 0.55+ takes Lua for `dispatch` (the old `dispatch dpms on`
         # fails), and invalid dpms actions are silently ignored, so keep these
         # exactly "enable" / "disable".
-        after_sleep_cmd = "${dpmsOn}"; # to avoid having to press a key twice to turn on the display.
+        # Display on (avoids pressing a key twice), keyboard backlight back.
+        after_sleep_cmd = "${dpmsOn}; ${kbdBacklight} restore after-sleep";
       };
 
       listener = [
@@ -47,12 +76,20 @@ in
         }
         {
           timeout = 150; # 2.5min.
-          on-timeout = "${brightnessctl} -sd tpacpi::kbd_backlight set 00"; # turn off keyboard backlight.
-          on-resume = "${brightnessctl} -rd tpacpi::kbd_backlight"; # turn on keyboard backlight.
+          on-timeout = "${kbdBacklight} off"; # keyboard backlight off (level remembered).
+          on-resume = "${kbdBacklight} restore"; # and back.
+        }
+        {
+          # Gentle fade to black over the last 15 s before locking
+          # (quickshell overlays/IdleFade.qml); any input cancels it.
+          timeout = 285;
+          on-timeout = "${qs} -c nyx ipc call idlefade start 15";
+          on-resume = "${qs} -c nyx ipc call idlefade cancel";
         }
         {
           timeout = 300; # 5min
           on-timeout = "${loginctl} lock-session"; # lock screen when timeout has passed
+          on-resume = "${qs} -c nyx ipc call idlefade cancel"; # (also after unlocking)
         }
         {
           timeout = 330; # 5.5min
@@ -69,19 +106,11 @@ in
 
   services.hyprsunset = {
     enable = true;
+    # No profiles: the schedule (sunset/sunrise or custom times) is run by
+    # quickshell (quickshell/config/services/NightLight.qml), which drives
+    # hyprsunset through `hyprctl hyprsunset`.
     settings = {
       max-gamma = 150;
-
-      profile = [
-        {
-          time = "7:30";
-          identity = true;
-        }
-        {
-          time = "21:00";
-          temperature = 4000;
-        }
-      ];
     };
   };
 
